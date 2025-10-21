@@ -1,4 +1,4 @@
-package com.backend.sigclc.Model.UsuariosModel;
+package com.backend.sigclc.Model.Usuarios;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
