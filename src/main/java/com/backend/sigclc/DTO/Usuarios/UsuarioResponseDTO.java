@@ -15,6 +15,6 @@ public class UsuarioResponseDTO {
     private String ocupacion;
     private String correoElectronico;
     private String telefono;
-    private RolUsuario rolUsuario;
+    private RolUsuario rol;
 }
 

@@ -22,7 +22,7 @@ public class UsuariosModel {
     private String ocupacion;
     private String correoElectronico;
     private String telefono;
-    private RolUsuario rolUsuario;
+    private RolUsuario rol;
 
     @JsonProperty("id")
     public String getIdAsString(){

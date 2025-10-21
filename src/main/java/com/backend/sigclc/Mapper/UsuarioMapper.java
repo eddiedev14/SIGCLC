@@ -17,10 +17,11 @@ public class UsuarioMapper {
     public UsuariosModel toModel(UsuarioCreateDTO dto) {
         UsuariosModel model = new UsuariosModel();
         model.setNombreCompleto(dto.getNombreCompleto());
+        model.setEdad(dto.getEdad());
         model.setOcupacion(dto.getOcupacion());
         model.setCorreoElectronico(dto.getCorreoElectronico());
         model.setTelefono(dto.getTelefono());
-        model.setRolUsuario(dto.getRolUsuario());
+        model.setRol(dto.getRol());
         return model;
     }
 
@@ -35,7 +36,7 @@ public class UsuarioMapper {
         dto.setOcupacion(model.getOcupacion());
         dto.setCorreoElectronico(model.getCorreoElectronico());
         dto.setTelefono(model.getTelefono());
-        dto.setRolUsuario(model.getRolUsuario());
+        dto.setRol(model.getRol());
         return dto;
     }
 

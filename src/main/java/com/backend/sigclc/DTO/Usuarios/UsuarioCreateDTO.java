@@ -14,7 +14,7 @@ public class UsuarioCreateDTO {
     private String ocupacion;
     private String correoElectronico;
     private String telefono;
-    private RolUsuario rolUsuario;
+    private RolUsuario rol;
 }
 
 
