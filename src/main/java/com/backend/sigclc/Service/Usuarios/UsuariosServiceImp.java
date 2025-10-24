@@ -37,26 +37,33 @@ public class UsuariosServiceImp implements IUsuariosService {
     }
 
     @Override
-    public UsuariosModel buscarUsuariosPorId(ObjectId id) {
-        return usuariosRepository.findById(id)
+    public UsuarioResponseDTO buscarUsuariosPorId(ObjectId id) {
+        UsuariosModel usuario = usuariosRepository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException(
                 "Error! No existe un usuario con id: " + id + " o está mal escrito."));
-    }
+
+        // Aquí usamos el mapper en lugar del método manual
+        return usuarioMapper.toResponseDTO(usuario);
+}
+
 
     @Override
-    public UsuariosModel actualizarUsuario(ObjectId id, UsuarioUpdateDTO dto) {
+    public UsuarioResponseDTO actualizarUsuario(ObjectId id, UsuarioUpdateDTO dto) {
+        // Buscar el usuario existente
         UsuariosModel existente = usuariosRepository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el usuario con id: " + id));
 
-        // Solo actualizamos los campos no nulos del DTO
-        if (dto.getNombreCompleto() != null) existente.setNombreCompleto(dto.getNombreCompleto());
-        if (dto.getEdad() != null) existente.setEdad(dto.getEdad());
-        if (dto.getOcupacion() != null) existente.setOcupacion(dto.getOcupacion());
-        if (dto.getCorreoElectronico() != null) existente.setCorreoElectronico(dto.getCorreoElectronico());
-        if (dto.getTelefono() != null) existente.setTelefono(dto.getTelefono());
+        // Usamos el mapper para actualizar solo los campos no nulos
+        usuarioMapper.updateModelFromDTO(dto, existente);
 
-        return usuariosRepository.save(existente);
+        // Guardamos el usuario actualizado
+        UsuariosModel actualizado = usuariosRepository.save(existente);
+
+        // Convertimos a DTO de respuesta y lo devolvemos
+        return usuarioMapper.toResponseDTO(actualizado);
     }
+
+
 
     @Override
     public String eliminarUsuario(ObjectId id) {

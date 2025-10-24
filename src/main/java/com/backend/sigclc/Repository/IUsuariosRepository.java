@@ -13,18 +13,14 @@ import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 @Repository
 public interface IUsuariosRepository extends MongoRepository<UsuariosModel, ObjectId> {
 
-    /**
-     * 🔍 Buscar usuario por correo electrónico usando aggregation
-     */
+    // Buscar usuario por correo electrónico usando aggregation
     @Aggregation(pipeline = {
         "{ $match: { correoElectronico: ?0 } }",
         "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rolUsuario: 1 } }"
     })
     Optional<UsuariosModel> findByCorreoElectronicoAgg(String correoElectronico);
 
-    /**
-     * 🧩 Buscar usuarios por rol usando aggregation
-     */
+    // Buscar usuarios por rol usando aggregation
     @Aggregation(pipeline = {
         "{ $match: { rolUsuario: ?0 } }",
         "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rolUsuario: 1 } }",

@@ -6,12 +6,11 @@ import org.bson.types.ObjectId;
 import com.backend.sigclc.DTO.Usuarios.UsuarioCreateDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioResponseDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioUpdateDTO;
-import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 
 public interface IUsuariosService {
-    public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO empleado);
+    public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario);
     public List<UsuarioResponseDTO> listarUsuarios();
-    public UsuariosModel buscarUsuariosPorId(ObjectId id);
-    public UsuariosModel actualizarUsuario(ObjectId id, UsuarioUpdateDTO usuario);
+    public UsuarioResponseDTO  buscarUsuariosPorId(ObjectId id);
+    public UsuarioResponseDTO  actualizarUsuario(ObjectId id, UsuarioUpdateDTO usuario);
     public String eliminarUsuario(ObjectId id);
 }
