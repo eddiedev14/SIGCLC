@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LibroResponseDTO {
+    private String id;
     private String titulo;
     private String genero;
     private Integer anioPublicacion;
