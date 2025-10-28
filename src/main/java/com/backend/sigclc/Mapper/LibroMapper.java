@@ -32,7 +32,7 @@ public class LibroMapper {
         return dto;
     }
 
-    public List<LibroResponseDTO> toResponseDTO(List<LibrosModel> models) {
+    public List<LibroResponseDTO> toResponseDTOList(List<LibrosModel> models) {
         return models.stream()
                 .map(this::toResponseDTO)
                 .toList();
@@ -41,5 +41,9 @@ public class LibroMapper {
     public void updateModelFromDTO(LibroUpdateDTO dto, LibrosModel model) {
         if (dto.getTitulo() != null) model.setTitulo(dto.getTitulo());
         if (dto.getAutor() != null) model.setAutor(dto.getAutor());
+        if (dto.getGenero() != null) model.setGenero(dto.getGenero());
+        if (dto.getAnioPublicacion() != null) model.setAnioPublicacion(dto.getAnioPublicacion());
+        if (dto.getSinopsis() != null) model.setSinopsis(dto.getSinopsis());
+        if (dto.getPortadaPath() != null) model.setPortadaPath(dto.getPortadaPath());
     }
 }
