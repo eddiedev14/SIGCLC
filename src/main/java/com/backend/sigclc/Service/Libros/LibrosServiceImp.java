@@ -100,15 +100,8 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public LibroResponseDTO actualizarLibro(String id, LibroUpdateDTO dto) {
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del libro proporcionado no es válido");
-        }
-
-        LibrosModel libro = librosRepository.findById(objectId)
+    public LibroResponseDTO actualizarLibro(ObjectId id, LibroUpdateDTO dto) {
+        LibrosModel libro = librosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No se pudo encontrar el libro con el ID especificado"
                 ));
@@ -159,15 +152,8 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public String eliminarLibro(String id) {
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del libro proporcionado no es válido");
-        }
-
-        LibrosModel libro = librosRepository.findById(objectId)
+    public String eliminarLibro(ObjectId id) {
+        LibrosModel libro = librosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No se pudo encontrar el libro con el ID especificado"
                 ));
@@ -188,7 +174,7 @@ public class LibrosServiceImp implements ILibrosService {
                 }
             }
 
-            librosRepository.deleteById(objectId);
+            librosRepository.deleteById(id);
             return "Libro eliminado correctamente.";
 
         } catch (IOException e) {
