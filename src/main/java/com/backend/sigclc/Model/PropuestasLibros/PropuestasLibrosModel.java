@@ -24,7 +24,7 @@ public class PropuestasLibrosModel {
     private UsuarioProponenteModel usuarioProponente;
     private Date fechaPropuesta;
     private EstadoPropuesta estadoPropuesta;
-    private List<VotosModel> votos;
+    private List<VotoModel> votos;
     private PeriodoSeleccionModel periodoSeleccion;
     
     @JsonProperty("id")
