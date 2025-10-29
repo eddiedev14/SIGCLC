@@ -21,7 +21,7 @@ public class LibrosModel {
     private ObjectId id;
     private String titulo;
     private List<String> autores;
-    private String genero;
+    private GeneroLibro genero;
     private Integer anioPublicacion;
     private String sinopsis;
     private String portadaPath;

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -26,9 +28,8 @@ public class LibroCreateDTO {
     @Size(min = 1, message =  "El libro debe de tener almenos un autor")
     private List<@Size(min = 1, max = 100, message = "El autor debe tener entre {min} y {max} caracteres") String> autores;
 
-    @NotBlank(message = "El genero es obligatorio")
-    @Size(min = 1, max = 100, message = "El genero debe tener entre {min} y {max} caracteres")
-    private String genero;
+    @NotNull(message = "El genero es obligatorio")
+    private GeneroLibro genero;
 
     @NotNull(message = "El año de publicación es obligatorio")
     @Min(value = 1450, message = "El año de publicación debe ser posterior a la invención de la imprenta (1450)")
