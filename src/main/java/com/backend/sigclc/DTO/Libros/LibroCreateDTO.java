@@ -3,6 +3,8 @@ package com.backend.sigclc.DTO.Libros;
 import java.time.Year;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -36,8 +38,7 @@ public class LibroCreateDTO {
     @Size(min = 1, max = 1000, message = "La sinopsis debe tener entre {min} y {max} caracteres")
     private String sinopsis;
 
-    @Size(max = 300, message = "La ubicación del archivo tener menos de {max} caracteres")
-    private String portadaPath;
+    private MultipartFile imagen;
 
     @NotBlank(message = "El usuario que registra es obligatorio")
     private String registrado_por;

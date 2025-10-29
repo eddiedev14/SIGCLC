@@ -3,6 +3,8 @@ package com.backend.sigclc.DTO.Libros;
 import java.time.Year;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -31,6 +33,8 @@ public class LibroUpdateDTO {
 
     @Size(max = 300, message = "La ubicación del archivo tener menos de {max} caracteres")
     private String portadaPath;
+
+    private MultipartFile imagen;
 
     @AssertTrue(message = "El año de publicación no puede ser del futuro")
     public boolean isAnioValid(){

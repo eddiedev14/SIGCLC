@@ -19,11 +19,10 @@ public class LibroMapper {
         model.setGenero(dto.getGenero());
         model.setAnioPublicacion(dto.getAnioPublicacion());
         model.setSinopsis(dto.getSinopsis());
-        model.setPortadaPath(dto.getPortadaPath());
 
         if (dto.getRegistrado_por() != null && !dto.getRegistrado_por().isBlank()) {
-        model.setRegistrado_por(new ObjectId(dto.getRegistrado_por()));
-    }
+            model.setRegistrado_por(new ObjectId(dto.getRegistrado_por()));
+        }
         return model;
     }
 
@@ -45,13 +44,16 @@ public class LibroMapper {
                 .map(this::toResponseDTO)
                 .toList();
     }
-    
+
     public void updateModelFromDTO(LibroUpdateDTO dto, LibrosModel model) {
         if (dto.getTitulo() != null) model.setTitulo(dto.getTitulo());
         if (dto.getAutores() != null) model.setAutores(dto.getAutores());
         if (dto.getGenero() != null) model.setGenero(dto.getGenero());
         if (dto.getAnioPublicacion() != null) model.setAnioPublicacion(dto.getAnioPublicacion());
         if (dto.getSinopsis() != null) model.setSinopsis(dto.getSinopsis());
-        if (dto.getPortadaPath() != null) model.setPortadaPath(dto.getPortadaPath());
+
+        if (dto.getPortadaPath() != null && !dto.getPortadaPath().isBlank()) {
+            model.setPortadaPath(dto.getPortadaPath());
+        }
     }
 }
