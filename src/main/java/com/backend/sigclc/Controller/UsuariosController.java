@@ -24,7 +24,7 @@ import com.backend.sigclc.Service.Usuarios.IUsuariosService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/SIGCLC/backend") // endpoint base
+@RequestMapping("/SIGCLC/backend/usuarios") // endpoint base
 @CrossOrigin(origins = "*") // permite peticiones desde Postman o frontend
 public class UsuariosController {
 
