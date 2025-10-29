@@ -36,6 +36,11 @@ public class LibrosServiceImp implements ILibrosService {
     @Override
     public LibroResponseDTO guardarLibro(LibroCreateDTO dto) {
         try {
+            if (dto.getRegistrado_por() == null || !ObjectId.isValid(dto.getRegistrado_por())) {
+                throw new IllegalArgumentException("El registrador posee un Id inválido");
+            }
+            ObjectId registrador = new ObjectId(dto.getRegistrado_por());
+
             // Se asegura que la carpeta exista
             if (!Files.exists(rootFolder)) {
                 Files.createDirectories(rootFolder);
@@ -64,6 +69,7 @@ public class LibrosServiceImp implements ILibrosService {
 
             // Crea el modelo del libro a partir del dto
             LibrosModel libro = libroMapper.toModel(dto);
+            libro.setRegistrado_por(registrador);
 
             // en caso de que si se haya subido la imagen se establece el portadaPath
             if (nombreArchivo != null) {
