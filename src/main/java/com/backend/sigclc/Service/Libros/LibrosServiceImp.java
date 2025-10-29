@@ -193,6 +193,17 @@ public class LibrosServiceImp implements ILibrosService {
         }
     }
 
+    @Override
+    public List<LibroResponseDTO> listarPorGenero(String genero) {
+        List<LibrosModel> libros = librosRepository.buscarPorGenero(genero);
+        return libroMapper.toResponseDTOList(libros);
+    }
+
+    @Override
+    public List<LibroResponseDTO> listarPorAutor(String autor) {
+        List<LibrosModel> libros = librosRepository.buscarPorAutor(autor);
+        return libroMapper.toResponseDTOList(libros);
+    }
     
 
 }

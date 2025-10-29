@@ -42,6 +42,16 @@ public class LibrosController {
         return new ResponseEntity<>(librosService.listarLibros(), HttpStatus.OK);
     }
 
+    @GetMapping("/listar-por-genero/{genero}")
+    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable String genero) {
+        return new ResponseEntity<>(librosService.listarPorGenero(genero), HttpStatus.OK);
+    }
+
+    @GetMapping("/listar-por-autor/{autor}")
+    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorAutor(@PathVariable String autor) {
+        return new ResponseEntity<>(librosService.listarPorAutor(autor), HttpStatus.OK);
+    }
+
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LibroResponseDTO> actualizarLibro(
             @PathVariable String id,
