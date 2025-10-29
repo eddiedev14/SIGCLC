@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
@@ -13,6 +14,7 @@ import com.backend.sigclc.Mapper.LibroMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 
+@Service
 public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
