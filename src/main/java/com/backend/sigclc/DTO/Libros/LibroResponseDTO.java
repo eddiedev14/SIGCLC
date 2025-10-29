@@ -1,6 +1,8 @@
 package com.backend.sigclc.DTO.Libros;
 
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class LibroResponseDTO {
     private String id;
     private String titulo;
-    private String autor;
+    private List<String> autores;
     private String genero;
     private Integer anioPublicacion;
     private String sinopsis;

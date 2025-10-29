@@ -1,5 +1,7 @@
 package com.backend.sigclc.Model.Libros;
 
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,7 +20,7 @@ public class LibrosModel {
     @Id
     private ObjectId id;
     private String titulo;
-    private String autor;
+    private List<String> autores;
     private String genero;
     private Integer anioPublicacion;
     private String sinopsis;

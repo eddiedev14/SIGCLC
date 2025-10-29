@@ -1,6 +1,7 @@
 package com.backend.sigclc.DTO.Libros;
 
 import java.time.Year;
+import java.util.List;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -20,9 +21,8 @@ public class LibroCreateDTO {
     @Size(min = 1, max = 100, message = "El titulo debe tener entre {min} y {max} caracteres")
     private String titulo;
 
-    @NotBlank(message = "El autor es obligatorio")
-    @Size(min = 1, max = 100, message = "El autor debe tener entre {min} y {max} caracteres")
-    private String autor;
+    @Size(min = 1, message =  "El libro debe de tener almenos un autor")
+    private List<@Size(min = 1, max = 100, message = "El autor debe tener entre {min} y {max} caracteres") String> autores;
 
     @NotBlank(message = "El genero es obligatorio")
     @Size(min = 1, max = 100, message = "El genero debe tener entre {min} y {max} caracteres")
