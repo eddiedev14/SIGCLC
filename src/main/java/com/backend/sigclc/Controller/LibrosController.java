@@ -2,6 +2,7 @@ package com.backend.sigclc.Controller;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,7 +55,7 @@ public class LibrosController {
 
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LibroResponseDTO> actualizarLibro(
-            @PathVariable String id,
+            @PathVariable ObjectId id,
             @Valid @ModelAttribute LibroUpdateDTO libro) {
 
         LibroResponseDTO actualizado = librosService.actualizarLibro(id, libro);
@@ -62,7 +63,7 @@ public class LibrosController {
     }
     
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> eliminarLibro(@PathVariable String id) {
+    public ResponseEntity<String> eliminarLibro(@PathVariable ObjectId id) {
         return new ResponseEntity<>(librosService.eliminarLibro(id), HttpStatus.OK);
     }
 }

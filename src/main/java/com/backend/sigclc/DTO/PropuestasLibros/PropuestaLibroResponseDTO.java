@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PropuestaLibroResponseDTO {
     private String id;
-    private LibroPropuestoDTO libroPropuesto;
-    private UsuarioProponenteDTO usuarioProponente;
+    private LibroPropuestoResponseDTO libroPropuesto;
+    private UsuarioProponenteResponseDTO usuarioProponente;
     private Date fechaPropuesta;
     private EstadoPropuesta estadoPropuesta;
-    private List<VotoDTO> votos;
+    private List<VotoResponseDTO> votos;
     private PeriodoSeleccionDTO periodoSeleccion;
 }

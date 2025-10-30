@@ -15,4 +15,8 @@ public class VotoModel {
     private ObjectId usuarioId;
     private String nombreCompleto;
     private Date fechaVoto;
+
+    public String getUsuarioIdAsString(){
+        return usuarioId.toHexString();
+    }
 }

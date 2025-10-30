@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class UsuarioProponenteModel {
     private ObjectId usuarioId;
     private String nombreCompleto;
+
+    public String getUsuarioIdAsString(){
+        return usuarioId.toHexString();
+    }
 }

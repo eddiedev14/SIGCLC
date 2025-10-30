@@ -29,10 +29,10 @@ public class LibroPropuestoDTO {
     @NotNull(message = "El genero es obligatorio")
     private GeneroLibro genero;
 
-    @NotNull(message = "La fecha de propuesta es obligatoria")
+    //Es opcional
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date fechaPropuesta;
+    private Date fechaSeleccion;
 
-    @NotNull(message = "El estado de lectura es obligatorio")
+    //Es opcional
     private EstadoLectura estadoLectura;
 }

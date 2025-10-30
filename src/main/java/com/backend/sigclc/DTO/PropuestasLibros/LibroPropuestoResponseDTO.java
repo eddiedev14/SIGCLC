@@ -1,26 +1,21 @@
-package com.backend.sigclc.Model.PropuestasLibros;
+package com.backend.sigclc.DTO.PropuestasLibros;
 
 import java.util.Date;
 
-import org.bson.types.ObjectId;
-
 import com.backend.sigclc.Model.Libros.GeneroLibro;
+import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class LibroPropuestoModel {
-    private ObjectId libroId;
+@NoArgsConstructor
+public class LibroPropuestoResponseDTO {
+    private String libroId;
     private String titulo;
     private GeneroLibro genero;
     private Date fechaSeleccion;
     private EstadoLectura estadoLectura;
-
-    public String getLibroPropuestoIdAsString(){
-        return libroId.toHexString();
-    }
 }
