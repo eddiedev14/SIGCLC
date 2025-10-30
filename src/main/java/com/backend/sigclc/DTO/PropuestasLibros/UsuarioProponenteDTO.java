@@ -15,7 +15,4 @@ import lombok.NoArgsConstructor;
 public class UsuarioProponenteDTO {
     @NotNull(message = "El id del usuario es obligatorio")
     private ObjectId usuarioId;
-
-    @NotBlank(message = "El nombre completo es obligatorio")
-    private String nombreCompleto;
 }

@@ -43,8 +43,6 @@ public class PropuestaLibroMapper {
     public LibroPropuestoModel toLibroPropuestoModel(LibroPropuestoDTO dto) {
         LibroPropuestoModel model = new LibroPropuestoModel();
         model.setLibroId(dto.getLibroId());
-        model.setTitulo(dto.getTitulo());
-        model.setGenero(dto.getGenero());
         model.setFechaSeleccion(dto.getFechaSeleccion());
         model.setEstadoLectura(dto.getEstadoLectura());
         return model;
@@ -54,7 +52,6 @@ public class PropuestaLibroMapper {
     public UsuarioProponenteModel toUsuarioProponenteModel(UsuarioProponenteDTO dto) {
         UsuarioProponenteModel model = new UsuarioProponenteModel();
         model.setUsuarioId(dto.getUsuarioId());
-        model.setNombreCompleto(dto.getNombreCompleto());
         return model;
     }
 
@@ -70,7 +67,6 @@ public class PropuestaLibroMapper {
     public VotoModel toVotoModel(VotoDTO dto) {
         VotoModel model = new VotoModel();
         model.setUsuarioId(dto.getUsuarioId());
-        model.setNombreCompleto(dto.getNombreCompleto());
         model.setFechaVoto(dto.getFechaVoto());
         return model;
     }
@@ -110,7 +106,7 @@ public class PropuestaLibroMapper {
         LibroPropuestoResponseDTO dto = new LibroPropuestoResponseDTO();
         dto.setLibroId(model.getLibroPropuestoIdAsString());
         dto.setTitulo(model.getTitulo());
-        dto.setGenero(model.getGenero());
+        dto.setGeneros(model.getGeneros());
         dto.setFechaSeleccion(model.getFechaSeleccion());
         dto.setEstadoLectura(model.getEstadoLectura());
         return dto;

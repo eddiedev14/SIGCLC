@@ -1,6 +1,7 @@
 package com.backend.sigclc.Model.PropuestasLibros;
 
 import java.util.Date;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class LibroPropuestoModel {
     private ObjectId libroId;
     private String titulo;
-    private GeneroLibro genero;
+    private List<GeneroLibro> generos;
     private Date fechaSeleccion;
     private EstadoLectura estadoLectura;
 

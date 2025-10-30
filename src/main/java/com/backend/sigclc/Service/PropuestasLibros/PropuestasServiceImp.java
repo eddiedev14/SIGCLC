@@ -1,5 +1,6 @@
 package com.backend.sigclc.Service.PropuestasLibros;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -8,11 +9,16 @@ import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
+import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.PropuestaLibroMapper;
+import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
+import com.backend.sigclc.Model.PropuestasLibros.VotoModel;
+import com.backend.sigclc.Model.Usuarios.UsuariosModel;
+import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
-
+import com.backend.sigclc.Repository.IUsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +30,12 @@ public class PropuestasServiceImp implements IPropuestasService {
     @Autowired 
     private PropuestaLibroMapper propuestaLibrosMapper;
 
+    @Autowired
+    private ILibrosRepository librosRepository;
+
+    @Autowired
+    private IUsuariosRepository usuariosRepository;
+    
     @Override
     public PropuestaLibroResponseDTO guardarPropuesta(PropuestaLibroCreateDTO propuesta) {
         //* Validaciones del DTO
@@ -66,7 +78,36 @@ public class PropuestasServiceImp implements IPropuestasService {
         }
         
         PropuestasLibrosModel model = propuestaLibrosMapper.toModel(propuesta);
-        propuestasLibrosRepository.save(model);
+
+        //* Añadir campos automáticamente a libroPropuesto con base al libro */
+        ObjectId libroId = propuesta.getLibroPropuesto().getLibroId();
+        LibrosModel libro = librosRepository.findById(libroId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un libro con id: " + libroId + " o está mal escrito."));
+        
+        model.getLibroPropuesto().setTitulo(libro.getTitulo());
+        model.getLibroPropuesto().setGeneros(libro.getGeneros());
+
+        //* Añadir campos automáticamente a usuarioProponente con base al usuario */
+        ObjectId usuarioId = propuesta.getUsuarioProponente().getUsuarioId();
+        UsuariosModel usuario = usuariosRepository.findById(usuarioId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
+
+        model.getUsuarioProponente().setNombreCompleto(usuario.getNombreCompleto());
+
+        //* Añadir campos automáticamente a votos con base al voto */
+        List<VotoModel> votos = new ArrayList<>();
+        for (VotoDTO voto : propuesta.getVotos()) {
+            ObjectId votoUsuarioId = voto.getUsuarioId();
+            UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
+            votos.add(new VotoModel(votoUsuarioId, usuarioVoto.getNombreCompleto(), voto.getFechaVoto()));
+        }
+
+        model.setVotos(votos);
+
         return propuestaLibrosMapper.toResponseDTO(model);
     }
 

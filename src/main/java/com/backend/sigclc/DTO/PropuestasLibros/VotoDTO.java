@@ -17,9 +17,6 @@ public class VotoDTO {
     @NotNull(message = "El usuario es obligatorio")
     private ObjectId usuarioId;
 
-    @NotNull(message = "El nombre completo es obligatorio")
-    private String nombreCompleto;
-
     @NotNull(message = "La fecha del voto es obligatoria")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaVoto;
