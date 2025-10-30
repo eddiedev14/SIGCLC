@@ -19,14 +19,20 @@ import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.LibroMapper;
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
+import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
 public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private ILibrosRepository librosRepository;
+
+    @Autowired
+    private IUsuariosRepository usuarioRepository;
 
     @Autowired
     private LibroMapper libroMapper;
@@ -36,11 +42,6 @@ public class LibrosServiceImp implements ILibrosService {
     @Override
     public LibroResponseDTO guardarLibro(LibroCreateDTO dto) {
         try {
-            if (dto.getRegistrado_por() == null || !ObjectId.isValid(dto.getRegistrado_por())) {
-                throw new IllegalArgumentException("El registrador posee un Id inválido");
-            }
-            ObjectId registrador = new ObjectId(dto.getRegistrado_por());
-
             // Se asegura que la carpeta exista
             if (!Files.exists(rootFolder)) {
                 Files.createDirectories(rootFolder);
@@ -69,8 +70,15 @@ public class LibrosServiceImp implements ILibrosService {
 
             // Crea el modelo del libro a partir del dto
             LibrosModel libro = libroMapper.toModel(dto);
-            libro.setRegistrado_por(registrador);
 
+            //* Añadir nombre completo del creador automáticamente */
+            ObjectId usuarioId = dto.getCreador().getUsuarioId();
+            UsuariosModel usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
+            
+            libro.getCreador().setNombreCompleto(usuario.getNombreCompleto());
+            
             // en caso de que si se haya subido la imagen se establece el portadaPath
             if (nombreArchivo != null) {
                 libro.setPortadaPath("uploads/portadas/" + nombreArchivo);
@@ -92,7 +100,7 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public LibroResponseDTO buscarLibrosPorId(ObjectId id) {
+    public LibroResponseDTO buscarLibroPorId(ObjectId id) {
         LibrosModel libro = librosRepository.findById(id)
         .orElseThrow(() -> new RecursoNoEncontradoException(
             "Error! No existe un libro con id: " + id + " o está mal escrito."));
@@ -186,13 +194,15 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public List<LibroResponseDTO> listarPorGenero(String genero) {
+    public List<LibroResponseDTO> listarPorGenero(GeneroLibro genero) {
         List<LibrosModel> libros = librosRepository.buscarPorGenero(genero);
         return libroMapper.toResponseDTOList(libros);
     }
 
     @Override
     public List<LibroResponseDTO> listarPorAutor(String autor) {
+        // Quitar guiones del nombre del autor
+        autor = autor.replace("-", " ");
         List<LibrosModel> libros = librosRepository.buscarPorAutor(autor);
         return libroMapper.toResponseDTOList(libros);
     }

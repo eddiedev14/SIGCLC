@@ -16,9 +16,9 @@ public class LibroResponseDTO {
     private String id;
     private String titulo;
     private List<String> autores;
-    private GeneroLibro genero;
+    private List<GeneroLibro> generos;
     private Integer anioPublicacion;
     private String sinopsis;
     private String portadaPath;
-    private String registrado_por;
+    private CreadorResponseDTO creador;
 }

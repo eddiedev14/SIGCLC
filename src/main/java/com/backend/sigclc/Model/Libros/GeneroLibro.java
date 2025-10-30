@@ -3,7 +3,7 @@ package com.backend.sigclc.Model.Libros;
 public enum GeneroLibro {
     // Ficción
     ficcion,
-    novelas,
+    novela,
     ciencia_ficcion,
     fantasia,
     distopia,

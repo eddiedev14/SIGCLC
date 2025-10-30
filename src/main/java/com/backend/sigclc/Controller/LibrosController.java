@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Service.Libros.ILibrosService;
 
 import jakarta.validation.Valid;
@@ -43,8 +44,13 @@ public class LibrosController {
         return new ResponseEntity<>(librosService.listarLibros(), HttpStatus.OK);
     }
 
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<LibroResponseDTO> buscarLibroPorId(@PathVariable ObjectId id) {
+        return ResponseEntity.ok(librosService.buscarLibroPorId(id));
+    }
+    
     @GetMapping("/listar-por-genero/{genero}")
-    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable String genero) {
+    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable GeneroLibro genero) {
         return new ResponseEntity<>(librosService.listarPorGenero(genero), HttpStatus.OK);
     }
 

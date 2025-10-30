@@ -21,18 +21,14 @@ public class LibrosModel {
     private ObjectId id;
     private String titulo;
     private List<String> autores;
-    private GeneroLibro genero;
+    private List<GeneroLibro> generos;
     private Integer anioPublicacion;
     private String sinopsis;
     private String portadaPath;
-    private ObjectId registrado_por;
+    private CreadorModel creador;
     
     @JsonProperty("id")
     public String getIdAString(){
         return id != null ? id.toHexString():null;
-    }
-
-    public String getResgiradoPorAsString(){
-        return registrado_por != null ? registrado_por.toHexString():null;
     }
 }

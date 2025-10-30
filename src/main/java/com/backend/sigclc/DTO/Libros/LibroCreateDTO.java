@@ -28,8 +28,8 @@ public class LibroCreateDTO {
     @Size(min = 1, message =  "El libro debe de tener almenos un autor")
     private List<@Size(min = 1, max = 100, message = "El autor debe tener entre {min} y {max} caracteres") String> autores;
 
-    @NotNull(message = "El genero es obligatorio")
-    private GeneroLibro genero;
+    @NotNull(message = "El libro debe tener al menos un género")
+    private List<GeneroLibro> generos;
 
     @NotNull(message = "El año de publicación es obligatorio")
     @Min(value = 1450, message = "El año de publicación debe ser posterior a la invención de la imprenta (1450)")
@@ -41,8 +41,8 @@ public class LibroCreateDTO {
 
     private MultipartFile imagen;
 
-    @NotBlank(message = "El usuario que registra es obligatorio")
-    private String registrado_por;
+    @NotNull(message = "El usuario que registra es obligatorio")
+    private CreadorDTO creador;
 
     @AssertTrue(message = "El año de publicación no puede ser del futuro")
     public boolean isAnioValid(){
