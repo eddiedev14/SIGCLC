@@ -183,14 +183,34 @@ public class PropuestasServiceImp implements IPropuestasService {
 
     @Override
     public List<PropuestaLibroResponseDTO> listarPropuestas() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listarPropuestas'");
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.findAll();
+        return propuestaLibrosMapper.toResponseDTOList(propuestas);
     }
 
     @Override
     public PropuestaLibroResponseDTO buscarPropuesta(ObjectId id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'buscarPropuesta'");
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+        return propuestaLibrosMapper.toResponseDTO(propuesta);
+    }
+
+    @Override
+    public List<PropuestaLibroResponseDTO> listarPropuestasPorEstado(EstadoPropuesta estado) {
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorEstado(estado);
+        return propuestaLibrosMapper.toResponseDTOList(propuestas);
+    }
+
+    @Override
+    public List<PropuestaLibroResponseDTO> listarPropuestasPorUsuario(ObjectId usuarioId) {
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorUsuario(usuarioId);
+        return propuestaLibrosMapper.toResponseDTOList(propuestas);
+    }
+
+    @Override
+    public List<PropuestaLibroResponseDTO> listarPropuestasPorLibro(ObjectId libroId) {
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorLibro(libroId);
+        return propuestaLibrosMapper.toResponseDTOList(propuestas);
     }
 
     @Override

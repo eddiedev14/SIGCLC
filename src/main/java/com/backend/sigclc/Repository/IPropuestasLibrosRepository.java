@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 
@@ -37,5 +38,17 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     @Query(value = "{ 'libroPropuesto.libroId': ?0, 'estadoPropuesta': 'en_votacion' }", exists = true)
     boolean tienePropuestasEnVotacion(ObjectId libroId);
     
-    //* Agregaciones a futuro */
+    //* Agregaciones */
+
+    // Buscar propuestas por estado
+    @Query("{ 'estadoPropuesta': ?0 }")
+    List<PropuestasLibrosModel> buscarPropuestasPorEstado(EstadoPropuesta estado);
+
+    // Buscar propuestas por usuario
+    @Query("{ 'usuarioProponente.usuarioId': ?0 }")
+    List<PropuestasLibrosModel> buscarPropuestasPorUsuario(ObjectId usuarioId);
+
+    // Buscar propuestas por libro
+    @Query("{ 'libroPropuesto.libroId': ?0 }")
+    List<PropuestasLibrosModel> buscarPropuestasPorLibro(ObjectId libroId);
 }
