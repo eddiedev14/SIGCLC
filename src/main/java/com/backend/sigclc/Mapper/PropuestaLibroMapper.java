@@ -73,6 +73,7 @@ public class PropuestaLibroMapper {
 
     // Convierte PeriodoSeleccionDTO a PeriodoSeleccionModel
     public PeriodoSeleccionModel toPeriodoSeleccionModel(PeriodoSeleccionDTO dto) {
+        if (dto == null) return null; 
         PeriodoSeleccionModel model = new PeriodoSeleccionModel();
         model.setFechaInicio(dto.getFechaInicio());
         model.setFechaFin(dto.getFechaFin());
@@ -138,6 +139,7 @@ public class PropuestaLibroMapper {
 
     // Convierte PeriodoSeleccionModel a PeriodoSeleccionDTO
     public PeriodoSeleccionDTO toPeriodoSeleccionDTO(PeriodoSeleccionModel model) {
+        if (model == null) return null;
         PeriodoSeleccionDTO dto = new PeriodoSeleccionDTO();
         dto.setFechaInicio(model.getFechaInicio());
         dto.setFechaFin(model.getFechaFin());

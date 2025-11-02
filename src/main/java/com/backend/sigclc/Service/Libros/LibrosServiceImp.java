@@ -23,6 +23,7 @@ import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
+import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
@@ -30,6 +31,9 @@ public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private ILibrosRepository librosRepository;
+
+    @Autowired
+    private IPropuestasLibrosRepository propuestasLibrosRepository;
 
     @Autowired
     private IUsuariosRepository usuarioRepository;
@@ -151,12 +155,34 @@ public class LibrosServiceImp implements ILibrosService {
                 libro.setPortadaPath("uploads/portadas/" + nuevoArchivo);
             }
 
+            // Actualizar libro
             librosRepository.save(libro);
+
+            // Propagar cambio de nombre en caso de que haya sido modificado a otras colecciones
+            if (dto.getTitulo() != null) {
+                sincronizarTituloLibro(id, dto.getTitulo());
+            }
+
+            // Propagar cambio de generos en caso de que haya sido modificado a otras colecciones
+            if (dto.getGeneros() != null) {
+                sincronizarGenerosLibro(id, dto.getGeneros());
+            }
+
             return libroMapper.toResponseDTO(libro);
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al procesar la solicitud", e);
         }
+    }
+
+    @Override
+    public void sincronizarTituloLibro(ObjectId id, String tituloLibro) {
+        propuestasLibrosRepository.actualizarTituloLibroPropuesto(id, tituloLibro);
+    }   
+
+    @Override
+    public void sincronizarGenerosLibro(ObjectId id, List<GeneroLibro> generosLibro) {
+        propuestasLibrosRepository.actualizarGenerosLibroPropuesto(id, generosLibro);
     }
 
     @Override
@@ -180,6 +206,13 @@ public class LibrosServiceImp implements ILibrosService {
                 } else {
                     System.out.println("No se encontró la imagen");
                 }
+            }
+
+            // * Un libro solo puede ser eliminado si no está asociado a ninguna otra colección
+            boolean tienePropuestasEnVotacion = propuestasLibrosRepository.tienePropuestasEnVotacion(id);
+
+            if (tienePropuestasEnVotacion) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene propuestas en votación o está asociado a otros registros");
             }
 
             librosRepository.deleteById(id);

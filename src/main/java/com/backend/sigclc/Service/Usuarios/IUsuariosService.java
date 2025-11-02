@@ -12,5 +12,6 @@ public interface IUsuariosService {
     public List<UsuarioResponseDTO> listarUsuarios();
     public UsuarioResponseDTO  buscarUsuariosPorId(ObjectId id);
     public UsuarioResponseDTO  actualizarUsuario(ObjectId id, UsuarioUpdateDTO usuario);
+    public void sincronizarNombreUsuario(ObjectId id, String nombreCompleto);
     public String eliminarUsuario(ObjectId id);
 }

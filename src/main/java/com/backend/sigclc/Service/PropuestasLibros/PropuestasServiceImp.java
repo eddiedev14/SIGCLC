@@ -2,6 +2,8 @@ package com.backend.sigclc.Service.PropuestasLibros;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 
@@ -62,6 +64,19 @@ public class PropuestasServiceImp implements IPropuestasService {
             }
         }   
 
+        // Un usuario que ya votó no puede votar otra vez
+        if (propuesta.getVotos() != null) {
+            // Crear un set (Estructura de datos que no permite duplicados)
+            Set<ObjectId> usuariosVotantes = new HashSet<>();
+            for (VotoDTO voto : propuesta.getVotos()) {
+                ObjectId usuarioId = voto.getUsuarioId();
+                // Si ocurre un error al agregar un usuarioId al set, significa que ya existe
+                if (!usuariosVotantes.add(usuarioId)) {
+                    throw new IllegalArgumentException("Un usuario no puede votar más de una vez en la misma propuesta");
+                }
+            }
+        }
+
         // Si el estadoLectura es no seleccionada o en_votacion, entonces fechaSeleccion y estadoLectura debe ser nulo
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada && (propuesta.getLibroPropuesto().getFechaSeleccion() != null || propuesta.getLibroPropuesto().getEstadoLectura() != null)) {
             throw new IllegalArgumentException("La fechaSeleccion y estadoLectura deben ser nulos cuando la propuesta no está en estado 'SELECCIONADA'");
@@ -107,6 +122,9 @@ public class PropuestasServiceImp implements IPropuestasService {
         }
 
         model.setVotos(votos);
+
+        // Guardar propuesta
+        propuestasLibrosRepository.save(model);
 
         return propuestaLibrosMapper.toResponseDTO(model);
     }

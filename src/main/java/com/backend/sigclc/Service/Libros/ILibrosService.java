@@ -14,6 +14,8 @@ public interface ILibrosService {
     public List<LibroResponseDTO> listarLibros();
     public LibroResponseDTO buscarLibroPorId(ObjectId id);
     public LibroResponseDTO actualizarLibro(ObjectId id, LibroUpdateDTO libro);
+    public void sincronizarTituloLibro(ObjectId id, String tituloLibro);
+    public void sincronizarGenerosLibro(ObjectId id, List<GeneroLibro> generosLibro);
     public String eliminarLibro(ObjectId id);
     public List<LibroResponseDTO> listarPorGenero(GeneroLibro genero);
     public List<LibroResponseDTO> listarPorAutor(String autor);

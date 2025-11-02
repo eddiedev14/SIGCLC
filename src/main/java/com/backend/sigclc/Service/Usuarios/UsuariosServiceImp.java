@@ -12,6 +12,8 @@ import com.backend.sigclc.DTO.Usuarios.UsuarioUpdateDTO;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.UsuarioMapper;
+import com.backend.sigclc.Repository.ILibrosRepository;
+import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
@@ -19,6 +21,12 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired 
     private IUsuariosRepository usuariosRepository;
+
+    @Autowired 
+    private ILibrosRepository librosRepository;
+
+    @Autowired 
+    private IPropuestasLibrosRepository propuestasLibrosRepository;
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
@@ -59,11 +67,21 @@ public class UsuariosServiceImp implements IUsuariosService {
         // Guardamos el usuario actualizado
         UsuariosModel actualizado = usuariosRepository.save(existente);
 
+        // Propagar cambio de nombre en caso de que haya sido modificado a otras colecciones
+        if (dto.getNombreCompleto() != null) {
+            sincronizarNombreUsuario(id, dto.getNombreCompleto());
+        }
+
         // Convertimos a DTO de respuesta y lo devolvemos
         return usuarioMapper.toResponseDTO(actualizado);
     }
 
-
+    @Override
+    public void sincronizarNombreUsuario(ObjectId usuarioId, String nombreCompleto) {
+        librosRepository.actualizarNombreCreador(usuarioId, nombreCompleto);
+        propuestasLibrosRepository.actualizarNombreUsuarioProponente(usuarioId, nombreCompleto);
+        propuestasLibrosRepository.actualizarNombreUsuarioVoto(usuarioId, nombreCompleto);
+    }
 
     @Override
     public String eliminarUsuario(ObjectId id) {
