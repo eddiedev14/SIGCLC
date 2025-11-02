@@ -58,6 +58,7 @@ public class PropuestaLibroMapper {
     // Convierte VotoDTO a VotosModel
     public List<VotoModel> toVotosModelList(List<VotoDTO> dtos) {
         List<VotoModel> votos = new ArrayList<>();
+        if (dtos == null) return votos;
         for (VotoDTO dto : dtos) {
             votos.add(toVotoModel(dto));
         }
@@ -97,6 +98,7 @@ public class PropuestaLibroMapper {
 
     // Convierte List<PropuestasLibrosModel> a List<PropuestaLibroResponseDTO>
     public List<PropuestaLibroResponseDTO> toResponseDTOList(List<PropuestasLibrosModel> models) {
+        if (models == null) return new ArrayList<>();
         return models.stream()
                 .map(this::toResponseDTO)
                 .toList();
@@ -132,6 +134,7 @@ public class PropuestaLibroMapper {
 
     // Convierte List<VotosModel> a List<VotoResponseDTO>
     public List<VotoResponseDTO> toVotosResponseDTOList(List<VotoModel> models) {
+        if (models == null) return new ArrayList<>();
         return models.stream()
                 .map(this::toVotoResponseDTO)
                 .toList();

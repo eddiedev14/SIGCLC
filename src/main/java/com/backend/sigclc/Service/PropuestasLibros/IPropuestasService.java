@@ -11,8 +11,9 @@ import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
 
 public interface IPropuestasService {
     public PropuestaLibroResponseDTO guardarPropuesta(PropuestaLibroCreateDTO propuesta);
-    public PropuestaLibroResponseDTO agregarVoto(ObjectId id, VotoDTO voto);
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId id, VotoDTO voto);
     public List<PropuestaLibroResponseDTO> listarPropuestas();
+    public PropuestaLibroResponseDTO buscarPropuesta(ObjectId id);
     public PropuestaLibroResponseDTO actualizarPropuesta(ObjectId id, PropuestaLibroUpdateDTO propuesta);
     public String eliminarPropuesta(ObjectId id);
 }

@@ -53,14 +53,16 @@ public class PropuestasServiceImp implements IPropuestasService {
         }
 
         // Si el estadoLectura es seleccionada, entonces debe de tener al menos un voto
-        if (propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && propuesta.getVotos() == null || propuesta.getVotos().isEmpty()) {
+        if (propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && (propuesta.getVotos() == null || propuesta.getVotos().isEmpty())) {
             throw new IllegalArgumentException("Debe incluirse al menos un voto cuando la propuesta está en estado 'SELECCIONADA'");
         }
 
         // No pueden haber votos con una fecha anterior a la fecha de propuesta
-        for (VotoDTO voto : propuesta.getVotos()) {
-            if (voto.getFechaVoto().before(propuesta.getFechaPropuesta())) {
-                throw new IllegalArgumentException("No pueden haber votos con una fecha anterior a la fecha de propuesta");
+        if (propuesta.getVotos() != null) {
+            for (VotoDTO voto : propuesta.getVotos()) {
+                if (voto.getFechaVoto().before(propuesta.getFechaPropuesta())) {
+                    throw new IllegalArgumentException("No pueden haber votos con una fecha anterior a la fecha de propuesta");
+                }
             }
         }   
 
@@ -113,12 +115,14 @@ public class PropuestasServiceImp implements IPropuestasService {
 
         //* Añadir campos automáticamente a votos con base al voto */
         List<VotoModel> votos = new ArrayList<>();
-        for (VotoDTO voto : propuesta.getVotos()) {
-            ObjectId votoUsuarioId = voto.getUsuarioId();
-            UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
-            votos.add(new VotoModel(votoUsuarioId, usuarioVoto.getNombreCompleto(), voto.getFechaVoto()));
+        if (propuesta.getVotos() != null) {
+            for (VotoDTO voto : propuesta.getVotos()) {
+                ObjectId votoUsuarioId = voto.getUsuarioId();
+                UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
+                votos.add(new VotoModel(votoUsuarioId, usuarioVoto.getNombreCompleto(), voto.getFechaVoto()));
+            }
         }
 
         model.setVotos(votos);
@@ -130,15 +134,63 @@ public class PropuestasServiceImp implements IPropuestasService {
     }
 
     @Override
-    public PropuestaLibroResponseDTO agregarVoto(ObjectId id, VotoDTO voto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'agregarVoto'");
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId id, VotoDTO voto) {
+        // Obtener la propuesta
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+
+        // Solo se puede votar si el estado_propuesta es en_votacion
+        if (propuesta.getEstadoPropuesta() != EstadoPropuesta.en_votacion) {
+            throw new IllegalArgumentException("Solo se puede votar si el estado de la propuesta es en_votacion");
+        }
+
+        // Validar que el usuario no haya votado previamente
+        if (propuesta.getVotos() != null) {
+            for (VotoModel votoModel : propuesta.getVotos()) {
+                if (votoModel.getUsuarioId().equals(voto.getUsuarioId())) {
+                    throw new IllegalArgumentException("El usuario ya ha votado previamente");
+                }
+            }
+        }
+
+        // Validar que la fecha del voto sea mayor a la fecha de propuesta
+        if (voto.getFechaVoto().before(propuesta.getFechaPropuesta())) {
+            throw new IllegalArgumentException("La fecha del voto debe ser mayor a la fecha de propuesta");
+        }
+
+        // Agregar voto
+        VotoModel votoModel = propuestaLibrosMapper.toVotoModel(voto);
+
+        //* Añadir campos automáticamente a votos con base al usuario */
+        ObjectId votoUsuarioId = voto.getUsuarioId();
+        UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
+        votoModel.setNombreCompleto(usuarioVoto.getNombreCompleto());
+
+        // Agregar voto
+        if (propuesta.getVotos() == null) {
+            propuesta.setVotos(new ArrayList<>());
+        }
+        propuesta.getVotos().add(votoModel);
+
+        // Guardar propuesta
+        propuestasLibrosRepository.save(propuesta);
+
+        return propuestaLibrosMapper.toResponseDTO(propuesta);
     }
 
     @Override
     public List<PropuestaLibroResponseDTO> listarPropuestas() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'listarPropuestas'");
+    }
+
+    @Override
+    public PropuestaLibroResponseDTO buscarPropuesta(ObjectId id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'buscarPropuesta'");
     }
 
     @Override
