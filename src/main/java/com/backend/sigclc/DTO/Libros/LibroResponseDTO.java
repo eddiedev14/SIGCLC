@@ -3,6 +3,7 @@ package com.backend.sigclc.DTO.Libros;
 
 import java.util.List;
 
+import com.backend.sigclc.DTO.Libros.Creador.CreadorResponseDTO;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 
 import lombok.AllArgsConstructor;

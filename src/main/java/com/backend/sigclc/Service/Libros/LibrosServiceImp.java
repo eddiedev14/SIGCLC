@@ -76,7 +76,7 @@ public class LibrosServiceImp implements ILibrosService {
             LibrosModel libro = libroMapper.toModel(dto);
 
             //* Añadir nombre completo del creador automáticamente */
-            ObjectId usuarioId = dto.getCreador().getUsuarioId();
+            ObjectId usuarioId = libro.getCreador().getUsuarioId();
             UsuariosModel usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                     "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));

@@ -3,13 +3,13 @@ package com.backend.sigclc.Mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
-import com.backend.sigclc.DTO.Libros.CreadorDTO;
-import com.backend.sigclc.DTO.Libros.CreadorResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
+import com.backend.sigclc.DTO.Libros.Creador.CreadorResponseDTO;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Libros.CreadorModel;
@@ -24,7 +24,7 @@ public class LibroMapper {
         model.setGeneros(toGenerosModelList(dto.getGeneros()));
         model.setAnioPublicacion(dto.getAnioPublicacion());
         model.setSinopsis(dto.getSinopsis());
-        model.setCreador(toCreadorModel(dto.getCreador()));
+        model.setCreador(toCreadorModel(dto.getCreadorId()));
         return model;
     }
 
@@ -36,9 +36,9 @@ public class LibroMapper {
         return generosModel;
     }
 
-    public CreadorModel toCreadorModel(CreadorDTO dto) {
+    public CreadorModel toCreadorModel(ObjectId creadorId) {
         CreadorModel model = new CreadorModel();
-        model.setUsuarioId(dto.getUsuarioId());
+        model.setUsuarioId(creadorId);
         return model;
     }
 

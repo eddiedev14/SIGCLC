@@ -1,9 +1,8 @@
-package com.backend.sigclc.DTO.PropuestasLibros;
+package com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto;
 
 import java.util.Date;
 
 import org.bson.types.ObjectId;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 
@@ -16,14 +15,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LibroPropuestoDTO {
+public class LibroPropuestoUpdateDTO {
     @NotNull(message = "El id del libro es obligatorio")
     private ObjectId libroId;
 
-    //Es opcional
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    // Campos opcionales
     private Date fechaSeleccion;
-
-    //Es opcional
     private EstadoLectura estadoLectura;
 }

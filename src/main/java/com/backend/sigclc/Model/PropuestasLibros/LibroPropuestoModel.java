@@ -18,8 +18,12 @@ public class LibroPropuestoModel {
     private ObjectId libroId;
     private String titulo;
     private List<GeneroLibro> generos;
-    private Date fechaSeleccion;
-    private EstadoLectura estadoLectura;
+
+    // Por defecto se crea sin fecha de seleccion
+    private Date fechaSeleccion = null;
+
+    // Por defecto se crea sin estado de lectura
+    private EstadoLectura estadoLectura = null;
 
     public String getLibroPropuestoIdAsString(){
         return libroId.toHexString();

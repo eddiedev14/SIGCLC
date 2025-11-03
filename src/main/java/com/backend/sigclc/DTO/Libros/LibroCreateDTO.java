@@ -4,6 +4,7 @@ import java.time.Year;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.bson.types.ObjectId;
 
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 
@@ -42,7 +43,7 @@ public class LibroCreateDTO {
     private MultipartFile imagen;
 
     @NotNull(message = "El usuario que registra es obligatorio")
-    private CreadorDTO creador;
+    private ObjectId creadorId;
 
     @AssertTrue(message = "El año de publicación no puede ser del futuro")
     public boolean isAnioValid(){

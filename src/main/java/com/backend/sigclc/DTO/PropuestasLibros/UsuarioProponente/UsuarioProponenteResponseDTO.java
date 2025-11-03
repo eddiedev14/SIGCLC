@@ -1,13 +1,13 @@
-package com.backend.sigclc.DTO.Libros;
+package com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponente;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreadorResponseDTO {
+public class UsuarioProponenteResponseDTO {
     private String usuarioId;
     private String nombreCompleto;
 }

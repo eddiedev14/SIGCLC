@@ -1,5 +1,6 @@
 package com.backend.sigclc.Model.PropuestasLibros;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class PropuestasLibrosModel {
     private UsuarioProponenteModel usuarioProponente;
     private Date fechaPropuesta;
     private EstadoPropuesta estadoPropuesta;
-    private List<VotoModel> votos;
-    private PeriodoSeleccionModel periodoSeleccion;
+    private List<VotoModel> votos = new ArrayList<>();
+    private PeriodoSeleccionModel periodoSeleccion = null;
     
     @JsonProperty("id")
     public String getIdAString(){

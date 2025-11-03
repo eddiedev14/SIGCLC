@@ -3,24 +3,22 @@ package com.backend.sigclc.Mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
-
+import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto.LibroPropuestoResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion.PeriodoSeleccionDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponente.UsuarioProponenteResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.LibroPropuestoModel;
-import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuestoDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuestoResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.UsuarioProponenteModel;
-import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponenteDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponenteResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.VotoModel;
-import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.VotoResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.PeriodoSeleccionModel;
-import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccionDTO;
 
 @Component
 public class PropuestaLibroMapper {
@@ -28,30 +26,22 @@ public class PropuestaLibroMapper {
     public PropuestasLibrosModel toModel(PropuestaLibroCreateDTO dto) {
         // Crear modelo a partir del DTO teniendo en cuenta que algunos campos son opcionales (votos, periodoSeleccion)
         PropuestasLibrosModel model = new PropuestasLibrosModel();
-        model.setLibroPropuesto(toLibroPropuestoModel(dto.getLibroPropuesto()));
-        model.setUsuarioProponente(toUsuarioProponenteModel(dto.getUsuarioProponente()));
-        model.setFechaPropuesta(dto.getFechaPropuesta());
-        model.setEstadoPropuesta(dto.getEstadoPropuesta());
-        
-        // Campos opcionales
-        model.setVotos(toVotosModelList(dto.getVotos()));
-        model.setPeriodoSeleccion(toPeriodoSeleccionModel(dto.getPeriodoSeleccion()));
+        model.setLibroPropuesto(createLibroPropuestoModel(dto.getLibroId()));
+        model.setUsuarioProponente(createUsuarioProponenteModel(dto.getUsuarioId()));
         return model;
     }
 
-    // Convierte LibroPropuestoDTO a LibroPropuestoModel
-    public LibroPropuestoModel toLibroPropuestoModel(LibroPropuestoDTO dto) {
+    // Crear LibroPropuestoModel
+    public LibroPropuestoModel createLibroPropuestoModel(ObjectId libroId) {
         LibroPropuestoModel model = new LibroPropuestoModel();
-        model.setLibroId(dto.getLibroId());
-        model.setFechaSeleccion(dto.getFechaSeleccion());
-        model.setEstadoLectura(dto.getEstadoLectura());
+        model.setLibroId(libroId);
         return model;
     }
 
-    // Convierte UsuarioProponenteDTO a UsuarioProponenteModel
-    public UsuarioProponenteModel toUsuarioProponenteModel(UsuarioProponenteDTO dto) {
+    // Crear UsuarioProponenteModel
+    public UsuarioProponenteModel createUsuarioProponenteModel(ObjectId usuarioId) {
         UsuarioProponenteModel model = new UsuarioProponenteModel();
-        model.setUsuarioId(dto.getUsuarioId());
+        model.setUsuarioId(usuarioId);
         return model;
     }
 
@@ -65,10 +55,10 @@ public class PropuestaLibroMapper {
         return votos;
     }
 
+    // Convertir VotoDTO a VotoModel
     public VotoModel toVotoModel(VotoDTO dto) {
         VotoModel model = new VotoModel();
         model.setUsuarioId(dto.getUsuarioId());
-        model.setFechaVoto(dto.getFechaVoto());
         return model;
     }
 
@@ -134,7 +124,6 @@ public class PropuestaLibroMapper {
 
     // Convierte List<VotosModel> a List<VotoResponseDTO>
     public List<VotoResponseDTO> toVotosResponseDTOList(List<VotoModel> models) {
-        if (models == null) return new ArrayList<>();
         return models.stream()
                 .map(this::toVotoResponseDTO)
                 .toList();
@@ -151,11 +140,6 @@ public class PropuestaLibroMapper {
 
     //* Update DTO */
     public void updateModelFromDTO(PropuestaLibroUpdateDTO dto, PropuestasLibrosModel model) {
-        if (dto.getLibroPropuesto() != null) model.setLibroPropuesto(toLibroPropuestoModel(dto.getLibroPropuesto()));
-        if (dto.getUsuarioProponente() != null) model.setUsuarioProponente(toUsuarioProponenteModel(dto.getUsuarioProponente()));
-        if (dto.getFechaPropuesta() != null) model.setFechaPropuesta(dto.getFechaPropuesta());
-        if (dto.getEstadoPropuesta() != null) model.setEstadoPropuesta(dto.getEstadoPropuesta());
-        if (dto.getVotos() != null) model.setVotos(toVotosModelList(dto.getVotos()));
-        if (dto.getPeriodoSeleccion() != null) model.setPeriodoSeleccion(toPeriodoSeleccionModel(dto.getPeriodoSeleccion()));
+
     }
 }
