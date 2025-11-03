@@ -172,6 +172,11 @@ public class PropuestasServiceImp implements IPropuestasService {
             throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no se debe pasar el periodoSeleccion y/o el estadoLectura");
         }
 
+        // Para cambiar al estado seleccionado, la propuesta debe tener al menos un voto
+        if (propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && propuestaModel.getVotos().isEmpty()) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a seleccionada, debe de tener al menos un voto");
+        }
+
         // Si la fechaInicio es mayor a la fechaFin del periodoSeleccion, se debe de lanzar una excepción
         if (propuesta.getPeriodoSeleccion() != null && propuesta.getPeriodoSeleccion().getFechaInicio().after(propuesta.getPeriodoSeleccion().getFechaFin())) {
             throw new IllegalArgumentException("La fecha de inicio del periodo de seleccion debe de ser anterior a la fecha de fin");
