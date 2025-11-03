@@ -3,6 +3,7 @@ package com.backend.sigclc.Controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,6 +77,12 @@ public class PropuestasLibrosController {
     @PatchMapping(value = "/actualizar/{id}")
     public ResponseEntity<PropuestaLibroResponseDTO> actualizarPropuesta(@PathVariable ObjectId id, @Valid @RequestBody PropuestaLibroUpdateDTO dto) {
         PropuestaLibroResponseDTO response = propuestasService.actualizarPropuesta(id, dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(value = "/eliminar/{id}")
+    public ResponseEntity<String> eliminarPropuesta(@PathVariable ObjectId id) {
+        String response = propuestasService.eliminarPropuesta(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

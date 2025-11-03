@@ -200,8 +200,20 @@ public class PropuestasServiceImp implements IPropuestasService {
 
     @Override
     public String eliminarPropuesta(ObjectId id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarPropuesta'");
+        // Obtener la propuesta
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+
+        // Si el estado es diferente a no seleccionada, no se puede eliminar
+        if (propuesta.getEstadoPropuesta() != EstadoPropuesta.no_seleccionada) {
+            throw new IllegalArgumentException("No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
+        }
+
+        // Eliminar propuesta
+        propuestasLibrosRepository.delete(propuesta);
+
+        return "Propuesta eliminada correctamente con id: " + id;
     }
     
 }
