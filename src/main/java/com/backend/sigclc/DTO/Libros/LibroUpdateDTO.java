@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -22,8 +24,7 @@ public class LibroUpdateDTO {
 
     private List<@Size(min = 1, max = 100, message = "El autor debe tener entre {min} y {max} caracteres") String> autores;
 
-    @Size(min = 1, max = 100, message = "El genero debe tener entre {min} y {max} caracteres")
-    private String genero;
+    private List<GeneroLibro> generos;
 
     @Min(value = 1450, message = "El año de publicación debe ser posterior a la invención de la imprenta (1450)")
     private Integer anioPublicacion;

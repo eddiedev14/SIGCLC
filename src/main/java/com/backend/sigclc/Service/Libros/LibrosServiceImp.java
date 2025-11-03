@@ -19,14 +19,24 @@ import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.LibroMapper;
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
+import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
 public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private ILibrosRepository librosRepository;
+
+    @Autowired
+    private IPropuestasLibrosRepository propuestasLibrosRepository;
+
+    @Autowired
+    private IUsuariosRepository usuarioRepository;
 
     @Autowired
     private LibroMapper libroMapper;
@@ -36,11 +46,6 @@ public class LibrosServiceImp implements ILibrosService {
     @Override
     public LibroResponseDTO guardarLibro(LibroCreateDTO dto) {
         try {
-            if (dto.getRegistrado_por() == null || !ObjectId.isValid(dto.getRegistrado_por())) {
-                throw new IllegalArgumentException("El registrador posee un Id inválido");
-            }
-            ObjectId registrador = new ObjectId(dto.getRegistrado_por());
-
             // Se asegura que la carpeta exista
             if (!Files.exists(rootFolder)) {
                 Files.createDirectories(rootFolder);
@@ -69,8 +74,15 @@ public class LibrosServiceImp implements ILibrosService {
 
             // Crea el modelo del libro a partir del dto
             LibrosModel libro = libroMapper.toModel(dto);
-            libro.setRegistrado_por(registrador);
 
+            //* Añadir nombre completo del creador automáticamente */
+            ObjectId usuarioId = libro.getCreador().getUsuarioId();
+            UsuariosModel usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
+            
+            libro.getCreador().setNombreCompleto(usuario.getNombreCompleto());
+            
             // en caso de que si se haya subido la imagen se establece el portadaPath
             if (nombreArchivo != null) {
                 libro.setPortadaPath("uploads/portadas/" + nombreArchivo);
@@ -92,7 +104,7 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public LibroResponseDTO buscarLibrosPorId(ObjectId id) {
+    public LibroResponseDTO buscarLibroPorId(ObjectId id) {
         LibrosModel libro = librosRepository.findById(id)
         .orElseThrow(() -> new RecursoNoEncontradoException(
             "Error! No existe un libro con id: " + id + " o está mal escrito."));
@@ -100,15 +112,8 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public LibroResponseDTO actualizarLibro(String id, LibroUpdateDTO dto) {
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del libro proporcionado no es válido");
-        }
-
-        LibrosModel libro = librosRepository.findById(objectId)
+    public LibroResponseDTO actualizarLibro(ObjectId id, LibroUpdateDTO dto) {
+        LibrosModel libro = librosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No se pudo encontrar el libro con el ID especificado"
                 ));
@@ -150,7 +155,19 @@ public class LibrosServiceImp implements ILibrosService {
                 libro.setPortadaPath("uploads/portadas/" + nuevoArchivo);
             }
 
+            // Actualizar libro
             librosRepository.save(libro);
+
+            // Propagar cambio de nombre en caso de que haya sido modificado a otras colecciones
+            if (dto.getTitulo() != null) {
+                sincronizarTituloLibro(id, dto.getTitulo());
+            }
+
+            // Propagar cambio de generos en caso de que haya sido modificado a otras colecciones
+            if (dto.getGeneros() != null) {
+                sincronizarGenerosLibro(id, dto.getGeneros());
+            }
+
             return libroMapper.toResponseDTO(libro);
 
         } catch (IOException e) {
@@ -159,15 +176,18 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public String eliminarLibro(String id) {
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del libro proporcionado no es válido");
-        }
+    public void sincronizarTituloLibro(ObjectId id, String tituloLibro) {
+        propuestasLibrosRepository.actualizarTituloLibroPropuesto(id, tituloLibro);
+    }   
 
-        LibrosModel libro = librosRepository.findById(objectId)
+    @Override
+    public void sincronizarGenerosLibro(ObjectId id, List<GeneroLibro> generosLibro) {
+        propuestasLibrosRepository.actualizarGenerosLibroPropuesto(id, generosLibro);
+    }
+
+    @Override
+    public String eliminarLibro(ObjectId id) {
+        LibrosModel libro = librosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No se pudo encontrar el libro con el ID especificado"
                 ));
@@ -188,7 +208,14 @@ public class LibrosServiceImp implements ILibrosService {
                 }
             }
 
-            librosRepository.deleteById(objectId);
+            // * Un libro solo puede ser eliminado si no está asociado a ninguna otra colección
+            boolean tienePropuestasEnVotacion = propuestasLibrosRepository.tienePropuestasEnVotacion(id);
+
+            if (tienePropuestasEnVotacion) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene propuestas en votación o está asociado a otros registros");
+            }
+
+            librosRepository.deleteById(id);
             return "Libro eliminado correctamente.";
 
         } catch (IOException e) {
@@ -200,13 +227,15 @@ public class LibrosServiceImp implements ILibrosService {
     }
 
     @Override
-    public List<LibroResponseDTO> listarPorGenero(String genero) {
+    public List<LibroResponseDTO> listarPorGenero(GeneroLibro genero) {
         List<LibrosModel> libros = librosRepository.buscarPorGenero(genero);
         return libroMapper.toResponseDTOList(libros);
     }
 
     @Override
     public List<LibroResponseDTO> listarPorAutor(String autor) {
+        // Quitar guiones del nombre del autor
+        autor = autor.replace("-", " ");
         List<LibrosModel> libros = librosRepository.buscarPorAutor(autor);
         return libroMapper.toResponseDTOList(libros);
     }

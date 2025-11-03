@@ -2,6 +2,7 @@ package com.backend.sigclc.Controller;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Service.Libros.ILibrosService;
 
 import jakarta.validation.Valid;
@@ -42,8 +44,13 @@ public class LibrosController {
         return new ResponseEntity<>(librosService.listarLibros(), HttpStatus.OK);
     }
 
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<LibroResponseDTO> buscarLibroPorId(@PathVariable ObjectId id) {
+        return ResponseEntity.ok(librosService.buscarLibroPorId(id));
+    }
+    
     @GetMapping("/listar-por-genero/{genero}")
-    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable String genero) {
+    public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable GeneroLibro genero) {
         return new ResponseEntity<>(librosService.listarPorGenero(genero), HttpStatus.OK);
     }
 
@@ -54,7 +61,7 @@ public class LibrosController {
 
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LibroResponseDTO> actualizarLibro(
-            @PathVariable String id,
+            @PathVariable ObjectId id,
             @Valid @ModelAttribute LibroUpdateDTO libro) {
 
         LibroResponseDTO actualizado = librosService.actualizarLibro(id, libro);
@@ -62,7 +69,7 @@ public class LibrosController {
     }
     
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> eliminarLibro(@PathVariable String id) {
+    public ResponseEntity<String> eliminarLibro(@PathVariable ObjectId id) {
         return new ResponseEntity<>(librosService.eliminarLibro(id), HttpStatus.OK);
     }
 }

@@ -1,5 +1,7 @@
-package com.backend.sigclc.Model.Libros;
+package com.backend.sigclc.Model.PropuestasLibros;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -12,20 +14,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document ("libros")
+@Document ("propuestasLibros")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LibrosModel {
+public class PropuestasLibrosModel {
     @Id
     private ObjectId id;
-    private String titulo;
-    private List<String> autores;
-    private List<GeneroLibro> generos;
-    private Integer anioPublicacion;
-    private String sinopsis;
-    private String portadaPath;
-    private CreadorModel creador;
+    private LibroPropuestoModel libroPropuesto;
+    private UsuarioProponenteModel usuarioProponente;
+    private Date fechaPropuesta;
+    private EstadoPropuesta estadoPropuesta;
+    private List<VotoModel> votos = new ArrayList<>();
+    private PeriodoSeleccionModel periodoSeleccion = null;
     
     @JsonProperty("id")
     public String getIdAString(){
