@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto;
+package com.backend.sigclc.DTO.PropuestasLibros;
 
 import java.util.Date;
 import java.util.List;

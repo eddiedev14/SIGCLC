@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.PropuestasLibros.Votos;
+package com.backend.sigclc.DTO.PropuestasLibros;
 
 import org.bson.types.ObjectId;
 

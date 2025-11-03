@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion;
+package com.backend.sigclc.DTO.PropuestasLibros;
 
 import java.util.Date;
 

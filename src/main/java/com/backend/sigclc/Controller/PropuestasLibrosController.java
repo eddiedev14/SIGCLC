@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Service.PropuestasLibros.IPropuestasService;
 

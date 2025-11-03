@@ -3,10 +3,6 @@ package com.backend.sigclc.DTO.PropuestasLibros;
 import java.util.Date;
 import java.util.List;
 
-import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto.LibroPropuestoResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion.PeriodoSeleccionDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponente.UsuarioProponenteResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 
 import lombok.AllArgsConstructor;
