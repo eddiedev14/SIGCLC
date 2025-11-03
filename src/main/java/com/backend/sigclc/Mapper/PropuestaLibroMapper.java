@@ -45,16 +45,6 @@ public class PropuestaLibroMapper {
         return model;
     }
 
-    // Convierte VotoDTO a VotosModel
-    public List<VotoModel> toVotosModelList(List<VotoDTO> dtos) {
-        List<VotoModel> votos = new ArrayList<>();
-        if (dtos == null) return votos;
-        for (VotoDTO dto : dtos) {
-            votos.add(toVotoModel(dto));
-        }
-        return votos;
-    }
-
     // Convertir VotoDTO a VotoModel
     public VotoModel toVotoModel(VotoDTO dto) {
         VotoModel model = new VotoModel();
@@ -140,6 +130,8 @@ public class PropuestaLibroMapper {
 
     //* Update DTO */
     public void updateModelFromDTO(PropuestaLibroUpdateDTO dto, PropuestasLibrosModel model) {
-
+        if (dto.getEstadoLectura() != null) model.getLibroPropuesto().setEstadoLectura(dto.getEstadoLectura());
+        if (dto.getEstadoPropuesta() != null) model.setEstadoPropuesta(dto.getEstadoPropuesta());
+        if (dto.getPeriodoSeleccion() != null) model.setPeriodoSeleccion(toPeriodoSeleccionModel(dto.getPeriodoSeleccion()));
     }
 }

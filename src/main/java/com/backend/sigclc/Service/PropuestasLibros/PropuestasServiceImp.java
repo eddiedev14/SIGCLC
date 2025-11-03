@@ -147,8 +147,55 @@ public class PropuestasServiceImp implements IPropuestasService {
 
     @Override
     public PropuestaLibroResponseDTO actualizarPropuesta(ObjectId id, PropuestaLibroUpdateDTO propuesta) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actualizarPropuesta'");
+        // Obtener la propuesta del libro
+        PropuestasLibrosModel propuestaModel = propuestasLibrosRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+        
+        // * Validaciones
+        
+        // Almacenar estado previo/original de la propuesta
+        EstadoPropuesta estadoOriginal = propuestaModel.getEstadoPropuesta();
+
+        // Si el estado original es distinto a seleccionado, y se quiere cambiar a seleccionado, debe de pasarse en el DTO periodoSeleccion y/o estadoLectura
+        if (estadoOriginal != EstadoPropuesta.seleccionada && propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && (propuesta.getPeriodoSeleccion() == null || propuesta.getEstadoLectura() == null)) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a seleccionada, debe de pasarse el periodoSeleccion y/o el estadoLectura");
+        }
+
+        // Si el estado original es distinto a seleccionado, y se pasa en el DTO el periodoSeleccion o estadoLectura y no se pasa el estadoPropuesta a seleccionada, se debe de lanzar una excepción
+        if (estadoOriginal != EstadoPropuesta.seleccionada && (propuesta.getPeriodoSeleccion() != null || propuesta.getEstadoLectura() != null) && propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada) {
+            throw new IllegalArgumentException("Para cambiar el periodoSeleccion y/o el estadoLectura, debe de pasarse el estadoPropuesta a seleccionada");
+        }
+
+        // Si el estado original es seleccionado, y se quiere cambiar a distinto de seleccionado (transición explícita en el DTO), no se debe pasar en el DTO periodoSeleccion y/o estadoLectura.
+        if (estadoOriginal == EstadoPropuesta.seleccionada && propuesta.getEstadoPropuesta() != null && propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada && (propuesta.getPeriodoSeleccion() != null || propuesta.getEstadoLectura() != null)) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no se debe pasar el periodoSeleccion y/o el estadoLectura");
+        }
+
+        // Si la fechaInicio es mayor a la fechaFin del periodoSeleccion, se debe de lanzar una excepción
+        if (propuesta.getPeriodoSeleccion() != null && propuesta.getPeriodoSeleccion().getFechaInicio().after(propuesta.getPeriodoSeleccion().getFechaFin())) {
+            throw new IllegalArgumentException("La fecha de inicio del periodo de seleccion debe de ser anterior a la fecha de fin");
+        }
+        
+        // * Actualizar propuesta de libro
+        propuestaLibrosMapper.updateModelFromDTO(propuesta, propuestaModel);
+
+        // En caso de que el nuevo estado es seleccionado y el original no lo era, se setea la fechaSeleccion con la fecha actual
+        if (propuestaModel.getEstadoPropuesta() == EstadoPropuesta.seleccionada && estadoOriginal != EstadoPropuesta.seleccionada) {
+            propuestaModel.getLibroPropuesto().setFechaSeleccion(new Date());
+        }
+
+        // En caso de que se pasa a un estado distinto a seleccionado y el estado previo es seleccionado, se setea la fechaSeleccion, periodoSeleccion y estadoLectura a null
+        if (propuestaModel.getEstadoPropuesta() != EstadoPropuesta.seleccionada && estadoOriginal == EstadoPropuesta.seleccionada) {
+            propuestaModel.getLibroPropuesto().setFechaSeleccion(null);
+            propuestaModel.setPeriodoSeleccion(null);
+            propuestaModel.getLibroPropuesto().setEstadoLectura(null);
+        }
+
+        // Guardar propuesta
+        propuestasLibrosRepository.save(propuestaModel);
+
+        return propuestaLibrosMapper.toResponseDTO(propuestaModel);
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Service.PropuestasLibros.IPropuestasService;
@@ -69,6 +70,12 @@ public class PropuestasLibrosController {
     @GetMapping(value = "/listarPorLibro/{libroId}")
     public ResponseEntity<List<PropuestaLibroResponseDTO>> listarPropuestasPorLibro(@PathVariable ObjectId libroId) {
         List<PropuestaLibroResponseDTO> response = propuestasService.listarPropuestasPorLibro(libroId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping(value = "/actualizar/{id}")
+    public ResponseEntity<PropuestaLibroResponseDTO> actualizarPropuesta(@PathVariable ObjectId id, @Valid @RequestBody PropuestaLibroUpdateDTO dto) {
+        PropuestaLibroResponseDTO response = propuestasService.actualizarPropuesta(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

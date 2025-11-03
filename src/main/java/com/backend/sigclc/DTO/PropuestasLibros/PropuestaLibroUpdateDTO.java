@@ -1,5 +1,6 @@
 package com.backend.sigclc.DTO.PropuestasLibros;
 
+import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 
 import lombok.AllArgsConstructor;
@@ -10,7 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PropuestaLibroUpdateDTO {
-    // TODO: Colocar DTOS de LibroPropuesto y UsuarioProponente de actualizar
+    //* Solo se puede actualizar: fechaSeleccion (fecha actual), estadoLectura, estadoPropuesta y periodoSeleccion */
+    private EstadoLectura estadoLectura;
     private EstadoPropuesta estadoPropuesta;
     private PeriodoSeleccionDTO periodoSeleccion;
 }
