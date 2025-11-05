@@ -17,4 +17,8 @@ public class LibrosSeleccionados {
     private ObjectId propuestaId;
     private String titulo;
     private List<GeneroLibro> generos;
+
+    public String getPropuestaIdAString(){
+        return propuestaId != null ? propuestaId.toHexString():null;
+    }
 }

@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class Asistentes {
     private ObjectId asistenteId;
     private String nombreCompleto;
+
+    public String getAsistenteIdAString(){
+        return asistenteId != null ? asistenteId.toHexString():null;
+    }
 }
