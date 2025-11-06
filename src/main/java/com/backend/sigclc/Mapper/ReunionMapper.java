@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.springframework.stereotype.Component;
 
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
@@ -16,6 +17,7 @@ import com.backend.sigclc.DTO.Reuniones.ArchivosAdjuntosResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.AsistentesResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.LibrosSeleccionadosResponseDTO;
 
+@Component
 public class ReunionMapper {
     
     public ReunionesModel toModel(ReunionCreateDTO dto) {
@@ -24,7 +26,6 @@ public class ReunionMapper {
         model.setHora(dto.getHora());
         model.setModalidad(dto.getModalidad());
         model.setEspacioReunion(dto.getEspacioReunion());
-        //No sé que mas va acá
         return model;
     }    
 
