@@ -26,9 +26,9 @@ public class ReunionesModel {
     private LocalTime hora;
     private Modalidad modalidad;
     private String espacioReunion;
-    private List<LibrosSeleccionados> librosSeleccionados = new ArrayList<>();
-    private List<Asistentes> asistentes = new ArrayList<>();
-    private List<ArchivosAdjuntos> archivosAdjuntos = new ArrayList<>();
+    private List<LibrosSeleccionadosModel> librosSeleccionados = new ArrayList<>();
+    private List<AsistentesModel> asistentes = new ArrayList<>();
+    private List<ArchivosAdjuntosModel> archivosAdjuntos = new ArrayList<>();
 
     @JsonProperty("id")
     public String getIdAString(){
