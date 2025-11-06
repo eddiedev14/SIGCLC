@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReunionResponseDTO {
-    private String id;
+public class ReunionUpdateDTO {
     private Date fecha;
     private LocalTime hora;
     private Modalidad modalidad;

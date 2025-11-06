@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import com.backend.sigclc.Model.Reuniones.Modalidad;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -23,7 +25,7 @@ public class ReunionCreateDTO {
     private LocalTime hora;
 
     @NotNull(message = "La modalidad de la reunión es obligatoria")
-    private String modalidad;
+    private Modalidad modalidad;
 
     @NotNull(message = "El espacio de la reunión es obligatorio")
     @Size(min = 1, max = 100, message = "El espacio de la reunión debe tener entre {min} y {max} caracteres")
