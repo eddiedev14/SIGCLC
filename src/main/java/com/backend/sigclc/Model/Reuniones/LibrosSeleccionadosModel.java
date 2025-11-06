@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LibrosSeleccionados {
+public class LibrosSeleccionadosModel {
     private ObjectId propuestaId;
     private String titulo;
     private List<GeneroLibro> generos;

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Asistentes {
+public class AsistentesModel {
     private ObjectId asistenteId;
     private String nombreCompleto;
 

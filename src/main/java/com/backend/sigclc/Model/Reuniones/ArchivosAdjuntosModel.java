@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArchivosAdjuntos {
+public class ArchivosAdjuntosModel {
     private String archivoPath;
     private Tipo tipo;
 }
