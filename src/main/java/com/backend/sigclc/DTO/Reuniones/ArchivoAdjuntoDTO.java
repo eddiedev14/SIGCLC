@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArchivosAdjuntosDTO {
+public class ArchivoAdjuntoDTO {
     @NotNull(message = "La ruta del archivo es obligatoria")
     @Size(min = 1, max = 100, message = "La ruta debe tener entre {min} y {max} caracteres")
     private String archivoPath;

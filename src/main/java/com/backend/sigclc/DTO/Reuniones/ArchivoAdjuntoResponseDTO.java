@@ -1,5 +1,7 @@
 package com.backend.sigclc.DTO.Reuniones;
 
+import com.backend.sigclc.Model.Reuniones.Tipo;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AsistentesResponseDTO {
-    private String asistenteId;
-    private String nombreCompleto;
+public class ArchivoAdjuntoResponseDTO {
+    private String archivoPath;
+    private Tipo tipo;
 }

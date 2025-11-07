@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LibrosSeleccionadosResponseDTO {
-    private String propuestaId;
+public class LibroSeleccionadoResponseDTO {
+    private String libroSeleccionadoId;
     private String titulo;
     private List<GeneroLibro> generos;
 }
