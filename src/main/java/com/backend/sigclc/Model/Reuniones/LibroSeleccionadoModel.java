@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LibrosSeleccionadosModel {
-    private ObjectId propuestaId;
+public class LibroSeleccionadoModel {
+    private ObjectId libroSeleccionadoId;
     private String titulo;
     private List<GeneroLibro> generos;
 
-    public String getPropuestaIdAString(){
-        return propuestaId != null ? propuestaId.toHexString():null;
+    public String getLibroSeleccionadoIdAString(){
+        return libroSeleccionadoId != null ? libroSeleccionadoId.toHexString():null;
     }
 }
