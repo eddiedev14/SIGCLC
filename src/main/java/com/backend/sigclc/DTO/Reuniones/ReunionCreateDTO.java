@@ -32,11 +32,11 @@ public class ReunionCreateDTO {
     private String espacioReunion;
 
     @NotNull(message = "Los id de los libros propuestos son obligatorios")
-    private List<ObjectId> propuestasId;
+    private List<ObjectId> librosSeleccionadosId;
 
     @NotNull(message = "Los id de los asistentes a la reunión son obligatorios")
     private List<ObjectId> asistentesId;
 
-    private List<ArchivosAdjuntosDTO> archivosAdjuntos;
+    private List<ArchivoAdjuntoDTO> archivosAdjuntos;
 
 }

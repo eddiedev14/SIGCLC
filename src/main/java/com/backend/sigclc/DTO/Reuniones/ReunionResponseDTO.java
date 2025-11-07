@@ -19,7 +19,7 @@ public class ReunionResponseDTO {
     private LocalTime hora;
     private Modalidad modalidad;
     private String espacioReunion;
-    private List<LibrosSeleccionadosResponseDTO> librosSeleccionados;
-    private List<AsistentesResponseDTO> asistentes;
-    private List<ArchivosAdjuntosResponseDTO> archivosAdjuntos;
+    private List<LibroSeleccionadoResponseDTO> librosSeleccionados;
+    private List<AsistenteResponseDTO> asistentes;
+    private List<ArchivoAdjuntoResponseDTO> archivosAdjuntos;
 }
