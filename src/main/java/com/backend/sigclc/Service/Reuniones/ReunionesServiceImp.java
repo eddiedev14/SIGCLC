@@ -129,4 +129,11 @@ public class ReunionesServiceImp implements IReunionesService{
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar la reunión", e);
         }
     }
+
+    @Override
+    public List<ReunionResponseDTO> listarReuniones() {
+        List<ReunionesModel> reuniones = reunionesRepository.findAll();
+        return reunionMapper.toResponseDTOList(reuniones);
+    }
+
 }
