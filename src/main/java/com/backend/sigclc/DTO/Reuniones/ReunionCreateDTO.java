@@ -1,10 +1,8 @@
 package com.backend.sigclc.DTO.Reuniones;
 
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 

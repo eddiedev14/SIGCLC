@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.backend.sigclc.DTO.Reuniones.ArchivoAdjuntoDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;

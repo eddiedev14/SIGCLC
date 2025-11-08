@@ -1,6 +1,5 @@
 package com.backend.sigclc.Model.Reuniones;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
