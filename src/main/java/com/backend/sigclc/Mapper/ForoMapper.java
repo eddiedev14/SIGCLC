@@ -16,6 +16,8 @@ import com.backend.sigclc.Model.Foros.ModeradorModel;
 @Component
 public class ForoMapper {
     
+    //create
+
     public ForosModel toModel(ForoCreateDTO dto) {
         ForosModel model = new ForosModel();
         model.setTipoTematica(dto.getTipoTematica());
@@ -30,6 +32,8 @@ public class ForoMapper {
         return model;
     }
 
+
+    //response
 
     public ForoResponseDTO toResponseDTO(ForosModel model) {
         ForoResponseDTO dto = new ForoResponseDTO();
@@ -49,7 +53,7 @@ public class ForoMapper {
     }
 
     /**
-     * Convierte una lista de UsuariosModel a lista de UsuarioResponseDTO
+     * Convierte una lista de ForosModel a lista de ForoResponseDTO
      */
     public List<ForoResponseDTO> toResponseDTOList(List<ForosModel> models) {
         return models.stream()
@@ -58,7 +62,7 @@ public class ForoMapper {
     }
 
     /**
-     * Actualiza un UsuariosModel existente con los datos de UsuarioUpdateDTO
+     * Actualiza un ForosModel existente con los datos de ForoUpdateDTO
      */
     public void updateModelFromDTO(ForoUpdateDTO dto, ForosModel model) {
         if (dto.getTipoTematica() != null) model.setTipoTematica(dto.getTipoTematica());
