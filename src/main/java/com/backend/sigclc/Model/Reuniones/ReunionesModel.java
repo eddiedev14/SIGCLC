@@ -23,7 +23,7 @@ public class ReunionesModel {
     @Id
     private ObjectId id;
     private Date fecha;
-    private LocalTime hora;
+    private String hora;
     private Modalidad modalidad;
     private String espacioReunion;
     private List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
