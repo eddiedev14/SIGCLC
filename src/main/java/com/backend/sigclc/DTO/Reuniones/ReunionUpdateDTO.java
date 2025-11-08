@@ -17,7 +17,6 @@ public class ReunionUpdateDTO {
     private String hora;
     private Modalidad modalidad;
     private String espacioReunion;
-    private List<LibroSeleccionadoResponseDTO> librosSeleccionados;
-    private List<AsistenteResponseDTO> asistentes;
-    private List<ArchivoAdjuntoResponseDTO> archivosAdjuntos;
+    private List<String> asistentesId;
+    private List<String> librosSeleccionadosId;
 }
