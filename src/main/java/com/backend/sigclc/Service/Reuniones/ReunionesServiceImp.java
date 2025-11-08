@@ -1,5 +1,7 @@
 package com.backend.sigclc.Service.Reuniones;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,6 +136,25 @@ public class ReunionesServiceImp implements IReunionesService{
     public List<ReunionResponseDTO> listarReuniones() {
         List<ReunionesModel> reuniones = reunionesRepository.findAll();
         return reunionMapper.toResponseDTOList(reuniones);
+    }
+
+    @Override
+    public String eliminarReunion(ObjectId id) {
+        ReunionesModel reunion = reunionesRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reunión con id: " + id + " o está mal escrito."));
+
+        LocalDate fechaReunion = reunion.getFecha().toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate();
+
+        if (fechaReunion.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("No se puede eliminar una reunión cuya fecha ya ha pasado.");
+        }
+
+        reunionesRepository.delete(reunion);
+
+        return "Reunión eliminada correctamente con id: " + id;
     }
 
 }
