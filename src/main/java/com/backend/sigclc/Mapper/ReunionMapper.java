@@ -43,6 +43,12 @@ public class ReunionMapper {
         return dto;
     }
 
+    public List<ReunionResponseDTO> toResponseDTOList(List<ReunionesModel> models) {
+        return models.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
     // Convierte LibroSeleccionadoResponseDTO a LibroSeleccionadoModel
     public LibroSeleccionadoModel toLibroSeleccionadoModel(LibroSeleccionadoDTO dto) {
         LibroSeleccionadoModel model = new LibroSeleccionadoModel();
