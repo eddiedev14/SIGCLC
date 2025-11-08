@@ -108,6 +108,55 @@ public class ReunionMapper {
                 .toList();
     }
 
+    public List<LibroSeleccionadoModel> toLibroSeleccionadoModelList(List<String> ids) {
+        return ids.stream()
+                .map(this::toLibroSeleccionadoModelFromId)
+                .toList();
+    }
+
+    public List<AsistenteModel> toAsistentesModelList(List<String> ids) {
+        return ids.stream()
+                .map(this::toAsistenteModelFromId)
+                .toList();
+    }
+
+    public List<ArchivoAdjuntoModel> toArchivosAdjuntosModelList(List<ArchivoAdjuntoResponseDTO> dtos) {
+        return dtos.stream()
+                .map(this::toArchivoAdjuntoModelFromResponseDTO)
+                .toList();
+    }
+
+    public LibroSeleccionadoModel toLibroSeleccionadoModelFromResponseDTO(LibroSeleccionadoResponseDTO dto) {
+        LibroSeleccionadoModel model = new LibroSeleccionadoModel();
+        model.setPropuestaId(new org.bson.types.ObjectId(dto.getLibroSeleccionadoId()));
+        return model;
+    }
+
+    public ArchivoAdjuntoModel toArchivoAdjuntoModelFromResponseDTO(ArchivoAdjuntoResponseDTO dto) {
+        ArchivoAdjuntoModel model = new ArchivoAdjuntoModel();
+        model.setArchivoPath(dto.getArchivoPath());
+        model.setTipo(dto.getTipo());
+        return model;
+    }
+
+    public AsistenteModel toAsistenteModelFromResponseDTO(AsistenteResponseDTO dto) {
+        AsistenteModel model = new AsistenteModel();
+        model.setAsistenteId(new org.bson.types.ObjectId(dto.getAsistenteId()));
+        return model;
+    }
+
+    public AsistenteModel toAsistenteModelFromId(String asistenteId) {
+        AsistenteModel model = new AsistenteModel();
+        model.setAsistenteId(new org.bson.types.ObjectId(asistenteId));
+        return model;
+    }
+
+    public LibroSeleccionadoModel toLibroSeleccionadoModelFromId(String libroId) {
+        LibroSeleccionadoModel model = new LibroSeleccionadoModel();
+        model.setPropuestaId(new org.bson.types.ObjectId(libroId));
+        return model;
+    }
+
 
 
     public void updateModelFromDTO(ReunionesModel model, ReunionUpdateDTO dto) {
@@ -115,10 +164,11 @@ public class ReunionMapper {
         if (dto.getHora() != null) model.setHora(dto.getHora());
         if (dto.getModalidad() != null) model.setModalidad(dto.getModalidad());
         if (dto.getEspacioReunion() != null) model.setEspacioReunion(dto.getEspacioReunion());
-        //if (dto.getLibrosSeleccionados() != null) model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionados()));
-        //if (dto.getAsistentes() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentes()));
+        if (dto.getLibrosSeleccionadosId() != null) model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
+        if (dto.getAsistentesId() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
         //if (dto.getArchivosAdjuntos() != null) model.setArchivosAdjuntos(toArchivosAdjuntosModelList(dto.getArchivosAdjuntos()));
     }
 
+    
 
 }
