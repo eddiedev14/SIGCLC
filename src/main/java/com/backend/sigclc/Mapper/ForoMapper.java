@@ -33,7 +33,7 @@ public class ForoMapper {
 
     public ForoResponseDTO toResponseDTO(ForosModel model) {
         ForoResponseDTO dto = new ForoResponseDTO();
-        dto.setId(model.getId());
+        dto.setId(model.getIdAString());
         dto.setTipoTematica(model.getTipoTematica());
         dto.setNombreTematica(model.getNombreTematica());
         dto.setFechaPublicacion(model.getFechaPublicacion());
