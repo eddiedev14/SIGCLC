@@ -1,9 +1,10 @@
 package com.backend.sigclc.DTO.Reuniones;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.backend.sigclc.Model.Reuniones.Tipo;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArchivoAdjuntoDTO {
     @NotNull(message = "La ruta del archivo es obligatoria")
-    @Size(min = 1, max = 100, message = "La ruta debe tener entre {min} y {max} caracteres")
-    private String archivoPath;
-
-    @NotNull(message = "El tipo de archivo es obligatorio")
-    private Tipo tipo;
+    private MultipartFile archivo;
 }

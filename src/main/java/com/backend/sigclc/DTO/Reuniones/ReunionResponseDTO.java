@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class ReunionResponseDTO {
     private String id;
     private Date fecha;
-    private LocalTime hora;
+    private String hora;
     private Modalidad modalidad;
     private String espacioReunion;
     private List<LibroSeleccionadoResponseDTO> librosSeleccionados;
