@@ -3,6 +3,7 @@ package com.backend.sigclc.Service.Reuniones;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
@@ -13,4 +14,9 @@ public interface IReunionesService {
     public List<ReunionResponseDTO> listarReuniones();
     public String eliminarReunion(ObjectId id);
     public ReunionResponseDTO actualizarReunion(ObjectId id, ReunionUpdateDTO dto);
+    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String> librosIds);
+    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<String> asistentesIds);
+    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId id, List<String> asistentesId);
+    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId id, List<String> librosId);
+    public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos);
 }
