@@ -1,5 +1,6 @@
 package com.backend.sigclc.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -37,20 +38,22 @@ public class ReunionMapper {
         dto.setHora(model.getHora());
         dto.setModalidad(model.getModalidad());
         dto.setEspacioReunion(model.getEspacioReunion());
+        dto.setLibrosSeleccionados(toLibrosSeleccionadosResponseDTOList(model.getLibrosSeleccionados()));
+        dto.setAsistentes(toAsistentesResponseDTOList(model.getAsistentes()));
+        dto.setArchivosAdjuntos(toArchivosAdjuntosResponseDTOList(model.getArchivosAdjuntos()));
         return dto;
     }
 
     // Convierte LibroSeleccionadoResponseDTO a LibroSeleccionadoModel
     public LibroSeleccionadoModel toLibroSeleccionadoModel(LibroSeleccionadoDTO dto) {
         LibroSeleccionadoModel model = new LibroSeleccionadoModel();
-        model.setLibroSeleccionadoId(dto.getLibroSeleccionadoId());
+        model.setPropuestaId(dto.getLibroSeleccionadoId());
         return model;
     }
 
     public ArchivoAdjuntoModel toArchivoAdjuntoModel(ArchivoAdjuntoDTO dto) {
         ArchivoAdjuntoModel model = new ArchivoAdjuntoModel();
-        model.setArchivoPath(dto.getArchivoPath());
-        model.setTipo(dto.getTipo());
+        //model.setArchivo(dto.getArchivo());
         return model;
     }
 
@@ -62,7 +65,7 @@ public class ReunionMapper {
 
     public LibroSeleccionadoResponseDTO toLibroSeleccionadoResponseDTO(LibroSeleccionadoModel model) {
         LibroSeleccionadoResponseDTO dto = new LibroSeleccionadoResponseDTO();
-        dto.setLibroSeleccionadoId(model.getLibroSeleccionadoIdAString());
+        dto.setLibroSeleccionadoId(model.getPropuestaIdAString());
         dto.setTitulo(model.getTitulo());
         dto.setGeneros(model.getGeneros());
         return dto;
@@ -102,7 +105,6 @@ public class ReunionMapper {
 
 
 
-
     public void updateModelFromDTO(ReunionesModel model, ReunionUpdateDTO dto) {
         if (dto.getFecha() != null) model.setFecha(dto.getFecha());
         if (dto.getHora() != null) model.setHora(dto.getHora());
@@ -112,4 +114,6 @@ public class ReunionMapper {
         //if (dto.getAsistentes() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentes()));
         //if (dto.getArchivosAdjuntos() != null) model.setArchivosAdjuntos(toArchivosAdjuntosModelList(dto.getArchivosAdjuntos()));
     }
+
+
 }
