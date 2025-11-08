@@ -1,9 +1,12 @@
 package com.backend.sigclc.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +27,11 @@ public class ReunionesController {
     public ResponseEntity<ReunionResponseDTO> insertarReunion(@ModelAttribute ReunionCreateDTO dto) {
         ReunionResponseDTO respuesta = reunionesService.guardarReunion(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+    @GetMapping(value = "/listar")
+    public ResponseEntity<List<ReunionResponseDTO>> listarReuniones() {
+        List<ReunionResponseDTO> response = reunionesService.listarReuniones();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
