@@ -14,12 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReunionMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
+import com.backend.sigclc.Model.Reuniones.Modalidad;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
 import com.backend.sigclc.Model.Reuniones.Tipo;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
@@ -117,8 +119,6 @@ public class ReunionesServiceImp implements IReunionesService{
                 }
 
                 reunion.setArchivosAdjuntos(adjuntos);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe enviar al menos un archivo adjunto.");
             }
 
             reunionesRepository.save(reunion);
@@ -156,5 +156,72 @@ public class ReunionesServiceImp implements IReunionesService{
 
         return "Reunión eliminada correctamente con id: " + id;
     }
+
+    @Override
+    public ReunionResponseDTO actualizarReunion(ObjectId id, ReunionUpdateDTO dto) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
+                ));
+
+            if (dto.getModalidad() != null && 
+                !(dto.getModalidad().equals(Modalidad.presencial) || dto.getModalidad().equals(Modalidad.virtual))) {
+                throw new IllegalArgumentException("La modalidad solo puede ser presencial o virtual.");
+            }
+
+            if (dto.getModalidad() != null && dto.getEspacioReunion() == null) {
+                throw new IllegalArgumentException("Debe especificar un espacioReunion (dirección o enlace) si cambia la modalidad.");
+            }
+
+            if (dto.getFecha() != null) reunion.setFecha(dto.getFecha());
+            if (dto.getHora() != null) reunion.setHora(dto.getHora());
+            if (dto.getModalidad() != null) reunion.setModalidad(dto.getModalidad());
+            if (dto.getEspacioReunion() != null) reunion.setEspacioReunion(dto.getEspacioReunion());
+
+            if (dto.getAsistentesId() != null) {
+                List<AsistenteModel> asistentes = new ArrayList<>();
+                for (String asistenteId : dto.getAsistentesId()) {
+                    UsuariosModel usuario = usuariosRepository.findById(new ObjectId(asistenteId))
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un usuario con id: " + asistenteId
+                        ));
+                    AsistenteModel asistente = new AsistenteModel();
+                    asistente.setAsistenteId(usuario.getId());
+                    asistente.setNombreCompleto(usuario.getNombreCompleto());
+                    asistentes.add(asistente);
+                }
+                reunion.setAsistentes(asistentes);
+            }
+
+            if (dto.getLibrosSeleccionadosId() != null) {
+                List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
+                for (String libroId : dto.getLibrosSeleccionadosId()) {
+                    LibrosModel libro = librosRepository.findById(new ObjectId(libroId))
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un libro con id: " + libroId
+                        ));
+                    LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
+                    libroSel.setPropuestaId(libro.getId());
+                    libroSel.setTitulo(libro.getTitulo());
+                    libroSel.setGeneros(libro.getGeneros());
+                    librosSeleccionados.add(libroSel);
+                }
+                reunion.setLibrosSeleccionados(librosSeleccionados);
+            }
+
+            reunionesRepository.save(reunion);
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (RecursoNoEncontradoException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al actualizar la reunión", e);
+        }
+    }
+
 
 }
