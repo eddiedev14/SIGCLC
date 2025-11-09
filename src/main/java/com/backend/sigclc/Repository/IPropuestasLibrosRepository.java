@@ -1,17 +1,16 @@
 package com.backend.sigclc.Repository;
 
+import java.util.List;
+
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
-import com.backend.sigclc.Model.Libros.GeneroLibro;
-
-import java.util.List;
-
-import org.bson.types.ObjectId;
 
 @Repository
 public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasLibrosModel, ObjectId> {
