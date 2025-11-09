@@ -17,8 +17,6 @@ public interface IForosService {
     public ForoResponseDTO listarPorNombreTematica(String nombreTematica);
     public List<ForoResponseDTO> listarPorTipoTematica(TipoTematica tipoTematica);
     public List<ForoResponseDTO> listarPorModerador(ObjectId moderadorId);
-    public List<ForoResponseDTO> listarForosPublicadosDespues(Date fecha);
-    public List<ForoResponseDTO> listarForosPublicadosAntes(Date fecha);
     public ForoResponseDTO actualizarForo(ObjectId id, ForoUpdateDTO foro);
     public String eliminarForo(ObjectId id);
 }

@@ -31,7 +31,7 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     void actualizarNombreUsuarioProponente(ObjectId usuarioId, String nuevoNombre);
     
     @Query("{ 'votos.usuarioId': ?0 }")
-    @Update("{ '$set': { 'votos.$[voto].nombreCompleto': ?1 } }")
+    @Update("{ '$set': { 'votos.$.nombreCompleto': ?1 } }")
     void actualizarNombreUsuarioVoto(ObjectId usuarioId, String nuevoNombre);
 
     // Verificar si un libro tiene propuestas cuando el estado de la propuesta es en_votacion

@@ -95,17 +95,6 @@ public class ForosServiceImp implements IForosService {
         return foroMapper.toResponseDTOList(foros);
     }
 
-    @Override
-    public List<ForoResponseDTO> listarForosPublicadosDespues(Date fecha) {
-        List<ForosModel> foros = forosRepository.buscarForosPublicadosDespues(fecha);
-        return foroMapper.toResponseDTOList(foros);
-    }
-
-    @Override
-    public List<ForoResponseDTO> listarForosPublicadosAntes(Date fecha) {
-        List<ForosModel> foros = forosRepository.buscarForosPublicadosAntes(fecha);
-        return foroMapper.toResponseDTOList(foros);
-    }
 
     @Override
     public ForoResponseDTO actualizarForo(ObjectId id, ForoUpdateDTO foroDTO) {

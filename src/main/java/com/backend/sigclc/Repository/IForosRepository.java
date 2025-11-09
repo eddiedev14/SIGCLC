@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
 import com.backend.sigclc.Model.Foros.ForosModel;
@@ -18,7 +20,8 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
     // Buscar foro por nombre de temática
     @Aggregation(pipeline = {
         "{ $match: { nombreTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }"
+        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $sort: { fechaPublicacion: -1 } }"
     })
     Optional<ForosModel> buscarPorNombreTematica(String nombreTematica);
 
@@ -38,19 +41,10 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
     })
     List<ForosModel> buscarPorModerador(ObjectId moderadorId);
 
-    // Buscar foros publicados después de una fecha específica
-    @Aggregation(pipeline = {
-        "{ $match: { fechaPublicacion: { $gt: ?0 } } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
-        "{ $sort: { fechaPublicacion: 1 } }"
-    })
-    List<ForosModel> buscarForosPublicadosDespues(Date fecha);
+    // Actualizar nombre de usuario si se modifica
 
-    // Buscar foros publicados antes de una fecha específica
-    @Aggregation(pipeline = {
-        "{ $match: { fechaPublicacion: { $lt: ?0 } } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
-        "{ $sort: { fechaPublicacion: -1 } }"
-    })
-    List<ForosModel> buscarForosPublicadosAntes(Date fecha);
+    @Query("{'moderador.moderadorId': ?0 }")
+    @Update("{ '$set': { 'moderador.nombreCompleto': ?1 } }")
+    void actualizarNombreModerador(ObjectId usuarioId, String nuevoNombre);
+
 }
