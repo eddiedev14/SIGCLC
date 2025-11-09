@@ -41,48 +41,48 @@ public class PropuestasLibrosController {
     @PatchMapping(value = "/votar/{id}")
     public ResponseEntity<PropuestaLibroResponseDTO> votarPropuesta(@PathVariable ObjectId id, @Valid @RequestBody VotoDTO dto) {
         PropuestaLibroResponseDTO response = propuestasService.votarPropuesta(id, dto);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/listar")
     public ResponseEntity<List<PropuestaLibroResponseDTO>> listarPropuestas() {
         List<PropuestaLibroResponseDTO> response = propuestasService.listarPropuestas();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/buscar/{id}")
     public ResponseEntity<PropuestaLibroResponseDTO> buscarPropuesta(@PathVariable ObjectId id) {
         PropuestaLibroResponseDTO response = propuestasService.buscarPropuesta(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/listarPorEstado/{estado}")
     public ResponseEntity<List<PropuestaLibroResponseDTO>> listarPropuestasPorEstado(@PathVariable EstadoPropuesta estado) {
         List<PropuestaLibroResponseDTO> response = propuestasService.listarPropuestasPorEstado(estado);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/listarPorUsuario/{usuarioId}")
     public ResponseEntity<List<PropuestaLibroResponseDTO>> listarPropuestasPorUsuario(@PathVariable ObjectId usuarioId) {
         List<PropuestaLibroResponseDTO> response = propuestasService.listarPropuestasPorUsuario(usuarioId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/listarPorLibro/{libroId}")
     public ResponseEntity<List<PropuestaLibroResponseDTO>> listarPropuestasPorLibro(@PathVariable ObjectId libroId) {
         List<PropuestaLibroResponseDTO> response = propuestasService.listarPropuestasPorLibro(libroId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping(value = "/actualizar/{id}")
     public ResponseEntity<PropuestaLibroResponseDTO> actualizarPropuesta(@PathVariable ObjectId id, @Valid @RequestBody PropuestaLibroUpdateDTO dto) {
         PropuestaLibroResponseDTO response = propuestasService.actualizarPropuesta(id, dto);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(value = "/eliminar/{id}")
     public ResponseEntity<String> eliminarPropuesta(@PathVariable ObjectId id) {
         String response = propuestasService.eliminarPropuesta(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 }

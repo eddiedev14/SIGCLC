@@ -41,7 +41,7 @@ public class LibrosController {
 
     @GetMapping("/listar")
     public ResponseEntity<List<LibroResponseDTO>> listarLibros() {
-        return new ResponseEntity<>(librosService.listarLibros(), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarLibros());
     }
 
     @GetMapping("/buscar/{id}")
@@ -51,12 +51,12 @@ public class LibrosController {
     
     @GetMapping("/listar-por-genero/{genero}")
     public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable GeneroLibro genero) {
-        return new ResponseEntity<>(librosService.listarPorGenero(genero), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarPorGenero(genero));
     }
 
     @GetMapping("/listar-por-autor/{autor}")
     public ResponseEntity<List<LibroResponseDTO>> listarLibroPorAutor(@PathVariable String autor) {
-        return new ResponseEntity<>(librosService.listarPorAutor(autor), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarPorAutor(autor));
     }
 
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -70,6 +70,6 @@ public class LibrosController {
     
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarLibro(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(librosService.eliminarLibro(id), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.eliminarLibro(id));
     }
 }

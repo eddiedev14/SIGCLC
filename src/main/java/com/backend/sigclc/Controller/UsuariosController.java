@@ -33,16 +33,16 @@ public class UsuariosController {
 
     // Crear usuario
     @PostMapping("/insertar")
-    public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
-    UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
+        public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
+        UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 
     // Listar todos los usuarios
     @GetMapping("/listar")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
-        return new ResponseEntity<>(usuariosService.listarUsuarios(), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.listarUsuarios());
     }
 
     // Buscar usuario por ID
@@ -73,6 +73,6 @@ public class UsuariosController {
     // Eliminar usuario
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(usuariosService.eliminarUsuario(id), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.eliminarUsuario(id));
     }
 }
