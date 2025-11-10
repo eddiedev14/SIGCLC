@@ -16,15 +16,15 @@ public interface IUsuariosRepository extends MongoRepository<UsuariosModel, Obje
     // Buscar usuario por correo electrónico usando aggregation
     @Aggregation(pipeline = {
         "{ $match: { correoElectronico: ?0 } }",
-        "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rol: 1 } }"
+        "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rolUsuario: 1 } }"
     })
-    Optional<UsuariosModel> buscarPorCorreo(String correoElectronico);
+    Optional<UsuariosModel> findByCorreoElectronicoAgg(String correoElectronico);
 
     // Buscar usuarios por rol usando aggregation
     @Aggregation(pipeline = {
-        "{ $match: { rol: ?0 } }",
-        "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rol: 1 } }",
+        "{ $match: { rolUsuario: ?0 } }",
+        "{ $project: { _id: 1, nombreCompleto: 1, edad: 1, ocupacion: 1, correoElectronico: 1, telefono: 1, rolUsuario: 1 } }",
         "{ $sort: { nombreCompleto: 1 } }"
     })
-    List<UsuariosModel> buscarPorRol(String rol);
+    List<UsuariosModel> findByRolUsuarioAgg(String rolUsuario);
 }
