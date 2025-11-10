@@ -3,6 +3,7 @@ package com.backend.sigclc.Repository;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -50,4 +51,13 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     // Buscar propuestas por libro
     @Query("{ 'libroPropuesto.libroId': ?0 }")
     List<PropuestasLibrosModel> buscarPropuestasPorLibro(ObjectId libroId);
+
+    // Retornar conteo de reuniones asociadas a una propuesta (en coleccion 'reuniones')
+    @Aggregation(pipeline = {
+        "{ $lookup: { from: 'reuniones', localField: '_id', foreignField: 'librosSeleccionados.propuestaId', as: 'reunionesAsociadas' } }",
+        "{ $addFields: { tieneReunion: { $gt: [ { $size: '$reunionesAsociadas' }, 0 ] } } }",
+        "{ $match: { _id: ?0 } }",
+        "{ $project: { _id: 1, tieneReunion: 1 } }"
+    })
+    Boolean tieneReuniones(ObjectId propuestaId);
 }
