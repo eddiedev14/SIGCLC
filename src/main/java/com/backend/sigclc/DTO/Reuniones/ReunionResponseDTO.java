@@ -3,7 +3,7 @@ package com.backend.sigclc.DTO.Reuniones;
 import java.util.Date;
 import java.util.List;
 
-import com.backend.sigclc.Model.Reuniones.Modalidad;
+import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class ReunionResponseDTO {
     private String id;
     private Date fecha;
     private String hora;
-    private Modalidad modalidad;
+    private ModalidadReunion modalidad;
     private String espacioReunion;
     private List<LibroSeleccionadoResponseDTO> librosSeleccionados;
     private List<AsistenteResponseDTO> asistentes;

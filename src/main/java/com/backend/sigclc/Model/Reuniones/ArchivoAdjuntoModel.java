@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArchivoAdjuntoModel {
     private String archivoPath;
-    private Tipo tipo;
+    private TipoReunion tipo;
 }

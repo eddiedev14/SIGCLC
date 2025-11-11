@@ -1,6 +1,6 @@
 package com.backend.sigclc.Model.Reuniones;
 
-public enum Tipo {
+public enum TipoReunion {
     pdf,
     presentacion,
     imagen

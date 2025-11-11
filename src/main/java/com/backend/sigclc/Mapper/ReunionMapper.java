@@ -2,6 +2,7 @@ package com.backend.sigclc.Mapper;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
@@ -27,6 +28,8 @@ public class ReunionMapper {
         model.setHora(dto.getHora());
         model.setModalidad(dto.getModalidad());
         model.setEspacioReunion(dto.getEspacioReunion());
+        model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
+        model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
         return model;
     }    
 
@@ -108,13 +111,13 @@ public class ReunionMapper {
                 .toList();
     }
 
-    public List<LibroSeleccionadoModel> toLibroSeleccionadoModelList(List<String> ids) {
+    public List<LibroSeleccionadoModel> toLibroSeleccionadoModelList(List<ObjectId> ids) {
         return ids.stream()
                 .map(this::toLibroSeleccionadoModelFromId)
                 .toList();
     }
 
-    public List<AsistenteModel> toAsistentesModelList(List<String> ids) {
+    public List<AsistenteModel> toAsistentesModelList(List<ObjectId> ids) {
         return ids.stream()
                 .map(this::toAsistenteModelFromId)
                 .toList();
@@ -145,15 +148,15 @@ public class ReunionMapper {
         return model;
     }
 
-    public AsistenteModel toAsistenteModelFromId(String asistenteId) {
+    public AsistenteModel toAsistenteModelFromId(ObjectId asistenteId) {
         AsistenteModel model = new AsistenteModel();
-        model.setAsistenteId(new org.bson.types.ObjectId(asistenteId));
+        model.setAsistenteId(asistenteId);
         return model;
     }
 
-    public LibroSeleccionadoModel toLibroSeleccionadoModelFromId(String libroId) {
+    public LibroSeleccionadoModel toLibroSeleccionadoModelFromId(ObjectId libroId) {
         LibroSeleccionadoModel model = new LibroSeleccionadoModel();
-        model.setPropuestaId(new org.bson.types.ObjectId(libroId));
+        model.setPropuestaId(libroId);
         return model;
     }
 

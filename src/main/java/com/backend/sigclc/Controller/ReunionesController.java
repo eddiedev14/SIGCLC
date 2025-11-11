@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +23,8 @@ import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.Service.Reuniones.IReunionesService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/SIGCLC/backend/reuniones")
 @CrossOrigin(origins = "*")
@@ -31,51 +33,51 @@ public class ReunionesController {
     private IReunionesService reunionesService;
 
     @PostMapping(value = "/insertar", consumes = "multipart/form-data")
-    public ResponseEntity<ReunionResponseDTO> insertarReunion(@ModelAttribute ReunionCreateDTO dto) {
-        ReunionResponseDTO respuesta = reunionesService.guardarReunion(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    public ResponseEntity<ReunionResponseDTO> insertarReunion(@Valid @ModelAttribute ReunionCreateDTO dto) {
+        ReunionResponseDTO response = reunionesService.guardarReunion(dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/listar")
     public ResponseEntity<List<ReunionResponseDTO>> listarReuniones() {
         List<ReunionResponseDTO> response = reunionesService.listarReuniones();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping(value = "/actualizar/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<ReunionResponseDTO> actualizarReunion(@PathVariable ObjectId id, @ModelAttribute ReunionUpdateDTO dto) {
-        ReunionResponseDTO respuesta = reunionesService.actualizarReunion(id, dto);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+    public ResponseEntity<ReunionResponseDTO> actualizarReunion(@PathVariable ObjectId id, @Valid @ModelAttribute ReunionUpdateDTO dto) {
+        ReunionResponseDTO response = reunionesService.actualizarReunion(id, dto);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/agregar-libros/{id}")
-    public ResponseEntity<ReunionResponseDTO> agregarLibrosAReunion(@PathVariable ObjectId id, @RequestParam("librosSeleccionadosId") List<String> librosSeleccionadosId) {
+    public ResponseEntity<ReunionResponseDTO> agregarLibrosAReunion(@PathVariable ObjectId id, @RequestBody List<String> librosSeleccionadosId) {
         ReunionResponseDTO response = reunionesService.agregarLibrosAReunion(id, librosSeleccionadosId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping(value = "/agregar-asistentes/{reunionId}", consumes = "multipart/form-data")
-    public ResponseEntity<ReunionResponseDTO> agregarAsistentesAReunion(@PathVariable ObjectId reunionId, @RequestParam("asistenteId") List<String> asistentesIds) {
-        ReunionResponseDTO respuesta = reunionesService.agregarAsistentesAReunion(reunionId, asistentesIds);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+    @PatchMapping(value = "/agregar-asistentes/{reunionId}")
+    public ResponseEntity<ReunionResponseDTO> agregarAsistentesAReunion(@PathVariable ObjectId reunionId, @RequestBody List<String> asistentesIds) {
+        ReunionResponseDTO response = reunionesService.agregarAsistentesAReunion(reunionId, asistentesIds);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/eliminar-libros/{id}")
     public ResponseEntity<ReunionResponseDTO> eliminarLibrosDeReunion(
             @PathVariable ObjectId id,
-            @RequestParam("librosSeleccionadosId") List<String> librosSeleccionadosId) {
+            @RequestBody List<String> librosSeleccionadosId) {
 
         ReunionResponseDTO response = reunionesService.eliminarLibrosSeleccionadosDeReunion(id, librosSeleccionadosId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping(value = "/eliminar-asistentes/{reunionId}", consumes = "multipart/form-data")
+    @PatchMapping(value = "/eliminar-asistentes/{reunionId}")
     public ResponseEntity<ReunionResponseDTO> eliminarAsistentesDeReunion(
             @PathVariable ObjectId reunionId,
-            @RequestParam("asistenteId") List<String> asistentesIds) {
+            @RequestBody List<String> asistentesIds) {
 
-        ReunionResponseDTO respuesta = reunionesService.eliminarAsistentesDeReunion(reunionId, asistentesIds);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        ReunionResponseDTO response = reunionesService.eliminarAsistentesDeReunion(reunionId, asistentesIds);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping(value = "/agregar-archivos/{reunionId}", consumes = "multipart/form-data")
@@ -83,14 +85,14 @@ public class ReunionesController {
             @PathVariable ObjectId reunionId,
             @RequestParam("archivosAdjuntos") List<MultipartFile> archivosAdjuntos) {
 
-        ReunionResponseDTO respuesta = reunionesService.agregarArchivosAReunion(reunionId, archivosAdjuntos);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        ReunionResponseDTO response = reunionesService.agregarArchivosAReunion(reunionId, archivosAdjuntos);
+        return ResponseEntity.ok(response);
     }
 
 
     @DeleteMapping(value = "/eliminar/{id}")
     public ResponseEntity<String> eliminarReunion(@PathVariable ObjectId id) {
-        String respuesta = reunionesService.eliminarReunion(id);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        String response = reunionesService.eliminarReunion(id);
+        return ResponseEntity.ok(response);
     }
 }

@@ -21,9 +21,9 @@ import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
-import com.backend.sigclc.Model.Reuniones.Modalidad;
+import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
-import com.backend.sigclc.Model.Reuniones.Tipo;
+import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
@@ -56,8 +56,8 @@ public class ReunionesServiceImp implements IReunionesService{
             ReunionesModel reunion = reunionMapper.toModel(dto);
 
             List<AsistenteModel> asistentes = new ArrayList<>();
-            for (String asistenteId : dto.getAsistentesId()) {
-                UsuariosModel usuario = usuariosRepository.findById(new ObjectId(asistenteId))
+            for (ObjectId asistenteId : dto.getAsistentesId()) {
+                UsuariosModel usuario = usuariosRepository.findById(asistenteId)
                     .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Error! No existe un usuario con id: " + asistenteId));
 
@@ -69,8 +69,8 @@ public class ReunionesServiceImp implements IReunionesService{
             reunion.setAsistentes(asistentes);
 
             List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
-            for (String libroId : dto.getLibrosSeleccionadosId()) {
-                LibrosModel libro = librosRepository.findById(new ObjectId(libroId))
+            for (ObjectId libroId : dto.getLibrosSeleccionadosId()) {
+                LibrosModel libro = librosRepository.findById(libroId)
                     .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Error! No existe un libro con id: " + libroId));
 
@@ -106,9 +106,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
                     String extension = archivosService.obtenerExtensionSinPunto(ruta);
                     switch (extension.toLowerCase()) {
-                        case "pdf" -> adjunto.setTipo(Tipo.pdf);
-                        case "jpg", "jpeg", "png" -> adjunto.setTipo(Tipo.imagen);
-                        case "ppt", "pptx" -> adjunto.setTipo(Tipo.presentacion);
+                        case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                        case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
                         default -> throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                     }
@@ -341,9 +341,9 @@ public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String>
 
                 String extension = archivosService.obtenerExtensionSinPunto(ruta);
                 switch (extension.toLowerCase()) {
-                    case "pdf" -> adjunto.setTipo(Tipo.pdf);
-                    case "jpg", "jpeg", "png" -> adjunto.setTipo(Tipo.imagen);
-                    case "ppt", "pptx" -> adjunto.setTipo(Tipo.presentacion);
+                    case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                    case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
                     default -> throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                 }
@@ -381,7 +381,7 @@ public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String>
                 ));
 
             if (dto.getModalidad() != null && 
-                !(dto.getModalidad().equals(Modalidad.presencial) || dto.getModalidad().equals(Modalidad.virtual))) {
+                !(dto.getModalidad().equals(ModalidadReunion.presencial) || dto.getModalidad().equals(ModalidadReunion.virtual))) {
                 throw new IllegalArgumentException("La modalidad solo puede ser presencial o virtual.");
             }
 
@@ -396,8 +396,8 @@ public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String>
 
             if (dto.getAsistentesId() != null) {
                 List<AsistenteModel> asistentes = new ArrayList<>();
-                for (String asistenteId : dto.getAsistentesId()) {
-                    UsuariosModel usuario = usuariosRepository.findById(new ObjectId(asistenteId))
+                for (ObjectId asistenteId : dto.getAsistentesId()) {
+                    UsuariosModel usuario = usuariosRepository.findById(asistenteId)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
                             "Error! No existe un usuario con id: " + asistenteId
                         ));
@@ -411,8 +411,8 @@ public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String>
 
             if (dto.getLibrosSeleccionadosId() != null) {
                 List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
-                for (String libroId : dto.getLibrosSeleccionadosId()) {
-                    LibrosModel libro = librosRepository.findById(new ObjectId(libroId))
+                for (ObjectId libroId : dto.getLibrosSeleccionadosId()) {
+                    LibrosModel libro = librosRepository.findById(libroId)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
                             "Error! No existe un libro con id: " + libroId
                         ));

@@ -1,6 +1,6 @@
 package com.backend.sigclc.Model.Reuniones;
 
-public enum Modalidad {
+public enum ModalidadReunion {
     presencial,
     virtual
 }
