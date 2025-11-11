@@ -28,8 +28,6 @@ public class ReunionMapper {
         model.setHora(dto.getHora());
         model.setModalidad(dto.getModalidad());
         model.setEspacioReunion(dto.getEspacioReunion());
-        model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
-        model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
         return model;
     }    
 
