@@ -14,6 +14,7 @@ import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.UsuarioMapper;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
@@ -30,6 +31,9 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private IReunionesRepository reunionesRepository;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -81,6 +85,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         librosRepository.actualizarNombreCreador(usuarioId, nombreCompleto);
         propuestasLibrosRepository.actualizarNombreUsuarioProponente(usuarioId, nombreCompleto);
         propuestasLibrosRepository.actualizarNombreUsuarioVoto(usuarioId, nombreCompleto);
+        reunionesRepository.actualizarNombreAsistente(usuarioId, nombreCompleto);
     }
 
     @Override
