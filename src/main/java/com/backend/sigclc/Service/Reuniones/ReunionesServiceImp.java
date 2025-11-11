@@ -18,6 +18,7 @@ import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReunionMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
@@ -26,6 +27,7 @@ import com.backend.sigclc.Model.Reuniones.ReunionesModel;
 import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
+import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Service.Archivos.IArchivosService;
@@ -37,6 +39,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
     @Autowired
     private ILibrosRepository librosRepository;
+
+    @Autowired
+    private IPropuestasLibrosRepository propuestasLibrosRepository;
 
     @Autowired
     private IUsuariosRepository usuariosRepository;
@@ -69,17 +74,20 @@ public class ReunionesServiceImp implements IReunionesService{
             reunion.setAsistentes(asistentes);
 
             List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
-            for (ObjectId libroId : dto.getLibrosSeleccionadosId()) {
-                LibrosModel libro = librosRepository.findById(libroId)
-                    .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Error! No existe un libro con id: " + libroId));
+            for (ObjectId propuestaId : dto.getLibrosSeleccionadosId()) {
+            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una propuesta con id: " + propuestaId));
 
-                LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
-                libroSel.setPropuestaId(libro.getId());
-                libroSel.setTitulo(libro.getTitulo());
-                libroSel.setGeneros(libro.getGeneros());
-                librosSeleccionados.add(libroSel);
-            }
+            LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
+
+            libroSel.setPropuestaId(propuesta.getId());
+
+            libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+            libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+
+            librosSeleccionados.add(libroSel);
+        }
             reunion.setLibrosSeleccionados(librosSeleccionados);
 
             List<ArchivoAdjuntoModel> adjuntos = new ArrayList<>();
