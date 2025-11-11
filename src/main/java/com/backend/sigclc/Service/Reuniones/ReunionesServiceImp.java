@@ -17,7 +17,6 @@ import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReunionMapper;
-import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
@@ -26,7 +25,6 @@ import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
 import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
-import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
@@ -36,9 +34,6 @@ import com.backend.sigclc.Service.Archivos.IArchivosService;
 public class ReunionesServiceImp implements IReunionesService{
     @Autowired
     private IReunionesRepository reunionesRepository;
-
-    @Autowired
-    private ILibrosRepository librosRepository;
 
     @Autowired
     private IPropuestasLibrosRepository propuestasLibrosRepository;
@@ -147,48 +142,50 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String> librosSeleccionadosId) {
-    try {
-        ReunionesModel reunion = reunionesRepository.findById(reunionId)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
-            ));
+    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String> librosSeleccionadosId) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(reunionId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
+                ));
 
-        if (reunion.getLibrosSeleccionados() == null) {
-            reunion.setLibrosSeleccionados(new ArrayList<>());
-        }
-
-        for (String libroIdStr : librosSeleccionadosId) {
-            ObjectId libroId = new ObjectId(libroIdStr);
-
-            boolean yaExiste = reunion.getLibrosSeleccionados().stream()
-                .anyMatch(lib -> lib.getPropuestaId().equals(libroId));
-
-            if (!yaExiste) {
-                LibrosModel libro = librosRepository.findById(libroId)
-                    .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Error! No existe un libro con id: " + libroId
-                    ));
-
-                LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
-                nuevo.setPropuestaId(libro.getId());
-                nuevo.setTitulo(libro.getTitulo());
-                nuevo.setGeneros(libro.getGeneros());
-
-                reunion.getLibrosSeleccionados().add(nuevo);
+            if (reunion.getLibrosSeleccionados() == null) {
+                reunion.setLibrosSeleccionados(new ArrayList<>());
             }
+
+            for (String propuestaIdStr : librosSeleccionadosId) {
+                ObjectId propuestaId = new ObjectId(propuestaIdStr);
+
+                boolean yaExiste = reunion.getLibrosSeleccionados().stream()
+                    .anyMatch(lib -> lib.getPropuestaId().equals(propuestaId));
+
+                if (!yaExiste) {
+                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe una propuesta con id: " + propuestaId
+                        ));
+
+                    LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
+
+                    nuevo.setPropuestaId(propuesta.getId());
+
+                    nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                    nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+
+                    reunion.getLibrosSeleccionados().add(nuevo);
+                }
+            }
+
+            reunionesRepository.save(reunion);
+
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
         }
-
-        reunionesRepository.save(reunion);
-
-        return reunionMapper.toResponseDTO(reunion);
-
-    } catch (RecursoNoEncontradoException e) {
-        throw e;
-    } catch (Exception e) {
-        e.printStackTrace();
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
-    }
     }
 
     @Override
@@ -419,17 +416,25 @@ public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String>
 
             if (dto.getLibrosSeleccionadosId() != null) {
                 List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
-                for (ObjectId libroId : dto.getLibrosSeleccionadosId()) {
-                    LibrosModel libro = librosRepository.findById(libroId)
+
+                for (ObjectId propuestaId : dto.getLibrosSeleccionadosId()) {
+                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe un libro con id: " + libroId
+                            "Error! No existe una propuesta con id: " + propuestaId
                         ));
+
                     LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
-                    libroSel.setPropuestaId(libro.getId());
-                    libroSel.setTitulo(libro.getTitulo());
-                    libroSel.setGeneros(libro.getGeneros());
+
+                    // ✅ Guarda el id de la propuesta
+                    libroSel.setPropuestaId(propuesta.getId());
+
+                    // ✅ Extrae los datos del libro dentro de la propuesta
+                    libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                    libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+
                     librosSeleccionados.add(libroSel);
                 }
+
                 reunion.setLibrosSeleccionados(librosSeleccionados);
             }
 
