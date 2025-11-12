@@ -3,6 +3,7 @@ package com.backend.sigclc.Service.Reuniones;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -54,6 +55,8 @@ public class ReunionesServiceImp implements IReunionesService{
     public ReunionResponseDTO guardarReunion(ReunionCreateDTO dto) {
         try {
             ReunionesModel reunion = reunionMapper.toModel(dto);
+
+            validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
 
             List<AsistenteModel> asistentes = new ArrayList<>();
             for (ObjectId asistenteId : dto.getAsistentesId()) {
@@ -148,6 +151,13 @@ public class ReunionesServiceImp implements IReunionesService{
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
+
+            List<ObjectId> librosIds = new ArrayList<>();
+            for (String idStr : librosSeleccionadosId) {
+                librosIds.add(new ObjectId(idStr));
+            }
+
+            validarFechaReunionConPeriodos(reunion.getFecha(), librosIds);
 
             List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
@@ -402,6 +412,8 @@ public class ReunionesServiceImp implements IReunionesService{
             }
 
             if (dto.getLibrosSeleccionadosId() != null) {
+                validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
+
                 List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
 
                 for (ObjectId propuestaId : dto.getLibrosSeleccionadosId()) {
@@ -433,6 +445,50 @@ public class ReunionesServiceImp implements IReunionesService{
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al actualizar la reunión", e);
+        }
+    }
+
+    private void validarFechaReunionConPeriodos(Date fechaReunion, List<ObjectId> librosSeleccionadosId) {
+        if (librosSeleccionadosId == null || librosSeleccionadosId.isEmpty()) {
+            return; 
+        }
+
+        Date fechaInterseccionInicio = null;
+        Date fechaInterseccionFin = null;
+
+        // Iterar sobre cada período de selección para encontrar la intersección
+        for (ObjectId propuestaId : librosSeleccionadosId) {
+            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una propuesta con id: " + propuestaId));
+
+            if (propuesta.getPeriodoSeleccion() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "La propuesta con id: " + propuestaId + " no tiene período de selección asignado.");
+            }
+
+            Date periodoInicio = propuesta.getPeriodoSeleccion().getFechaInicio();
+            Date periodoFin = propuesta.getPeriodoSeleccion().getFechaFin();
+
+            if (fechaInterseccionInicio == null) {
+                fechaInterseccionInicio = periodoInicio;
+                fechaInterseccionFin = periodoFin;
+            } else {
+                // Actualizar la intersección: tomar el máximo de los inicios y el mínimo de los finales
+                if (periodoInicio.after(fechaInterseccionInicio)) {
+                    fechaInterseccionInicio = periodoInicio;
+                }
+                if (periodoFin.before(fechaInterseccionFin)) {
+                    fechaInterseccionFin = periodoFin;
+                }
+            }
+        }
+
+        // Validar que la fecha de la reunión esté dentro de la intersección
+        if (fechaReunion.before(fechaInterseccionInicio) || fechaReunion.after(fechaInterseccionFin)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "La fecha de la reunión debe estar entre el " + fechaInterseccionInicio + 
+                " y el " + fechaInterseccionFin + " (períodos de selección de los libros).");
         }
     }
 
