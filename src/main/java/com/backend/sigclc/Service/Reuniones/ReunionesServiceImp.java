@@ -19,6 +19,8 @@ import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReunionMapper;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
+import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
+import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
@@ -57,6 +59,7 @@ public class ReunionesServiceImp implements IReunionesService{
             ReunionesModel reunion = reunionMapper.toModel(dto);
 
             validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
+            validarLibrosSeleccionadosNoLeidos(dto.getLibrosSeleccionadosId());
 
             List<AsistenteModel> asistentes = new ArrayList<>();
             for (ObjectId asistenteId : dto.getAsistentesId()) {
@@ -145,7 +148,7 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String> librosSeleccionadosId) {
+    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<ObjectId> librosSeleccionadosId) {
         try {
             ReunionesModel reunion = reunionesRepository.findById(reunionId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -153,29 +156,28 @@ public class ReunionesServiceImp implements IReunionesService{
                 ));
 
             List<ObjectId> librosIds = new ArrayList<>();
-            for (String idStr : librosSeleccionadosId) {
-                librosIds.add(new ObjectId(idStr));
+            for (ObjectId idStr : librosSeleccionadosId) {
+                librosIds.add(idStr);
             }
 
             validarFechaReunionConPeriodos(reunion.getFecha(), librosIds);
+            validarLibrosSeleccionadosNoLeidos(librosIds);
 
             List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
-            for (String propuestaIdStr : librosSeleccionadosId) {
-                ObjectId propuestaId = new ObjectId(propuestaIdStr);
-
+            for (ObjectId propuestaIdStr : librosSeleccionadosId) {
                 boolean yaExiste = false;
                 for (LibroSeleccionadoModel libro : librosSeleccionados) {
-                    if (libro.getPropuestaId().equals(propuestaId)) {
+                    if (libro.getPropuestaId().equals(propuestaIdStr)) {
                         yaExiste = true;
                         break;
                     }
                 }
 
                 if (!yaExiste) {
-                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaIdStr)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe una propuesta con id: " + propuestaId
+                            "Error! No existe una propuesta con id: " + propuestaIdStr
                         ));
 
                     LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
@@ -196,7 +198,7 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<String> asistentesId) {
+    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
         try {
             ReunionesModel reunion = reunionesRepository.findById(reunionId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -205,21 +207,19 @@ public class ReunionesServiceImp implements IReunionesService{
 
             List<AsistenteModel> asistentes = reunion.getAsistentes();
 
-            for (String asistenteIdStr : asistentesId) {
-                ObjectId asistenteId = new ObjectId(asistenteIdStr);
-
+            for (ObjectId asistenteIdStr : asistentesId) {
                 boolean yaExiste = false;
                 for (AsistenteModel asistente : asistentes) {
-                    if (asistente.getAsistenteId().equals(asistenteId)) {
+                    if (asistente.getAsistenteId().equals(asistenteIdStr)) {
                         yaExiste = true;
                         break;
                     }
                 }
 
                 if (!yaExiste) {
-                    UsuariosModel usuario = usuariosRepository.findById(asistenteId)
+                    UsuariosModel usuario = usuariosRepository.findById(asistenteIdStr)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe un usuario con id: " + asistenteId
+                            "Error! No existe un usuario con id: " + asistenteIdStr
                         ));
 
                     AsistenteModel nuevo = new AsistenteModel();
@@ -239,7 +239,7 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId reunionId, List<String> asistentesId) {
+    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
         try {
             ReunionesModel reunion = reunionesRepository.findById(reunionId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -251,9 +251,8 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene asistentes registrados.");
             }
 
-            for (String idStr : asistentesId) {
-                ObjectId idEliminar = new ObjectId(idStr);
-                asistentes.removeIf(a -> a.getAsistenteId().equals(idEliminar));
+            for (ObjectId idStr : asistentesId) {
+                asistentes.removeIf(a -> a.getAsistenteId().equals(idStr));
             }
 
             reunionesRepository.save(reunion);
@@ -266,7 +265,7 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId reunionId, List<String> librosId) {
+    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId reunionId, List<ObjectId> librosId) {
         try {
             ReunionesModel reunion = reunionesRepository.findById(reunionId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -278,9 +277,8 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene libros seleccionados.");
             }
 
-            for (String idStr : librosId) {
-                ObjectId idEliminar = new ObjectId(idStr);
-                libros.removeIf(l -> l.getPropuestaId().equals(idEliminar));
+            for (ObjectId idStr : librosId) {
+                libros.removeIf(l -> l.getPropuestaId().equals(idStr));
             }
 
             reunionesRepository.save(reunion);
@@ -413,6 +411,7 @@ public class ReunionesServiceImp implements IReunionesService{
 
             if (dto.getLibrosSeleccionadosId() != null) {
                 validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
+                validarLibrosSeleccionadosNoLeidos(dto.getLibrosSeleccionadosId());
 
                 List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
 
@@ -489,6 +488,29 @@ public class ReunionesServiceImp implements IReunionesService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
                 "La fecha de la reunión debe estar entre el " + fechaInterseccionInicio + 
                 " y el " + fechaInterseccionFin + " (períodos de selección de los libros).");
+        }
+    }
+
+    private void validarLibrosSeleccionadosNoLeidos(List<ObjectId> librosSeleccionadosId) {
+        if (librosSeleccionadosId == null || librosSeleccionadosId.isEmpty()) {
+            return;
+        }
+
+        for (ObjectId propuestaId : librosSeleccionadosId) {
+            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una propuesta con id: " + propuestaId));
+
+            if (propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La propuesta con id: " + propuestaId + " debe estar en estado 'seleccionada' para agregarse a una reunión.");
+            }
+
+            EstadoLectura estadoLectura = propuesta.getLibroPropuesto().getEstadoLectura();
+            if (estadoLectura == null || estadoLectura == EstadoLectura.leido) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El libro de la propuesta con id: " + propuestaId + " debe estar en estado de lectura 'pendiente' o 'en_lectura' (no leído).");
+            }
         }
     }
 

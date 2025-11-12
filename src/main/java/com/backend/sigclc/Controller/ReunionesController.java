@@ -52,13 +52,13 @@ public class ReunionesController {
     }
 
     @PatchMapping("/agregar-libros/{id}")
-    public ResponseEntity<ReunionResponseDTO> agregarLibrosAReunion(@PathVariable ObjectId id, @RequestBody List<String> librosSeleccionadosId) {
+    public ResponseEntity<ReunionResponseDTO> agregarLibrosAReunion(@PathVariable ObjectId id, @RequestBody List<ObjectId> librosSeleccionadosId) {
         ReunionResponseDTO response = reunionesService.agregarLibrosAReunion(id, librosSeleccionadosId);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping(value = "/agregar-asistentes/{reunionId}")
-    public ResponseEntity<ReunionResponseDTO> agregarAsistentesAReunion(@PathVariable ObjectId reunionId, @RequestBody List<String> asistentesIds) {
+    public ResponseEntity<ReunionResponseDTO> agregarAsistentesAReunion(@PathVariable ObjectId reunionId, @RequestBody List<ObjectId> asistentesIds) {
         ReunionResponseDTO response = reunionesService.agregarAsistentesAReunion(reunionId, asistentesIds);
         return ResponseEntity.ok(response);
     }
@@ -66,7 +66,7 @@ public class ReunionesController {
     @PatchMapping("/eliminar-libros/{id}")
     public ResponseEntity<ReunionResponseDTO> eliminarLibrosDeReunion(
             @PathVariable ObjectId id,
-            @RequestBody List<String> librosSeleccionadosId) {
+            @RequestBody List<ObjectId> librosSeleccionadosId) {
 
         ReunionResponseDTO response = reunionesService.eliminarLibrosSeleccionadosDeReunion(id, librosSeleccionadosId);
         return ResponseEntity.ok(response);
@@ -75,7 +75,7 @@ public class ReunionesController {
     @PatchMapping(value = "/eliminar-asistentes/{reunionId}")
     public ResponseEntity<ReunionResponseDTO> eliminarAsistentesDeReunion(
             @PathVariable ObjectId reunionId,
-            @RequestBody List<String> asistentesIds) {
+            @RequestBody List<ObjectId> asistentesIds) {
 
         ReunionResponseDTO response = reunionesService.eliminarAsistentesDeReunion(reunionId, asistentesIds);
         return ResponseEntity.ok(response);

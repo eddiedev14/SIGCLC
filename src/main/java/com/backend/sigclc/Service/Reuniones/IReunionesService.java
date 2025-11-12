@@ -15,10 +15,10 @@ public interface IReunionesService {
     public List<ReunionResponseDTO> listarReuniones();
     public String eliminarReunion(ObjectId id);
     public ReunionResponseDTO actualizarReunion(ObjectId id, ReunionUpdateDTO dto);
-    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<String> librosIds);
-    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<String> asistentesIds);
-    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId id, List<String> asistentesId);
-    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId id, List<String> librosId);
+    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<ObjectId> librosIds);
+    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<ObjectId> asistentesIds);
+    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId id, List<ObjectId> asistentesId);
+    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId id, List<ObjectId> librosId);
     public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos);
     public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId);
     public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId);
