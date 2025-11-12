@@ -425,10 +425,8 @@ public class ReunionesServiceImp implements IReunionesService{
 
                     LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
 
-                    // ✅ Guarda el id de la propuesta
                     libroSel.setPropuestaId(propuesta.getId());
 
-                    // ✅ Extrae los datos del libro dentro de la propuesta
                     libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
                     libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
 
