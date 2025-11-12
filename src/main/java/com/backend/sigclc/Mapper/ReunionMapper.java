@@ -12,7 +12,6 @@ import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
-import com.backend.sigclc.DTO.Reuniones.ArchivoAdjuntoDTO;
 import com.backend.sigclc.DTO.Reuniones.ArchivoAdjuntoResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.AsistenteDTO;
 import com.backend.sigclc.DTO.Reuniones.AsistenteResponseDTO;
@@ -54,12 +53,6 @@ public class ReunionMapper {
     public LibroSeleccionadoModel toLibroSeleccionadoModel(LibroSeleccionadoDTO dto) {
         LibroSeleccionadoModel model = new LibroSeleccionadoModel();
         model.setPropuestaId(dto.getLibroSeleccionadoId());
-        return model;
-    }
-
-    public ArchivoAdjuntoModel toArchivoAdjuntoModel(ArchivoAdjuntoDTO dto) {
-        ArchivoAdjuntoModel model = new ArchivoAdjuntoModel();
-        //model.setArchivo(dto.getArchivo());
         return model;
     }
 
@@ -121,31 +114,6 @@ public class ReunionMapper {
                 .toList();
     }
 
-    public List<ArchivoAdjuntoModel> toArchivosAdjuntosModelList(List<ArchivoAdjuntoResponseDTO> dtos) {
-        return dtos.stream()
-                .map(this::toArchivoAdjuntoModelFromResponseDTO)
-                .toList();
-    }
-
-    public LibroSeleccionadoModel toLibroSeleccionadoModelFromResponseDTO(LibroSeleccionadoResponseDTO dto) {
-        LibroSeleccionadoModel model = new LibroSeleccionadoModel();
-        model.setPropuestaId(new org.bson.types.ObjectId(dto.getLibroSeleccionadoId()));
-        return model;
-    }
-
-    public ArchivoAdjuntoModel toArchivoAdjuntoModelFromResponseDTO(ArchivoAdjuntoResponseDTO dto) {
-        ArchivoAdjuntoModel model = new ArchivoAdjuntoModel();
-        model.setArchivoPath(dto.getArchivoPath());
-        model.setTipo(dto.getTipo());
-        return model;
-    }
-
-    public AsistenteModel toAsistenteModelFromResponseDTO(AsistenteResponseDTO dto) {
-        AsistenteModel model = new AsistenteModel();
-        model.setAsistenteId(new org.bson.types.ObjectId(dto.getAsistenteId()));
-        return model;
-    }
-
     public AsistenteModel toAsistenteModelFromId(ObjectId asistenteId) {
         AsistenteModel model = new AsistenteModel();
         model.setAsistenteId(asistenteId);
@@ -167,7 +135,6 @@ public class ReunionMapper {
         if (dto.getEspacioReunion() != null) model.setEspacioReunion(dto.getEspacioReunion());
         if (dto.getLibrosSeleccionadosId() != null) model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
         if (dto.getAsistentesId() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
-        //if (dto.getArchivosAdjuntos() != null) model.setArchivosAdjuntos(toArchivosAdjuntosModelList(dto.getArchivosAdjuntos()));
     }
 
     

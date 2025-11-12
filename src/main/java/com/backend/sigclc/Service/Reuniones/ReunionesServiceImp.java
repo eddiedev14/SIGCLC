@@ -5,6 +5,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,29 +150,24 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            List<ObjectId> librosIds = new ArrayList<>();
-            for (ObjectId idStr : librosSeleccionadosId) {
-                librosIds.add(idStr);
-            }
-
-            validarFechaReunionConPeriodos(reunion.getFecha(), librosIds);
-            validarLibrosSeleccionadosNoLeidos(librosIds);
+            validarFechaReunionConPeriodos(reunion.getFecha(), librosSeleccionadosId);
+            validarLibrosSeleccionadosNoLeidos(librosSeleccionadosId);
 
             List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
-            for (ObjectId propuestaIdStr : librosSeleccionadosId) {
+            for (ObjectId propuestaId : librosSeleccionadosId) {
                 boolean yaExiste = false;
                 for (LibroSeleccionadoModel libro : librosSeleccionados) {
-                    if (libro.getPropuestaId().equals(propuestaIdStr)) {
+                    if (libro.getPropuestaId().equals(propuestaId)) {
                         yaExiste = true;
                         break;
                     }
                 }
 
                 if (!yaExiste) {
-                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaIdStr)
+                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe una propuesta con id: " + propuestaIdStr
+                            "Error! No existe una propuesta con id: " + propuestaId
                         ));
 
                     LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
@@ -184,6 +181,10 @@ public class ReunionesServiceImp implements IReunionesService{
             reunionesRepository.save(reunion);
             return reunionMapper.toResponseDTO(reunion);
 
+        } catch (RecursoNoEncontradoException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
@@ -225,6 +226,10 @@ public class ReunionesServiceImp implements IReunionesService{
             reunionesRepository.save(reunion);
             return reunionMapper.toResponseDTO(reunion);
 
+        } catch (RecursoNoEncontradoException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar asistentes a la reunión", e);
@@ -382,10 +387,7 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new IllegalArgumentException("Debe especificar un espacioReunion (dirección o enlace) si cambia la modalidad.");
             }
 
-            if (dto.getFecha() != null) reunion.setFecha(dto.getFecha());
-            if (dto.getHora() != null) reunion.setHora(dto.getHora());
-            if (dto.getModalidad() != null) reunion.setModalidad(dto.getModalidad());
-            if (dto.getEspacioReunion() != null) reunion.setEspacioReunion(dto.getEspacioReunion());
+            reunionMapper.updateModelFromDTO(reunion, dto);
 
             if (dto.getAsistentesId() != null) {
                 List<AsistenteModel> asistentes = new ArrayList<>();
