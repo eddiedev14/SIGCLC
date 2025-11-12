@@ -2,6 +2,7 @@ package com.backend.sigclc.Repository;
 
 
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -44,5 +45,26 @@ public interface IReunionesRepository extends MongoRepository <ReunionesModel, O
     @Query("{'librosSeleccionados.id': ?0}")
     @Update("{'$pull': {'librosSeleccionados': {'id': ?0}}}")
     void eliminarLibroDeReuniones(ObjectId libroId);
+
+    // buscar reuniones por asistente
+    @Query("{'asistentes.asistenteId': ?0}")
+    List<ReunionesModel> buscarPorAsistenteId(ObjectId asistenteId);
+
+    // buscar reuniones por libro seleccionado
+    @Query("{'librosSeleccionados.propuestaId': ?0}")
+    List<ReunionesModel> buscarPorLibroSeleccionadoId(ObjectId libroId);
+
+    // buscar reuniones por fecha específica
+    @Query("""
+        {
+            $expr: {
+                $eq: [
+                    { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
+                    { $dateToString: { format: "%Y-%m-%d", date: ?0 } }
+                ]
+            }
+        }
+        """)
+    List<ReunionesModel> buscarPorFecha(Date fecha);
 
 }
