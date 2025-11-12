@@ -95,13 +95,6 @@ public class ReunionesServiceImp implements IReunionesService{
             if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
                 boolean tieneArchivoValido = false;
                 for (MultipartFile archivo : dto.getArchivosAdjuntos()) {
-                    System.out.println("Archivo recibido: " + archivo.getOriginalFilename() + " | vacío: " + archivo.isEmpty());
-                    if (archivo == null || archivo.isEmpty()) {
-                        throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Se detectó un campo de archivo vacío. Todos los archivos deben tener contenido."
-                    );
-                }
 
                     tieneArchivoValido = true;
                     String ruta = archivosService.guardarArchivo(
