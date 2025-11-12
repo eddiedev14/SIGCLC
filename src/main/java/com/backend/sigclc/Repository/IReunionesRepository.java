@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
 
 @Repository
@@ -37,7 +38,7 @@ public interface IReunionesRepository extends MongoRepository <ReunionesModel, O
     // Actualizar géneros del libro si se modifican
     @Query("{'librosSeleccionados.id': ?0}")
     @Update("{'$set': {'librosSeleccionados.$.generos': ?1}}")
-    void actualizarGenerosLibroSeleccionado(ObjectId libroId, List<String> nuevosGeneros);
+    void actualizarGenerosLibroSeleccionado(ObjectId libroId, List<GeneroLibro> nuevosGeneros);
 
     // Eliminar libro de todas las reuniones si se elimina el libro
     @Query("{'librosSeleccionados.id': ?0}")
