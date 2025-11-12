@@ -309,15 +309,13 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + id + " o está mal escrito."
                 ));
 
-            if (reunion.getArchivosAdjuntos() == null) {
-                reunion.setArchivosAdjuntos(new ArrayList<>());
-            }
+            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
 
             boolean tieneArchivoValido = false;
 
             for (MultipartFile archivo : archivosAdjuntos) {
                 if (archivo == null || archivo.isEmpty()) {
-                    continue; 
+                    continue;
                 }
 
                 tieneArchivoValido = true;
@@ -327,6 +325,13 @@ public class ReunionesServiceImp implements IReunionesService{
                     CARPETA_ARCHIVOS,
                     EXTENSIONES_PERMITIDAS
                 );
+
+                boolean yaExiste = adjuntos.stream()
+                    .anyMatch(a -> a.getArchivoPath().equals(ruta));
+
+                if (yaExiste) {
+                    continue;
+                }
 
                 ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
                 adjunto.setArchivoPath(ruta);
@@ -339,13 +344,8 @@ public class ReunionesServiceImp implements IReunionesService{
                     default -> throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                 }
+                adjuntos.add(adjunto);
 
-                boolean yaExiste = reunion.getArchivosAdjuntos().stream()
-                    .anyMatch(a -> a.getArchivoPath().equals(ruta));
-
-                if (!yaExiste) {
-                    reunion.getArchivosAdjuntos().add(adjunto);
-                }
             }
 
             if (!tieneArchivoValido) {
