@@ -493,4 +493,25 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
 
+    // ---------- AGREGACIONES ----------
+
+    @Override
+    public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorAsistenteId(asistenteId);
+        return reunionMapper.toResponseDTOList(reuniones);
+    }
+
+    @Override
+    public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorLibroSeleccionadoId(libroId);
+        return reunionMapper.toResponseDTOList(reuniones);
+    }
+
+    @Override
+    public List<ReunionResponseDTO> listarPorFecha(Date fecha) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorFecha(fecha);
+        return reunionMapper.toResponseDTOList(reuniones);
+    }
+
+
 }

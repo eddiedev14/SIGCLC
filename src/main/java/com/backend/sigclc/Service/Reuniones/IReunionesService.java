@@ -1,5 +1,6 @@
 package com.backend.sigclc.Service.Reuniones;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -19,4 +20,7 @@ public interface IReunionesService {
     public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId id, List<String> asistentesId);
     public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId id, List<String> librosId);
     public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos);
+    public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId);
+    public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId);
+    public List<ReunionResponseDTO> listarPorFecha(Date fecha);
 }
