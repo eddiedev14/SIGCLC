@@ -1,9 +1,11 @@
 package com.backend.sigclc.Controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -92,6 +94,25 @@ public class ReunionesController {
     @DeleteMapping(value = "/eliminar/{id}")
     public ResponseEntity<String> eliminarReunion(@PathVariable ObjectId id) {
         String response = reunionesService.eliminarReunion(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/listar-por-asistente/{asistenteId}")
+    public ResponseEntity<List<ReunionResponseDTO>> listarPorAsistenteId(@PathVariable ObjectId asistenteId) {
+        List<ReunionResponseDTO> response = reunionesService.listarPorAsistenteId(asistenteId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/listar-por-libro/{libroId}")
+    public ResponseEntity<List<ReunionResponseDTO>> listarPorLibroSeleccionadoId(@PathVariable ObjectId libroId) {
+        List<ReunionResponseDTO> response = reunionesService.listarPorLibroSeleccionadoId(libroId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/listar-por-fecha/{fecha}")
+    public ResponseEntity<List<ReunionResponseDTO>> listarPorFecha(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fecha) {
+        List<ReunionResponseDTO> response = reunionesService.listarPorFecha(fecha);
         return ResponseEntity.ok(response);
     }
 }
