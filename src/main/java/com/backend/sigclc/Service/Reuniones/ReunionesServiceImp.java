@@ -149,15 +149,18 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            if (reunion.getLibrosSeleccionados() == null) {
-                reunion.setLibrosSeleccionados(new ArrayList<>());
-            }
+            List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
             for (String propuestaIdStr : librosSeleccionadosId) {
                 ObjectId propuestaId = new ObjectId(propuestaIdStr);
 
-                boolean yaExiste = reunion.getLibrosSeleccionados().stream()
-                    .anyMatch(lib -> lib.getPropuestaId().equals(propuestaId));
+                boolean yaExiste = false;
+                for (LibroSeleccionadoModel libro : librosSeleccionados) {
+                    if (libro.getPropuestaId().equals(propuestaId)) {
+                        yaExiste = true;
+                        break;
+                    }
+                }
 
                 if (!yaExiste) {
                     PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
@@ -166,22 +169,16 @@ public class ReunionesServiceImp implements IReunionesService{
                         ));
 
                     LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
-
                     nuevo.setPropuestaId(propuesta.getId());
-
                     nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
                     nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-
-                    reunion.getLibrosSeleccionados().add(nuevo);
+                    librosSeleccionados.add(nuevo);
                 }
             }
 
             reunionesRepository.save(reunion);
-
             return reunionMapper.toResponseDTO(reunion);
 
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
@@ -196,15 +193,18 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            if (reunion.getAsistentes() == null) {
-                reunion.setAsistentes(new ArrayList<>());
-            }
+            List<AsistenteModel> asistentes = reunion.getAsistentes();
 
             for (String asistenteIdStr : asistentesId) {
                 ObjectId asistenteId = new ObjectId(asistenteIdStr);
 
-                boolean yaExiste = reunion.getAsistentes().stream()
-                    .anyMatch(a -> a.getAsistenteId().equals(asistenteId));
+                boolean yaExiste = false;
+                for (AsistenteModel asistente : asistentes) {
+                    if (asistente.getAsistenteId().equals(asistenteId)) {
+                        yaExiste = true;
+                        break;
+                    }
+                }
 
                 if (!yaExiste) {
                     UsuariosModel usuario = usuariosRepository.findById(asistenteId)
@@ -215,17 +215,13 @@ public class ReunionesServiceImp implements IReunionesService{
                     AsistenteModel nuevo = new AsistenteModel();
                     nuevo.setAsistenteId(usuario.getId());
                     nuevo.setNombreCompleto(usuario.getNombreCompleto());
-
-                    reunion.getAsistentes().add(nuevo);
+                    asistentes.add(nuevo);
                 }
             }
 
             reunionesRepository.save(reunion);
-
             return reunionMapper.toResponseDTO(reunion);
 
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar asistentes a la reunión", e);
@@ -240,24 +236,19 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            if (reunion.getAsistentes() == null || reunion.getAsistentes().isEmpty()) {
+            List<AsistenteModel> asistentes = reunion.getAsistentes();
+            if (asistentes.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene asistentes registrados.");
             }
 
-            List<ObjectId> idsAEliminar = asistentesId.stream().map(ObjectId::new).toList();
-
-            reunion.setAsistentes(
-                reunion.getAsistentes().stream()
-                    .filter(a -> !idsAEliminar.contains(a.getAsistenteId()))
-                    .toList()
-            );
+            for (String idStr : asistentesId) {
+                ObjectId idEliminar = new ObjectId(idStr);
+                asistentes.removeIf(a -> a.getAsistenteId().equals(idEliminar));
+            }
 
             reunionesRepository.save(reunion);
-
             return reunionMapper.toResponseDTO(reunion);
 
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar asistentes de la reunión", e);
@@ -272,23 +263,19 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            if (reunion.getLibrosSeleccionados() == null || reunion.getLibrosSeleccionados().isEmpty()) {
+            List<LibroSeleccionadoModel> libros = reunion.getLibrosSeleccionados();
+            if (libros.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene libros seleccionados.");
             }
 
-            List<ObjectId> idsAEliminar = librosId.stream().map(ObjectId::new).toList();
-
-            reunion.setLibrosSeleccionados(
-                reunion.getLibrosSeleccionados().stream()
-                    .filter(l -> !idsAEliminar.contains(l.getPropuestaId()))
-                    .toList()
-            );
+            for (String idStr : librosId) {
+                ObjectId idEliminar = new ObjectId(idStr);
+                libros.removeIf(l -> l.getPropuestaId().equals(idEliminar));
+            }
 
             reunionesRepository.save(reunion);
             return reunionMapper.toResponseDTO(reunion);
 
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar libros de la reunión", e);
