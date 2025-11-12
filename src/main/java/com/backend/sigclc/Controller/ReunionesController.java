@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,7 +82,7 @@ public class ReunionesController {
     @PatchMapping(value = "/agregar-archivos/{reunionId}", consumes = "multipart/form-data")
     public ResponseEntity<ReunionResponseDTO> agregarArchivosAReunion(
             @PathVariable ObjectId reunionId,
-            @RequestParam("archivosAdjuntos") List<MultipartFile> archivosAdjuntos) {
+            @ModelAttribute List<MultipartFile> archivosAdjuntos) {
 
         ReunionResponseDTO response = reunionesService.agregarArchivosAReunion(reunionId, archivosAdjuntos);
         return ResponseEntity.ok(response);
