@@ -21,11 +21,6 @@ public interface IReunionesRepository extends MongoRepository <ReunionesModel, O
     @Update("{'$set': {'asistentes.$.nombre': ?1}}")
     void actualizarNombreAsistente(ObjectId asistenteId, String nuevoNombre);
 
-    // Eliminar asistente de todas las reuniones si se elimina el usuario
-    @Query("{'asistentes.id': ?0}")
-    @Update("{'$pull': {'asistentes': {'id': ?0}}}")
-    void eliminarAsistenteDeReuniones(ObjectId asistenteId);
-
     // Actualizar título de libro si se modifica
     @Query("{'librosSeleccionados.id': ?0}")
     @Update("{'$set': {'librosSeleccionados.$.titulo': ?1}}")
@@ -40,11 +35,6 @@ public interface IReunionesRepository extends MongoRepository <ReunionesModel, O
     @Query("{'librosSeleccionados.id': ?0}")
     @Update("{'$set': {'librosSeleccionados.$.generos': ?1}}")
     void actualizarGenerosLibroSeleccionado(ObjectId libroId, List<GeneroLibro> nuevosGeneros);
-
-    // Eliminar libro de todas las reuniones si se elimina el libro
-    @Query("{'librosSeleccionados.id': ?0}")
-    @Update("{'$pull': {'librosSeleccionados': {'id': ?0}}}")
-    void eliminarLibroDeReuniones(ObjectId libroId);
 
     // buscar reuniones por asistente
     @Query("{'asistentes.asistenteId': ?0}")
