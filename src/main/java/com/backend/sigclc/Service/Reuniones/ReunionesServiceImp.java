@@ -2,11 +2,10 @@ package com.backend.sigclc.Service.Reuniones;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.HashSet;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +59,14 @@ public class ReunionesServiceImp implements IReunionesService{
         try {
             ReunionesModel reunion = reunionMapper.toModel(dto);
 
-            validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
-            validarLibrosSeleccionadosNoLeidos(dto.getLibrosSeleccionadosId());
+            // Obtener todas las propuestas una sola vez
+            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(dto.getLibrosSeleccionadosId());
+            
+            // Validar usando las propuestas ya obtenidas
+            validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
+            validarLibrosSeleccionadosNoLeidos(propuestas);
 
-            List<AsistenteModel> asistentes = new ArrayList<>();
+            List<AsistenteModel> asistentes = reunion.getAsistentes();
             for (ObjectId asistenteId : dto.getAsistentesId()) {
                 UsuariosModel usuario = usuariosRepository.findById(asistenteId)
                     .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -76,24 +79,19 @@ public class ReunionesServiceImp implements IReunionesService{
             }
             reunion.setAsistentes(asistentes);
 
-            List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
-            for (ObjectId propuestaId : dto.getLibrosSeleccionadosId()) {
-            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una propuesta con id: " + propuestaId));
-
-            LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
-
-            libroSel.setPropuestaId(propuesta.getId());
-
-            libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
-            libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-
-            librosSeleccionados.add(libroSel);
-        }
+            // Reutilizar las propuestas ya obtenidas
+            List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
+            for (PropuestasLibrosModel propuesta : propuestas) {
+                LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
+                libroSel.setPropuestaId(propuesta.getId());
+                libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+                librosSeleccionados.add(libroSel);
+            }
             reunion.setLibrosSeleccionados(librosSeleccionados);
 
-            List<ArchivoAdjuntoModel> adjuntos = new ArrayList<>();
+            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+            adjuntos.clear();
             if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
                 boolean tieneArchivoValido = false;
                 for (MultipartFile archivo : dto.getArchivosAdjuntos()) {
@@ -150,32 +148,33 @@ public class ReunionesServiceImp implements IReunionesService{
                     "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
                 ));
 
-            validarFechaReunionConPeriodos(reunion.getFecha(), librosSeleccionadosId);
-            validarLibrosSeleccionadosNoLeidos(librosSeleccionadosId);
+            // Obtener todas las propuestas una sola vez
+            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(librosSeleccionadosId);
+            
+            // Validar usando las propuestas ya obtenidas
+            validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
+            validarLibrosSeleccionadosNoLeidos(propuestas);
 
             List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
-            for (ObjectId propuestaId : librosSeleccionadosId) {
-                boolean yaExiste = false;
-                for (LibroSeleccionadoModel libro : librosSeleccionados) {
-                    if (libro.getPropuestaId().equals(propuestaId)) {
-                        yaExiste = true;
-                        break;
-                    }
+            Set<ObjectId> existentes = new HashSet<>();
+            for (LibroSeleccionadoModel libro : librosSeleccionados) {
+                existentes.add(libro.getPropuestaId());
+            }
+
+            // Reutilizar las propuestas ya obtenidas
+            for (PropuestasLibrosModel propuesta : propuestas) {
+                if (existentes.contains(propuesta.getId())) {
+                    continue; 
                 }
 
-                if (!yaExiste) {
-                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
-                        .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe una propuesta con id: " + propuestaId
-                        ));
+                LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
+                nuevo.setPropuestaId(propuesta.getId());
+                nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+                librosSeleccionados.add(nuevo);
 
-                    LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
-                    nuevo.setPropuestaId(propuesta.getId());
-                    nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
-                    nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-                    librosSeleccionados.add(nuevo);
-                }
+                existentes.add(propuesta.getId());
             }
 
             reunionesRepository.save(reunion);
@@ -390,7 +389,7 @@ public class ReunionesServiceImp implements IReunionesService{
             reunionMapper.updateModelFromDTO(reunion, dto);
 
             if (dto.getAsistentesId() != null) {
-                List<AsistenteModel> asistentes = new ArrayList<>();
+                List<AsistenteModel> asistentes = reunion.getAsistentes();
                 for (ObjectId asistenteId : dto.getAsistentesId()) {
                     UsuariosModel usuario = usuariosRepository.findById(asistenteId)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -405,24 +404,18 @@ public class ReunionesServiceImp implements IReunionesService{
             }
 
             if (dto.getLibrosSeleccionadosId() != null) {
-                validarFechaReunionConPeriodos(reunion.getFecha(), dto.getLibrosSeleccionadosId());
-                validarLibrosSeleccionadosNoLeidos(dto.getLibrosSeleccionadosId());
+                List<PropuestasLibrosModel> propuestas = obtenerPropuestas(dto.getLibrosSeleccionadosId());
+                
+                validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
+                validarLibrosSeleccionadosNoLeidos(propuestas);
 
-                List<LibroSeleccionadoModel> librosSeleccionados = new ArrayList<>();
+                List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
 
-                for (ObjectId propuestaId : dto.getLibrosSeleccionadosId()) {
-                    PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
-                        .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe una propuesta con id: " + propuestaId
-                        ));
-
+                for (PropuestasLibrosModel propuesta : propuestas) {
                     LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
-
                     libroSel.setPropuestaId(propuesta.getId());
-
                     libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
                     libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-
                     librosSeleccionados.add(libroSel);
                 }
 
@@ -442,8 +435,8 @@ public class ReunionesServiceImp implements IReunionesService{
         }
     }
 
-    private void validarFechaReunionConPeriodos(Date fechaReunion, List<ObjectId> librosSeleccionadosId) {
-        if (librosSeleccionadosId == null || librosSeleccionadosId.isEmpty()) {
+    private void validarFechaReunionConPeriodos(Date fechaReunion, List<PropuestasLibrosModel> propuestas) {
+        if (propuestas == null || propuestas.isEmpty()) {
             return; 
         }
 
@@ -451,14 +444,10 @@ public class ReunionesServiceImp implements IReunionesService{
         Date fechaInterseccionFin = null;
 
         // Iterar sobre cada período de selección para encontrar la intersección
-        for (ObjectId propuestaId : librosSeleccionadosId) {
-            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una propuesta con id: " + propuestaId));
-
+        for (PropuestasLibrosModel propuesta : propuestas) {
             if (propuesta.getPeriodoSeleccion() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-                    "La propuesta con id: " + propuestaId + " no tiene período de selección asignado.");
+                    "La propuesta con id: " + propuesta.getId() + " no tiene período de selección asignado.");
             }
 
             Date periodoInicio = propuesta.getPeriodoSeleccion().getFechaInicio();
@@ -486,29 +475,40 @@ public class ReunionesServiceImp implements IReunionesService{
         }
     }
 
-    private void validarLibrosSeleccionadosNoLeidos(List<ObjectId> librosSeleccionadosId) {
-        if (librosSeleccionadosId == null || librosSeleccionadosId.isEmpty()) {
+    private void validarLibrosSeleccionadosNoLeidos(List<PropuestasLibrosModel> propuestas) {
+        if (propuestas == null || propuestas.isEmpty()) {
             return;
         }
 
-        for (ObjectId propuestaId : librosSeleccionadosId) {
-            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una propuesta con id: " + propuestaId));
-
+        for (PropuestasLibrosModel propuesta : propuestas) {
             if (propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La propuesta con id: " + propuestaId + " debe estar en estado 'seleccionada' para agregarse a una reunión.");
+                    "La propuesta con id: " + propuesta.getId() + " debe estar en estado 'seleccionada' para agregarse a una reunión.");
             }
 
             EstadoLectura estadoLectura = propuesta.getLibroPropuesto().getEstadoLectura();
             if (estadoLectura == null || estadoLectura == EstadoLectura.leido) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El libro de la propuesta con id: " + propuestaId + " debe estar en estado de lectura 'pendiente' o 'en_lectura' (no leído).");
+                    "El libro de la propuesta con id: " + propuesta.getId() + " debe estar en estado de lectura 'pendiente' o 'en_lectura' (no leído).");
             }
         }
     }
 
+
+    private List<PropuestasLibrosModel> obtenerPropuestas(List<ObjectId> propuestasId) {
+        if (propuestasId == null || propuestasId.isEmpty()) {
+            return List.of();
+        }
+
+        List<PropuestasLibrosModel> propuestas = new java.util.ArrayList<>();
+        for (ObjectId propuestaId : propuestasId) {
+            PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(propuestaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una propuesta con id: " + propuestaId));
+            propuestas.add(propuesta);
+        }
+        return propuestas;
+    }
 
     // ---------- AGREGACIONES ----------
 
