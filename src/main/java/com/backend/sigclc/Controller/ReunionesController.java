@@ -90,6 +90,15 @@ public class ReunionesController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping(value = "/eliminar-archivos/{reunionId}")
+    public ResponseEntity<ReunionResponseDTO> eliminarArchivosDeReunion(
+            @PathVariable ObjectId reunionId,
+            @RequestBody List<String> archivosAdjuntosUuid) {
+        
+        ReunionResponseDTO response = reunionesService.eliminarArchivosDeReunion(reunionId, archivosAdjuntosUuid);
+        return ResponseEntity.ok(response);
+
+    }
 
     @DeleteMapping(value = "/eliminar/{id}")
     public ResponseEntity<String> eliminarReunion(@PathVariable ObjectId id) {

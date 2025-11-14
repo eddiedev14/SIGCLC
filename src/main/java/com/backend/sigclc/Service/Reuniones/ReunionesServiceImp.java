@@ -370,6 +370,72 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
+    public ReunionResponseDTO eliminarArchivosDeReunion(ObjectId id, List<String> archivoUuids) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
+                ));
+
+            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+            if (adjuntos == null || adjuntos.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene archivos adjuntos.");
+            }
+
+            if (archivoUuids == null || archivoUuids.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe proporcionar una lista de identificadores de archivos a eliminar.");
+            }
+
+            List<String> notFound = new java.util.ArrayList<>();
+            List<String> failedToDelete = new java.util.ArrayList<>();
+            List<ArchivoAdjuntoModel> encontrados = new java.util.ArrayList<>();
+
+            for (String uuid : archivoUuids) {
+                ArchivoAdjuntoModel encontrado = adjuntos.stream()
+                    .filter(a -> a.getArchivoPath() != null && a.getArchivoPath().contains(uuid))
+                    .findFirst()
+                    .orElse(null);
+                if (encontrado == null) {
+                    notFound.add(uuid);
+                } else {
+                    encontrados.add(encontrado);
+                }
+            }
+
+            if (encontrados.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No se encontraron archivos adjuntos para los identificadores proporcionados: " + notFound);
+            }
+
+            for (ArchivoAdjuntoModel a : encontrados) {
+                try {
+                    archivosService.eliminarArchivo(a.getArchivoPath());
+                    adjuntos.remove(a);
+                } catch (Exception e) {
+                    failedToDelete.add(a.getArchivoPath());
+                }
+            }
+
+            reunionesRepository.save(reunion);
+
+            if (!failedToDelete.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Algunos archivos no se pudieron eliminar físicamente: " + failedToDelete);
+            }
+
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw e;
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar archivo de la reunión", e);
+        }
+    }
+
+    @Override
     public ReunionResponseDTO actualizarReunion(ObjectId id, ReunionUpdateDTO dto) {
         try {
             ReunionesModel reunion = reunionesRepository.findById(id)

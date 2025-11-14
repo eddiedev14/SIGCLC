@@ -20,6 +20,7 @@ public interface IReunionesService {
     public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId id, List<ObjectId> asistentesId);
     public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId id, List<ObjectId> librosId);
     public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos);
+    public ReunionResponseDTO eliminarArchivosDeReunion(ObjectId id, List<String> archivoUuids);
     public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId);
     public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId);
     public List<ReunionResponseDTO> listarPorFecha(Date fecha);
