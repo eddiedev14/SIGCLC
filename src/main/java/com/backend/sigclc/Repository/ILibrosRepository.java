@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -17,6 +18,10 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
     @Query("{ 'creador.usuarioId': ?0 }") // Filtro para buscar libros por usuarioId
     @Update("{ '$set': { 'creador.nombreCompleto': ?1 } }") // Actualizar el nombre del creador
     void actualizarNombreCreador(ObjectId usuarioId, String nuevoNombre);
+
+    // Validar si el usuario está asociado como creador de un libro
+    @ExistsQuery("{ 'creador.usuarioId': ?0 }")
+    boolean existsByCreadorId(ObjectId usuarioId);
 
     // Buscar libros por genero
     @Aggregation(pipeline = {

@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.sigclc.DTO.Usuarios.UsuarioCreateDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioResponseDTO;
@@ -98,6 +100,34 @@ public class UsuariosServiceImp implements IUsuariosService {
         if (!usuariosRepository.existsById(id)) {
             throw new RecursoNoEncontradoException("No se encontró el usuario con id: " + id);
         }
+
+        // * Validaciones previas a eliminar el usuario
+
+        // No se puede eliminar un usuario si está asociado como creador de un libro
+        if (librosRepository.existsByCreadorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como creador de un libro.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como proponente de una propuesta de libro
+        if (propuestasLibrosRepository.existsByProponenteId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como proponente de una propuesta de libro.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como votante de una propuesta de libro
+        if (propuestasLibrosRepository.existsByVotanteId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como votante de una propuesta de libro.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como asistente de una reunión
+        if (reunionesRepository.existsByAsistenteId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como asistente de una reunión.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como moderador de un foro
+        if (forosRepository.existsByModeradorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como moderador de un foro.");
+        }
+
         usuariosRepository.deleteById(id);
         return "Usuario eliminado correctamente con id: " + id;
     }

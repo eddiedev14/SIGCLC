@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -35,6 +36,12 @@ public interface IReunionesRepository extends MongoRepository <ReunionesModel, O
     @Query("{'librosSeleccionados.id': ?0}")
     @Update("{'$set': {'librosSeleccionados.$.generos': ?1}}")
     void actualizarGenerosLibroSeleccionado(ObjectId libroId, List<GeneroLibro> nuevosGeneros);
+
+    // Validar si el usuario está asociado como asistente de una reunión
+    @ExistsQuery("{'asistentes.asistenteId': ?0}")
+    boolean existsByAsistenteId(ObjectId usuarioId);
+
+    //* Consultas */
 
     // buscar reuniones por asistente
     @Query("{'asistentes.asistenteId': ?0}")

@@ -139,24 +139,20 @@ public class LibrosServiceImp implements ILibrosService {
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "No se pudo encontrar el libro con el ID especificado"));
 
-        try {
+            //* Validaciones previas a la eliminación */
+
+            // Verificar si el libro esta asociada a una propuesta (sin importar su estado)
+            if (propuestasLibrosRepository.existsByLibroPropuestoLibroId(id)) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El libro no puede ser eliminado porque tiene propuestas asociadas");
+            }
+
             // Eliminar archivo físico de portada
             archivoService.eliminarArchivo(libro.getPortadaPath());
 
-            // Verificar relaciones antes de eliminar
-            boolean tienePropuestasEnVotacion = propuestasLibrosRepository.tienePropuestasEnVotacion(id);
-            if (tienePropuestasEnVotacion) {
-                throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El libro no puede ser eliminado porque tiene propuestas en votación o está asociado a otros registros");
-            }
-
             librosRepository.deleteById(id);
             return "Libro eliminado correctamente.";
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar el libro", e);
-        }
     }
 
     @Override
