@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 
@@ -21,4 +22,5 @@ public class ReunionUpdateDTO {
     private String espacioReunion;
     private List<ObjectId> asistentesId;
     private List<ObjectId> librosSeleccionadosId;
+    private List<MultipartFile> archivosAdjuntos;
 }

@@ -248,8 +248,8 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene asistentes registrados.");
             }
 
-            for (ObjectId idStr : asistentesId) {
-                asistentes.removeIf(a -> a.getAsistenteId().equals(idStr));
+            for (ObjectId id : asistentesId) {
+                asistentes.removeIf(a -> a.getAsistenteId().equals(id));
             }
 
             reunionesRepository.save(reunion);
@@ -274,8 +274,8 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene libros seleccionados.");
             }
 
-            for (ObjectId idStr : librosId) {
-                libros.removeIf(l -> l.getPropuestaId().equals(idStr));
+            for (ObjectId id : librosId) {
+                libros.removeIf(l -> l.getPropuestaId().equals(id));
             }
 
             reunionesRepository.save(reunion);
@@ -420,6 +420,50 @@ public class ReunionesServiceImp implements IReunionesService{
                 }
 
                 reunion.setLibrosSeleccionados(librosSeleccionados);
+            }
+
+            if (dto.getArchivosAdjuntos() != null) {
+                List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+                adjuntos.clear();
+
+                if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
+                    boolean tieneArchivoValido = false;
+                    for (MultipartFile archivo : dto.getArchivosAdjuntos()) {
+                        if (archivo == null || archivo.isEmpty()) {
+                            continue;
+                        }
+                        tieneArchivoValido = true;
+
+                        String ruta = archivosService.guardarArchivo(
+                            archivo,
+                            CARPETA_ARCHIVOS,
+                            EXTENSIONES_PERMITIDAS
+                        );
+
+                        ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
+                        adjunto.setArchivoPath(ruta);
+
+                        String extension = archivosService.obtenerExtensionSinPunto(ruta);
+                        switch (extension.toLowerCase()) {
+                            case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                            case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                            case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                            default -> throw new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
+                        }
+                        adjuntos.add(adjunto);
+                    }
+
+                    if (!tieneArchivoValido) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
+                    }
+
+                    reunion.setArchivosAdjuntos(adjuntos);
+                } else {
+                    // Si la lista se pone vacía, se considera como que se resetea entonces se guarda vacia, osea que 
+                    // es como borrar los archivos adjuntos
+                    reunion.setArchivosAdjuntos(adjuntos);
+                }
             }
 
             reunionesRepository.save(reunion);
