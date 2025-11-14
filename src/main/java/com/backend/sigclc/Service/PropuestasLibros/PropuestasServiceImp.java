@@ -3,6 +3,7 @@ package com.backend.sigclc.Service.PropuestasLibros;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 import org.bson.types.ObjectId;
 
@@ -23,6 +24,7 @@ import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PropuestasServiceImp implements IPropuestasService {
@@ -181,6 +183,11 @@ public class PropuestasServiceImp implements IPropuestasService {
             throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no se debe pasar el periodoSeleccion y/o el estadoLectura");
         }
 
+        // Si el estado original es seleccionado, y se quiere cambiar a distinto de seleccionado (transición explícita en el DTO), no puede estar asociado a una reunion
+        if (estadoOriginal == EstadoPropuesta.seleccionada && propuesta.getEstadoPropuesta() != null && propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada && propuestasLibrosRepository.tieneReuniones(id)) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no puede estar asociado a una reunion");
+        }
+
         // Para cambiar al estado seleccionado, la propuesta debe tener al menos un voto
         if (propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && propuestaModel.getVotos().isEmpty()) {
             throw new IllegalArgumentException("Para cambiar el estado de la propuesta a seleccionada, debe de tener al menos un voto");
@@ -226,7 +233,12 @@ public class PropuestasServiceImp implements IPropuestasService {
 
         // Si el estado es diferente a no seleccionada, no se puede eliminar
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.no_seleccionada) {
-            throw new IllegalArgumentException("No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
+        }
+
+        // Si la propuesta está asociada a una reunion, no se puede eliminar
+        if (propuestasLibrosRepository.tieneReuniones(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar una propuesta que está asociada a una reunion");
         }
 
         // Eliminar propuesta

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -15,6 +16,16 @@ import com.backend.sigclc.Model.Foros.TipoTematica;
 
 @Repository
 public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> {
+    // Actualizar nombre de usuario si se modifica
+    @Query("{'moderador.moderadorId': ?0 }")
+    @Update("{ '$set': { 'moderador.nombreCompleto': ?1 } }")
+    void actualizarNombreModerador(ObjectId usuarioId, String nuevoNombre);
+
+    // Validar si el usuario está asociado como moderador de un foro
+    @ExistsQuery("{'moderador.moderadorId': ?0 }")
+    boolean existsByModeradorId(ObjectId usuarioId);
+
+    //* Agregaciones */
 
     // Buscar foro por nombre de temática
     @Aggregation(pipeline = {
@@ -39,11 +50,4 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
         "{ $sort: { fechaPublicacion: -1 } }"
     })
     List<ForosModel> buscarPorModerador(ObjectId moderadorId);
-
-    // Actualizar nombre de usuario si se modifica
-
-    @Query("{'moderador.moderadorId': ?0 }")
-    @Update("{ '$set': { 'moderador.nombreCompleto': ?1 } }")
-    void actualizarNombreModerador(ObjectId usuarioId, String nuevoNombre);
-
 }
