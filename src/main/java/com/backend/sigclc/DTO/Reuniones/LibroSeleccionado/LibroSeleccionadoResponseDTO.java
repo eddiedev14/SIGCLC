@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.Reuniones;
+package com.backend.sigclc.DTO.Reuniones.LibroSeleccionado;
 
 import java.util.List;
 

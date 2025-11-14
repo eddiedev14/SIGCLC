@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.Reuniones;
+package com.backend.sigclc.DTO.Archivos;
 
 import com.backend.sigclc.Model.Reuniones.TipoReunion;
 

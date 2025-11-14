@@ -1,5 +1,6 @@
 package com.backend.sigclc.DTO.PropuestasLibros;
 
+import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion.PeriodoSeleccionDTO;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 

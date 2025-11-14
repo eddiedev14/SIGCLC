@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
-import com.backend.sigclc.Model.Reuniones.ArchivoAdjuntoModel;
+import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteDTO;
+import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoDTO;
+import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoResponseDTO;
+import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
-import com.backend.sigclc.DTO.Reuniones.ArchivoAdjuntoResponseDTO;
-import com.backend.sigclc.DTO.Reuniones.AsistenteDTO;
-import com.backend.sigclc.DTO.Reuniones.AsistenteResponseDTO;
-import com.backend.sigclc.DTO.Reuniones.LibroSeleccionadoDTO;
-import com.backend.sigclc.DTO.Reuniones.LibroSeleccionadoResponseDTO;
+import com.backend.sigclc.DTO.Archivos.ArchivoAdjuntoResponseDTO;
 
 @Component
 public class ReunionMapper {

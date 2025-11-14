@@ -1,4 +1,6 @@
-package com.backend.sigclc.Model.Reuniones;
+package com.backend.sigclc.Model.Archivos;
+
+import com.backend.sigclc.Model.Reuniones.TipoReunion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

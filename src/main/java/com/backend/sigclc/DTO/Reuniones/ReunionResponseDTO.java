@@ -3,6 +3,9 @@ package com.backend.sigclc.DTO.Reuniones;
 import java.util.Date;
 import java.util.List;
 
+import com.backend.sigclc.DTO.Archivos.ArchivoAdjuntoResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoResponseDTO;
 import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 
 import lombok.AllArgsConstructor;

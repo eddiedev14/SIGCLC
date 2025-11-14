@@ -1,4 +1,4 @@
-package com.backend.sigclc.DTO.PropuestasLibros;
+package com.backend.sigclc.DTO.Reuniones.LibroSeleccionado;
 
 import org.bson.types.ObjectId;
 
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VotoDTO {
-    @NotNull(message = "El usuario es obligatorio")
-    private ObjectId usuarioId;
+public class LibroSeleccionadoDTO {
+    @NotNull(message = "El id del libro seleccionado es obligatorio")
+    private ObjectId libroSeleccionadoId;
 }

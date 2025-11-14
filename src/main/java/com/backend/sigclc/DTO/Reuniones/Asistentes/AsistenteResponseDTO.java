@@ -1,6 +1,4 @@
-package com.backend.sigclc.DTO.PropuestasLibros;
-
-import java.util.Date;
+package com.backend.sigclc.DTO.Reuniones.Asistentes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VotoResponseDTO {
-    private String usuarioId;
+public class AsistenteResponseDTO {
+    private String asistenteId;
     private String nombreCompleto;
-    private Date fechaVoto;
 }
