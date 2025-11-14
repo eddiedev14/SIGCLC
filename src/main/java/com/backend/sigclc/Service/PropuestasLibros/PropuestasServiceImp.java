@@ -13,6 +13,7 @@ import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.PropuestaLibroMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.PropuestasLibros.VotoModel;
@@ -63,6 +64,14 @@ public class PropuestasServiceImp implements IPropuestasService {
                 "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
 
         model.getUsuarioProponente().setNombreCompleto(usuario.getNombreCompleto());
+
+        // * Solo se puede crear una nueva si todas las propuestas de ese libro están seleccionadas y leidas
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorLibro(libroId);
+        for (PropuestasLibrosModel propuestaModel : propuestas) {
+            if (propuestaModel.getEstadoPropuesta() != EstadoPropuesta.seleccionada || propuestaModel.getLibroPropuesto().getEstadoLectura() != EstadoLectura.leido) {
+                throw new IllegalArgumentException("Solo se puede crear una nueva propuesta si todas las propuestas de ese libro están seleccionadas y leidas");
+            }
+        }
 
         // Guardar propuesta
         propuestasLibrosRepository.save(model);
@@ -180,6 +189,11 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Si la fechaInicio es mayor a la fechaFin del periodoSeleccion, se debe de lanzar una excepción
         if (propuesta.getPeriodoSeleccion() != null && propuesta.getPeriodoSeleccion().getFechaInicio().after(propuesta.getPeriodoSeleccion().getFechaFin())) {
             throw new IllegalArgumentException("La fecha de inicio del periodo de seleccion debe de ser anterior a la fecha de fin");
+        }
+
+        // Para cambiar al estado de lectura a leido, la propuesta debe estar asociado a al menos una reunion
+        if (propuesta.getEstadoLectura() == EstadoLectura.leido && !propuestasLibrosRepository.tieneReuniones(propuestaModel.getId())) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a leido, debe de estar asociado a al menos una reunion");
         }
         
         // * Actualizar propuesta de libro

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,16 +34,16 @@ public class UsuariosController {
 
     // Crear usuario
     @PostMapping("/insertar")
-    public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
-    UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
+        public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
+        UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 
     // Listar todos los usuarios
     @GetMapping("/listar")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
-        return new ResponseEntity<>(usuariosService.listarUsuarios(), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.listarUsuarios());
     }
 
     // Buscar usuario por ID
@@ -52,17 +53,15 @@ public class UsuariosController {
     }
 
     // Actualizar usuario
-    @PutMapping("/actualizar/{id}")
-    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(
-        @PathVariable ObjectId id,
-        @RequestBody UsuarioUpdateDTO usuario) {
-    UsuarioResponseDTO actualizado = usuariosService.actualizarUsuario(id, usuario);
-    return ResponseEntity.ok(actualizado);
-}
+    @PatchMapping("/actualizar/{id}")
+    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable ObjectId id, @Valid @RequestBody UsuarioUpdateDTO usuario) {
+        UsuarioResponseDTO actualizado = usuariosService.actualizarUsuario(id, usuario);
+        return ResponseEntity.ok(actualizado);
+    }
 
     // Eliminar usuario
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(usuariosService.eliminarUsuario(id), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.eliminarUsuario(id));
     }
 }

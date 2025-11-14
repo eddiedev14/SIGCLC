@@ -16,9 +16,13 @@ import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
+import com.backend.sigclc.Repository.IForosRepository;
 
 @Service
 public class UsuariosServiceImp implements IUsuariosService {
+
+    @Autowired
+    private IForosRepository forosRepository;
 
     @Autowired 
     private IUsuariosRepository usuariosRepository;
@@ -86,6 +90,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         propuestasLibrosRepository.actualizarNombreUsuarioProponente(usuarioId, nombreCompleto);
         propuestasLibrosRepository.actualizarNombreUsuarioVoto(usuarioId, nombreCompleto);
         reunionesRepository.actualizarNombreAsistente(usuarioId, nombreCompleto);
+        forosRepository.actualizarNombreModerador(usuarioId, nombreCompleto);
     }
 
     @Override

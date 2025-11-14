@@ -1,17 +1,17 @@
 package com.backend.sigclc.Repository;
 
+import java.util.List;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
-import com.backend.sigclc.Model.Libros.GeneroLibro;
-
-import java.util.List;
-
-import org.bson.types.ObjectId;
 
 @Repository
 public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasLibrosModel, ObjectId> {
@@ -31,7 +31,7 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     void actualizarNombreUsuarioProponente(ObjectId usuarioId, String nuevoNombre);
     
     @Query("{ 'votos.usuarioId': ?0 }")
-    @Update("{ '$set': { 'votos.$[voto].nombreCompleto': ?1 } }")
+    @Update("{ '$set': { 'votos.$.nombreCompleto': ?1 } }")
     void actualizarNombreUsuarioVoto(ObjectId usuarioId, String nuevoNombre);
 
     // Verificar si un libro tiene propuestas cuando el estado de la propuesta es en_votacion
@@ -51,4 +51,13 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     // Buscar propuestas por libro
     @Query("{ 'libroPropuesto.libroId': ?0 }")
     List<PropuestasLibrosModel> buscarPropuestasPorLibro(ObjectId libroId);
+
+    // Retornar conteo de reuniones asociadas a una propuesta (en coleccion 'reuniones')
+    @Aggregation(pipeline = {
+        "{ $lookup: { from: 'reuniones', localField: '_id', foreignField: 'librosSeleccionados.propuestaId', as: 'reunionesAsociadas' } }",
+        "{ $addFields: { tieneReunion: { $gt: [ { $size: '$reunionesAsociadas' }, 0 ] } } }",
+        "{ $match: { _id: ?0 } }",
+        "{ $project: { _id: 1, tieneReunion: 1 } }"
+    })
+    Boolean tieneReuniones(ObjectId propuestaId);
 }
