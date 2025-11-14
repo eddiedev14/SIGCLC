@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
 import com.backend.sigclc.DTO.Usuarios.UsuarioCreateDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioResponseDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioUpdateDTO;
+import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.UsuarioMapper;
-import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
 
@@ -34,6 +35,9 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private IReunionesRepository reunionesRepository;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -56,23 +60,7 @@ public class UsuariosServiceImp implements IUsuariosService {
 
         // Aquí usamos el mapper en lugar del método manual
         return usuarioMapper.toResponseDTO(usuario);
-    }
-
-
-    @Override
-        // Buscar por correo (usando aggregation)
-    public UsuarioResponseDTO buscarPorCorreo(String correoElectronico) {
-        UsuariosModel usuario = usuariosRepository.buscarPorCorreo(correoElectronico)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el correo: " + correoElectronico));
-        return usuarioMapper.toResponseDTO(usuario);
-    }
-
-    @Override
-    // Buscar por rol (usando aggregation)
-    public List<UsuarioResponseDTO> buscarPorRol(String rol) {
-        List<UsuariosModel> usuarios = usuariosRepository.buscarPorRol(rol);
-        return usuarioMapper.toResponseDTOList(usuarios);
-    }
+}
 
 
     @Override
@@ -101,6 +89,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         librosRepository.actualizarNombreCreador(usuarioId, nombreCompleto);
         propuestasLibrosRepository.actualizarNombreUsuarioProponente(usuarioId, nombreCompleto);
         propuestasLibrosRepository.actualizarNombreUsuarioVoto(usuarioId, nombreCompleto);
+        reunionesRepository.actualizarNombreAsistente(usuarioId, nombreCompleto);
         forosRepository.actualizarNombreModerador(usuarioId, nombreCompleto);
     }
 

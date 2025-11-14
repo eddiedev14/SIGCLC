@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,18 +50,6 @@ public class UsuariosController {
     @GetMapping("/buscar/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable ObjectId id) {
         return ResponseEntity.ok(usuariosService.buscarUsuariosPorId(id));
-    }
-
-    // Buscar usuario por correo electrónico
-    @GetMapping("/buscar-por-correo/{correoElectronico}")
-    public ResponseEntity<UsuarioResponseDTO> buscarPorCorreo(@PathVariable String correoElectronico) {
-        return ResponseEntity.ok(usuariosService.buscarPorCorreo(correoElectronico));
-    }
-
-    // Buscar usuarios por rol
-    @GetMapping("/buscar-por-rol/{rol}")
-    public ResponseEntity<List<UsuarioResponseDTO>> buscarPorRol(@PathVariable String rol) {
-        return ResponseEntity.ok(usuariosService.buscarPorRol(rol));
     }
 
     // Actualizar usuario
