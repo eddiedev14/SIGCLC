@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -115,6 +116,12 @@ public class ReseniasController {
     @PatchMapping(value = "/eliminar-archivos/{id}")
     public ResponseEntity<ReseniaResponseDTO> eliminarArchivosDeResenia(@PathVariable ObjectId id, @RequestBody List<String> archivosAdjuntosUuid) {
         ReseniaResponseDTO response = reseniasService.eliminarArchivosDeResenia(id, archivosAdjuntosUuid);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(value = "/eliminar/{id}")
+    public ResponseEntity<String> eliminarResenia(@PathVariable ObjectId id) {
+        String response = reseniasService.eliminarResenia(id);
         return ResponseEntity.ok(response);
     }
 }

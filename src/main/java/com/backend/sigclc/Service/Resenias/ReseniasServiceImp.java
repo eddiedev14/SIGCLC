@@ -496,4 +496,14 @@ public class ReseniasServiceImp implements IReseniasService {
 
         return reseniaMapper.toResponseDTO(resenia);
     }
+
+    @Override
+    public String eliminarResenia(ObjectId reseniaId) {
+        ReseniaModel resenia = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+
+        reseniasRepository.delete(resenia);
+        return "Reseña eliminada correctamente.";
+    }
 }
