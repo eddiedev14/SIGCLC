@@ -141,298 +141,31 @@ public class ReunionesServiceImp implements IReunionesService{
     }
 
     @Override
-    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<ObjectId> librosSeleccionadosId) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(reunionId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
-                ));
-
-            // Obtener todas las propuestas una sola vez
-            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(librosSeleccionadosId);
-            
-            // Validar usando las propuestas ya obtenidas
-            validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
-            validarLibrosSeleccionadosNoLeidos(propuestas);
-
-            List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
-
-            Set<ObjectId> existentes = new HashSet<>();
-            for (LibroSeleccionadoModel libro : librosSeleccionados) {
-                existentes.add(libro.getPropuestaId());
-            }
-
-            // Reutilizar las propuestas ya obtenidas
-            for (PropuestasLibrosModel propuesta : propuestas) {
-                if (existentes.contains(propuesta.getId())) {
-                    continue; 
-                }
-
-                LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
-                nuevo.setPropuestaId(propuesta.getId());
-                nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
-                nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-                librosSeleccionados.add(nuevo);
-
-                existentes.add(propuesta.getId());
-            }
-
-            reunionesRepository.save(reunion);
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (RecursoNoEncontradoException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        } catch (ResponseStatusException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
-        }
-    }
-
-    @Override
-    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(reunionId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
-                ));
-
-            List<AsistenteModel> asistentes = reunion.getAsistentes();
-
-            for (ObjectId asistenteIdStr : asistentesId) {
-                boolean yaExiste = false;
-                for (AsistenteModel asistente : asistentes) {
-                    if (asistente.getAsistenteId().equals(asistenteIdStr)) {
-                        yaExiste = true;
-                        break;
-                    }
-                }
-
-                if (!yaExiste) {
-                    UsuariosModel usuario = usuariosRepository.findById(asistenteIdStr)
-                        .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe un usuario con id: " + asistenteIdStr
-                        ));
-
-                    AsistenteModel nuevo = new AsistenteModel();
-                    nuevo.setAsistenteId(usuario.getId());
-                    nuevo.setNombreCompleto(usuario.getNombreCompleto());
-                    asistentes.add(nuevo);
-                }
-            }
-
-            reunionesRepository.save(reunion);
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (RecursoNoEncontradoException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        } catch (ResponseStatusException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar asistentes a la reunión", e);
-        }
-    }
-
-    @Override
-    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(reunionId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
-                ));
-
-            List<AsistenteModel> asistentes = reunion.getAsistentes();
-            if (asistentes.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene asistentes registrados.");
-            }
-
-            for (ObjectId id : asistentesId) {
-                asistentes.removeIf(a -> a.getAsistenteId().equals(id));
-            }
-
-            reunionesRepository.save(reunion);
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar asistentes de la reunión", e);
-        }
-    }
-
-    @Override
-    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId reunionId, List<ObjectId> librosId) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(reunionId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
-                ));
-
-            List<LibroSeleccionadoModel> libros = reunion.getLibrosSeleccionados();
-            if (libros.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene libros seleccionados.");
-            }
-
-            for (ObjectId id : librosId) {
-                libros.removeIf(l -> l.getPropuestaId().equals(id));
-            }
-
-            reunionesRepository.save(reunion);
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar libros de la reunión", e);
-        }
-    }
-
-    @Override
-    public String eliminarReunion(ObjectId id) {
+    public ReunionResponseDTO buscarReunionPorId(ObjectId id) {
         ReunionesModel reunion = reunionesRepository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una reunión con id: " + id + " o está mal escrito."));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + id + " o está mal escrito."));
+        return reunionMapper.toResponseDTO(reunion);
+    }
 
-        LocalDate fechaReunion = reunion.getFecha().toInstant()
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate();
+    // ---------- AGREGACIONES ----------
 
-        if (fechaReunion.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("No se puede eliminar una reunión cuya fecha ya ha pasado.");
-        }
-
-        reunionesRepository.delete(reunion);
-
-        return "Reunión eliminada correctamente con id: " + id;
+    @Override
+    public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorAsistenteId(asistenteId);
+        return reunionMapper.toResponseDTOList(reuniones);
     }
 
     @Override
-    public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
-                ));
-
-            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
-
-            boolean tieneArchivoValido = false;
-
-            for (MultipartFile archivo : archivosAdjuntos) {
-                if (archivo == null || archivo.isEmpty()) {
-                    continue;
-                }
-
-                tieneArchivoValido = true;
-
-                String ruta = archivosService.guardarArchivo(
-                    archivo,
-                    CARPETA_ARCHIVOS,
-                    EXTENSIONES_PERMITIDAS
-                );
-
-                boolean yaExiste = adjuntos.stream()
-                    .anyMatch(a -> a.getArchivoPath().equals(ruta));
-
-                if (yaExiste) {
-                    continue;
-                }
-
-                ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
-                adjunto.setArchivoPath(ruta);
-
-                String extension = archivosService.obtenerExtensionSinPunto(ruta);
-                switch (extension.toLowerCase()) {
-                    case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                    case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
-                    default -> throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
-                }
-                adjuntos.add(adjunto);
-
-            }
-
-            if (!tieneArchivoValido) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
-            }
-
-            reunionesRepository.save(reunion);
-
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar archivos a la reunión", e);
-        }
+    public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorLibroSeleccionadoId(libroId);
+        return reunionMapper.toResponseDTOList(reuniones);
     }
 
     @Override
-    public ReunionResponseDTO eliminarArchivosDeReunion(ObjectId id, List<String> archivoUuids) {
-        try {
-            ReunionesModel reunion = reunionesRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
-                ));
-
-            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
-            if (adjuntos == null || adjuntos.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene archivos adjuntos.");
-            }
-
-            if (archivoUuids == null || archivoUuids.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe proporcionar una lista de identificadores de archivos a eliminar.");
-            }
-
-            List<String> notFound = new java.util.ArrayList<>();
-            List<String> failedToDelete = new java.util.ArrayList<>();
-            List<ArchivoAdjuntoModel> encontrados = new java.util.ArrayList<>();
-
-            for (String uuid : archivoUuids) {
-                ArchivoAdjuntoModel encontrado = adjuntos.stream()
-                    .filter(a -> a.getArchivoPath() != null && a.getArchivoPath().contains(uuid))
-                    .findFirst()
-                    .orElse(null);
-                if (encontrado == null) {
-                    notFound.add(uuid);
-                } else {
-                    encontrados.add(encontrado);
-                }
-            }
-
-            if (encontrados.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No se encontraron archivos adjuntos para los identificadores proporcionados: " + notFound);
-            }
-
-            for (ArchivoAdjuntoModel a : encontrados) {
-                try {
-                    archivosService.eliminarArchivo(a.getArchivoPath());
-                    adjuntos.remove(a);
-                } catch (Exception e) {
-                    failedToDelete.add(a.getArchivoPath());
-                }
-            }
-
-            reunionesRepository.save(reunion);
-
-            if (!failedToDelete.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Algunos archivos no se pudieron eliminar físicamente: " + failedToDelete);
-            }
-
-            return reunionMapper.toResponseDTO(reunion);
-
-        } catch (RecursoNoEncontradoException e) {
-            throw e;
-        } catch (ResponseStatusException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar archivo de la reunión", e);
-        }
+    public List<ReunionResponseDTO> listarPorFecha(Date fecha) {
+        List<ReunionesModel> reuniones = reunionesRepository.buscarPorFecha(fecha);
+        return reunionMapper.toResponseDTOList(reuniones);
     }
 
     @Override
@@ -545,6 +278,301 @@ public class ReunionesServiceImp implements IReunionesService{
         }
     }
 
+    @Override
+    public ReunionResponseDTO agregarLibrosAReunion(ObjectId reunionId, List<ObjectId> librosSeleccionadosId) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(reunionId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
+                ));
+
+            // Obtener todas las propuestas una sola vez
+            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(librosSeleccionadosId);
+            
+            // Validar usando las propuestas ya obtenidas
+            validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
+            validarLibrosSeleccionadosNoLeidos(propuestas);
+
+            List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
+
+            Set<ObjectId> existentes = new HashSet<>();
+            for (LibroSeleccionadoModel libro : librosSeleccionados) {
+                existentes.add(libro.getPropuestaId());
+            }
+
+            // Reutilizar las propuestas ya obtenidas
+            for (PropuestasLibrosModel propuesta : propuestas) {
+                if (existentes.contains(propuesta.getId())) {
+                    continue; 
+                }
+
+                LibroSeleccionadoModel nuevo = new LibroSeleccionadoModel();
+                nuevo.setPropuestaId(propuesta.getId());
+                nuevo.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                nuevo.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+                librosSeleccionados.add(nuevo);
+
+                existentes.add(propuesta.getId());
+            }
+
+            reunionesRepository.save(reunion);
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar libros a la reunión", e);
+        }
+    }
+
+    @Override
+    public ReunionResponseDTO agregarAsistentesAReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(reunionId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
+                ));
+
+            List<AsistenteModel> asistentes = reunion.getAsistentes();
+
+            for (ObjectId asistenteIdStr : asistentesId) {
+                boolean yaExiste = false;
+                for (AsistenteModel asistente : asistentes) {
+                    if (asistente.getAsistenteId().equals(asistenteIdStr)) {
+                        yaExiste = true;
+                        break;
+                    }
+                }
+
+                if (!yaExiste) {
+                    UsuariosModel usuario = usuariosRepository.findById(asistenteIdStr)
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un usuario con id: " + asistenteIdStr
+                        ));
+
+                    AsistenteModel nuevo = new AsistenteModel();
+                    nuevo.setAsistenteId(usuario.getId());
+                    nuevo.setNombreCompleto(usuario.getNombreCompleto());
+                    asistentes.add(nuevo);
+                }
+            }
+
+            reunionesRepository.save(reunion);
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar asistentes a la reunión", e);
+        }
+    }
+
+    @Override
+    public ReunionResponseDTO agregarArchivosAReunion(ObjectId id, List<MultipartFile> archivosAdjuntos) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
+                ));
+
+            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+
+            boolean tieneArchivoValido = false;
+
+            for (MultipartFile archivo : archivosAdjuntos) {
+                if (archivo == null || archivo.isEmpty()) {
+                    continue;
+                }
+
+                tieneArchivoValido = true;
+
+                String ruta = archivosService.guardarArchivo(
+                    archivo,
+                    CARPETA_ARCHIVOS,
+                    EXTENSIONES_PERMITIDAS
+                );
+
+                boolean yaExiste = adjuntos.stream()
+                    .anyMatch(a -> a.getArchivoPath().equals(ruta));
+
+                if (yaExiste) {
+                    continue;
+                }
+
+                ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
+                adjunto.setArchivoPath(ruta);
+
+                String extension = archivosService.obtenerExtensionSinPunto(ruta);
+                switch (extension.toLowerCase()) {
+                    case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                    case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                    default -> throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
+                }
+                adjuntos.add(adjunto);
+
+            }
+
+            if (!tieneArchivoValido) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
+            }
+
+            reunionesRepository.save(reunion);
+
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al agregar archivos a la reunión", e);
+        }
+    }
+
+    @Override
+    public ReunionResponseDTO eliminarAsistentesDeReunion(ObjectId reunionId, List<ObjectId> asistentesId) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(reunionId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
+                ));
+
+            List<AsistenteModel> asistentes = reunion.getAsistentes();
+            if (asistentes.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene asistentes registrados.");
+            }
+
+            for (ObjectId id : asistentesId) {
+                asistentes.removeIf(a -> a.getAsistenteId().equals(id));
+            }
+
+            reunionesRepository.save(reunion);
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar asistentes de la reunión", e);
+        }
+    }
+
+    @Override
+    public ReunionResponseDTO eliminarLibrosSeleccionadosDeReunion(ObjectId reunionId, List<ObjectId> librosId) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(reunionId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + reunionId + " o está mal escrito."
+                ));
+
+            List<LibroSeleccionadoModel> libros = reunion.getLibrosSeleccionados();
+            if (libros.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene libros seleccionados.");
+            }
+
+            for (ObjectId id : librosId) {
+                libros.removeIf(l -> l.getPropuestaId().equals(id));
+            }
+
+            reunionesRepository.save(reunion);
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar libros de la reunión", e);
+        }
+    }
+
+    @Override
+    public ReunionResponseDTO eliminarArchivosDeReunion(ObjectId id, List<String> archivoUuids) {
+        try {
+            ReunionesModel reunion = reunionesRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe una reunión con id: " + id + " o está mal escrito."
+                ));
+
+            List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+            if (adjuntos == null || adjuntos.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene archivos adjuntos.");
+            }
+
+            if (archivoUuids == null || archivoUuids.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe proporcionar una lista de identificadores de archivos a eliminar.");
+            }
+
+            List<String> notFound = new java.util.ArrayList<>();
+            List<String> failedToDelete = new java.util.ArrayList<>();
+            List<ArchivoAdjuntoModel> encontrados = new java.util.ArrayList<>();
+
+            for (String uuid : archivoUuids) {
+                ArchivoAdjuntoModel encontrado = adjuntos.stream()
+                    .filter(a -> a.getArchivoPath() != null && a.getArchivoPath().contains(uuid))
+                    .findFirst()
+                    .orElse(null);
+                if (encontrado == null) {
+                    notFound.add(uuid);
+                } else {
+                    encontrados.add(encontrado);
+                }
+            }
+
+            if (encontrados.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No se encontraron archivos adjuntos para los identificadores proporcionados: " + notFound);
+            }
+
+            for (ArchivoAdjuntoModel a : encontrados) {
+                try {
+                    archivosService.eliminarArchivo(a.getArchivoPath());
+                    adjuntos.remove(a);
+                } catch (Exception e) {
+                    failedToDelete.add(a.getArchivoPath());
+                }
+            }
+
+            reunionesRepository.save(reunion);
+
+            if (!failedToDelete.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Algunos archivos no se pudieron eliminar físicamente: " + failedToDelete);
+            }
+
+            return reunionMapper.toResponseDTO(reunion);
+
+        } catch (RecursoNoEncontradoException e) {
+            throw e;
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al eliminar archivo de la reunión", e);
+        }
+    }
+
+    @Override
+    public String eliminarReunion(ObjectId id) {
+        ReunionesModel reunion = reunionesRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reunión con id: " + id + " o está mal escrito."));
+
+        LocalDate fechaReunion = reunion.getFecha().toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate();
+
+        if (fechaReunion.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("No se puede eliminar una reunión cuya fecha ya ha pasado.");
+        }
+
+        reunionesRepository.delete(reunion);
+
+        return "Reunión eliminada correctamente con id: " + id;
+    }
+
     private void validarFechaReunionConPeriodos(Date fechaReunion, List<PropuestasLibrosModel> propuestas) {
         if (propuestas == null || propuestas.isEmpty()) {
             return; 
@@ -619,26 +647,4 @@ public class ReunionesServiceImp implements IReunionesService{
         }
         return propuestas;
     }
-
-    // ---------- AGREGACIONES ----------
-
-    @Override
-    public List<ReunionResponseDTO> listarPorAsistenteId(ObjectId asistenteId) {
-        List<ReunionesModel> reuniones = reunionesRepository.buscarPorAsistenteId(asistenteId);
-        return reunionMapper.toResponseDTOList(reuniones);
-    }
-
-    @Override
-    public List<ReunionResponseDTO> listarPorLibroSeleccionadoId(ObjectId libroId) {
-        List<ReunionesModel> reuniones = reunionesRepository.buscarPorLibroSeleccionadoId(libroId);
-        return reunionMapper.toResponseDTOList(reuniones);
-    }
-
-    @Override
-    public List<ReunionResponseDTO> listarPorFecha(Date fecha) {
-        List<ReunionesModel> reuniones = reunionesRepository.buscarPorFecha(fecha);
-        return reunionMapper.toResponseDTOList(reuniones);
-    }
-
-
 }
