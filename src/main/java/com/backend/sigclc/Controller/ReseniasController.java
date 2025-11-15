@@ -99,4 +99,10 @@ public class ReseniasController {
         ReseniaResponseDTO response = reseniasService.actualizarComentario(idResenia, idComentario, dto);
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping(value = "/eliminar-valoracion/{idResenia}/{idUsuario}")
+    public ResponseEntity<ReseniaResponseDTO> eliminarValoracion(@PathVariable ObjectId idResenia, @PathVariable ObjectId idUsuario) {
+        ReseniaResponseDTO response = reseniasService.eliminarValoracion(idResenia, idUsuario);
+        return ResponseEntity.ok(response);
+    }
 }

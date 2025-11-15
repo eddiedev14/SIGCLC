@@ -399,4 +399,24 @@ public class ReseniasServiceImp implements IReseniasService {
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
     }
+
+    @Override
+    public ReseniaResponseDTO eliminarValoracion(ObjectId reseniaId, ObjectId usuarioId) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        ValoracionModel valoracion = reseniaModel.getValoraciones().stream()
+            .filter(v -> v.getValorador().getUsuarioId().equals(usuarioId))
+            .findFirst()
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una valoración con id: " + usuarioId + " o está mal escrito."));
+
+        //* Eliminar valoración *
+        reseniaModel.getValoraciones().remove(valoracion);
+
+        //* Guardar la reseña *
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
 }

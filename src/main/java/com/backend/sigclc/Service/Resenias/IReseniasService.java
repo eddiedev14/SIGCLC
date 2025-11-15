@@ -25,4 +25,5 @@ public interface IReseniasService {
     public ReseniaResponseDTO agregarArchivosAResenia(ObjectId reseniaId, List<MultipartFile> archivosAdjuntos);
     public ReseniaResponseDTO actualizarValoracion(ObjectId reseniaId, ObjectId usuarioId, ValoracionUpdateDTO valoracionUpdateDTO);
     public ReseniaResponseDTO actualizarComentario(ObjectId reseniaId, ObjectId comentarioId, ComentarioUpdateDTO comentarioUpdateDTO);
+    public ReseniaResponseDTO eliminarValoracion(ObjectId reseniaId, ObjectId usuarioId);
 }
