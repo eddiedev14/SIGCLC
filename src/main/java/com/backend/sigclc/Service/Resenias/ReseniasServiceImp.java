@@ -14,6 +14,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
@@ -373,6 +374,26 @@ public class ReseniasServiceImp implements IReseniasService {
 
         //* Actualizar valoracion *
         valoracion.setValoracion(valoracionUpdateDTO.getValoracion());
+
+        //* Guardar la reseña *
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public ReseniaResponseDTO actualizarComentario(ObjectId reseniaId, ObjectId comentarioId, ComentarioUpdateDTO comentarioUpdateDTO) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        ComentarioModel comentario = reseniaModel.getComentarios().stream()
+            .filter(c -> c.getComentarioId().equals(comentarioId))
+            .findFirst()
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un comentario con id: " + comentarioId + " o está mal escrito."));
+
+        //* Actualizar comentario *
+        comentario.setComentario(comentarioUpdateDTO.getComentario());
 
         //* Guardar la reseña *
         reseniasRepository.save(reseniaModel);

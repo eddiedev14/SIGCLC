@@ -20,6 +20,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 import com.backend.sigclc.Service.Resenias.IReseniasService;
@@ -90,6 +91,12 @@ public class ReseniasController {
     @PatchMapping(value = "/actualizar-valoracion/{idResenia}/{idUsuario}")
     public ResponseEntity<ReseniaResponseDTO> actualizarValoracion(@PathVariable ObjectId idResenia, @PathVariable ObjectId idUsuario, @Valid @RequestBody ValoracionUpdateDTO dto) {
         ReseniaResponseDTO response = reseniasService.actualizarValoracion(idResenia, idUsuario, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping(value = "/actualizar-comentario/{idResenia}/{idComentario}")
+    public ResponseEntity<ReseniaResponseDTO> actualizarComentario(@PathVariable ObjectId idResenia, @PathVariable ObjectId idComentario, @Valid @RequestBody ComentarioUpdateDTO dto) {
+        ReseniaResponseDTO response = reseniasService.actualizarComentario(idResenia, idComentario, dto);
         return ResponseEntity.ok(response);
     }
 }

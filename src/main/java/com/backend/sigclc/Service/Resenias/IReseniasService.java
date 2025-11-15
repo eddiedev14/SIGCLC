@@ -9,6 +9,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 
@@ -23,4 +24,5 @@ public interface IReseniasService {
     public ReseniaResponseDTO comentarResenia(ObjectId reseniaId, ComentarioCreateDTO comentarioCreateDTO);
     public ReseniaResponseDTO agregarArchivosAResenia(ObjectId reseniaId, List<MultipartFile> archivosAdjuntos);
     public ReseniaResponseDTO actualizarValoracion(ObjectId reseniaId, ObjectId usuarioId, ValoracionUpdateDTO valoracionUpdateDTO);
+    public ReseniaResponseDTO actualizarComentario(ObjectId reseniaId, ObjectId comentarioId, ComentarioUpdateDTO comentarioUpdateDTO);
 }
