@@ -102,6 +102,10 @@ public class ReseniasServiceImp implements IReseniasService {
 
         // Guardar la resenia
         reseniasRepository.save(reseniaModel);
-        return reseniaMapper.toResponseDTO(reseniaModel);
+
+        // Retornar DTO
+        ReseniaResponseDTO reseniaResponseDTO = reseniaMapper.toResponseDTO(reseniaModel);
+        reseniaResponseDTO.setCalificacionPromedio(0.0);
+        return reseniaResponseDTO;
     }
 }

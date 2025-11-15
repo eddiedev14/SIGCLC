@@ -21,6 +21,7 @@ public class ReseniaResponseDTO {
     private RedactorResponseDTO redactor;
     private Date fechaPublicacion;
     private LibroReseniadoResponseDTO libroReseniado;
+    private Double calificacionPromedio;
     private List<ArchivoAdjuntoResponseDTO> archivosAdjuntos;
     private List<ComentarioResponseDTO> comentarios;
     private List<ValoracionResponseDTO> valoraciones;
