@@ -23,7 +23,7 @@ public class ReseniaModel {
     @Id
     private ObjectId id;
     private RedactorModel redactor;
-    private Date fecha;
+    private Date fechaPublicacion;
     private LibroReseniadoModel libro;
     private List<ArchivoAdjuntoModel> archivosAdjuntos = new ArrayList<>();
     private List<ValoracionModel> valoraciones = new ArrayList<>();

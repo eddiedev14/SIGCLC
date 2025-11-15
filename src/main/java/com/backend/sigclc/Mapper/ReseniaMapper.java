@@ -56,7 +56,7 @@ public class ReseniaMapper {
         ReseniaResponseDTO reseniaResponseDTO = new ReseniaResponseDTO();
         reseniaResponseDTO.setId(reseniaModel.getIdAString());
         reseniaResponseDTO.setRedactor(toRedactorResponseDTO(reseniaModel.getRedactor()));
-        reseniaResponseDTO.setFecha(reseniaModel.getFecha());
+        reseniaResponseDTO.setFechaPublicacion(reseniaModel.getFechaPublicacion());
         reseniaResponseDTO.setLibroReseniado(toLibroReseniadoResponseDTO(reseniaModel.getLibro()));
         reseniaResponseDTO.setArchivosAdjuntos(archivoAdjuntoMapper.toArchivosAdjuntosResponseDTOList(reseniaModel.getArchivosAdjuntos()));
         reseniaResponseDTO.setComentarios(toComentariosResponseDTOList(reseniaModel.getComentarios()));

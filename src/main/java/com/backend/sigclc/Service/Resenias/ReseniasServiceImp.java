@@ -50,7 +50,7 @@ public class ReseniasServiceImp implements IReseniasService {
         ReseniaModel reseniaModel = reseniaMapper.toReseniaModel(reseniaCreateDTO);
 
         // Definir campos con valores por defecto
-        reseniaModel.setFecha(new Date());
+        reseniaModel.setFechaPublicacion(new Date());
 
         // Añadir campos automáticamente a redactor con base al usuario
         ObjectId usuarioId = reseniaModel.getRedactor().getUsuarioId();

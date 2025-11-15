@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class ReseniaResponseDTO {
     private String id;
     private RedactorResponseDTO redactor;
-    private Date fecha;
+    private Date fechaPublicacion;
     private LibroReseniadoResponseDTO libroReseniado;
     private List<ArchivoAdjuntoResponseDTO> archivosAdjuntos;
     private List<ComentarioResponseDTO> comentarios;
