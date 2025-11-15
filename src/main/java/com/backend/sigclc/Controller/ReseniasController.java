@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.Service.Resenias.IReseniasService;
 
@@ -69,6 +70,12 @@ public class ReseniasController {
     @PatchMapping(value = "/valorar/{id}")
     public ResponseEntity<ReseniaResponseDTO> valorarResenia(@PathVariable ObjectId id, @Valid @RequestBody ValoracionCreateDTO dto) {
         ReseniaResponseDTO response = reseniasService.valorarResenia(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping(value = "/comentar/{id}")
+    public ResponseEntity<ReseniaResponseDTO> comentarResenia(@PathVariable ObjectId id, @Valid @RequestBody ComentarioCreateDTO dto) {
+        ReseniaResponseDTO response = reseniasService.comentarResenia(id, dto);
         return ResponseEntity.ok(response);
     }
 }

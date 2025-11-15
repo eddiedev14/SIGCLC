@@ -278,4 +278,24 @@ public class ReseniasServiceImp implements IReseniasService {
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
     }
+
+    @Override
+    public ReseniaResponseDTO comentarResenia(ObjectId reseniaId, ComentarioCreateDTO comentarioCreateDTO) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        UsuariosModel usuario = usuariosRepository.findById(comentarioCreateDTO.getUsuarioId())
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un usuario con id: " + comentarioCreateDTO.getUsuarioId() + " o está mal escrito."));
+
+        ComentarioModel comentario = new ComentarioModel();
+        comentario.setComentador(new ComentadorModel(usuario.getId(), usuario.getNombreCompleto()));
+        comentario.setFecha(new Date());
+        comentario.setComentario(comentarioCreateDTO.getComentario());
+        reseniaModel.getComentarios().add(comentario);
+        
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
 }

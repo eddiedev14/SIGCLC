@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 
 public interface IReseniasService {
@@ -17,4 +18,5 @@ public interface IReseniasService {
     public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId);
     public ReseniaResponseDTO actualizarResenia(ObjectId reseniaId, ReseniaUpdateDTO reseniaUpdateDTO);
     public ReseniaResponseDTO valorarResenia(ObjectId reseniaId, ValoracionCreateDTO valoracionCreateDTO);
+    public ReseniaResponseDTO comentarResenia(ObjectId reseniaId, ComentarioCreateDTO comentarioCreateDTO);
 }
