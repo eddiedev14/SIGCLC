@@ -13,7 +13,6 @@ import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto.LibroPropuestoResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion.PeriodoSeleccionDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponente.UsuarioProponenteResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.LibroPropuestoModel;
 import com.backend.sigclc.Model.PropuestasLibros.UsuarioProponenteModel;
@@ -42,13 +41,6 @@ public class PropuestaLibroMapper {
     public UsuarioProponenteModel createUsuarioProponenteModel(ObjectId usuarioId) {
         UsuarioProponenteModel model = new UsuarioProponenteModel();
         model.setUsuarioId(usuarioId);
-        return model;
-    }
-
-    // Convertir VotoDTO a VotoModel
-    public VotoModel toVotoModel(VotoDTO dto) {
-        VotoModel model = new VotoModel();
-        model.setUsuarioId(dto.getUsuarioId());
         return model;
     }
 

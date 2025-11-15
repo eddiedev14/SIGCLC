@@ -8,9 +8,7 @@ import org.springframework.stereotype.Component;
 import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
-import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteDTO;
 import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteResponseDTO;
-import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoDTO;
 import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoResponseDTO;
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
@@ -47,19 +45,6 @@ public class ReunionMapper {
         return models.stream()
                 .map(this::toResponseDTO)
                 .toList();
-    }
-
-    // Convierte LibroSeleccionadoResponseDTO a LibroSeleccionadoModel
-    public LibroSeleccionadoModel toLibroSeleccionadoModel(LibroSeleccionadoDTO dto) {
-        LibroSeleccionadoModel model = new LibroSeleccionadoModel();
-        model.setPropuestaId(dto.getLibroSeleccionadoId());
-        return model;
-    }
-
-    public AsistenteModel toAsistenteModel(AsistenteDTO dto) {
-        AsistenteModel model = new AsistenteModel();
-        model.setAsistenteId(dto.getAsistenteId());
-        return model;
     }
 
     public LibroSeleccionadoResponseDTO toLibroSeleccionadoResponseDTO(LibroSeleccionadoModel model) {

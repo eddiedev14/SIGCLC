@@ -7,12 +7,11 @@ import org.bson.types.ObjectId;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoDTO;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 
 public interface IPropuestasService {
     public PropuestaLibroResponseDTO guardarPropuesta(PropuestaLibroCreateDTO propuesta);
-    public PropuestaLibroResponseDTO votarPropuesta(ObjectId id, VotoDTO voto);
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idLibro, ObjectId idUsuario);
     public List<PropuestaLibroResponseDTO> listarPropuestas();
     public PropuestaLibroResponseDTO buscarPropuesta(ObjectId id);
     public List<PropuestaLibroResponseDTO> listarPropuestasPorEstado(EstadoPropuesta estado);

@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.PropuestaLibroMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
@@ -82,11 +81,11 @@ public class PropuestasServiceImp implements IPropuestasService {
     }
 
     @Override
-    public PropuestaLibroResponseDTO votarPropuesta(ObjectId id, VotoDTO voto) {
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idLibro, ObjectId idUsuario) {
         // Obtener la propuesta
-        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(id)
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(idLibro)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+                "Error! No existe una propuesta con id: " + idLibro + " o está mal escrito."));
 
         // Solo se puede votar si el estado_propuesta es en_votacion
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.en_votacion) {
@@ -96,23 +95,21 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Validar que el usuario no haya votado previamente
         if (propuesta.getVotos() != null) {
             for (VotoModel votoModel : propuesta.getVotos()) {
-                if (votoModel.getUsuarioId().equals(voto.getUsuarioId())) {
+                if (votoModel.getUsuarioId().equals(idUsuario)) {
                     throw new IllegalArgumentException("El usuario ya ha votado previamente");
                 }
             }
         }
 
-        // Agregar voto
-        VotoModel votoModel = propuestaLibrosMapper.toVotoModel(voto);
-
         // Setear fecha del voto con la fecha actual
+        VotoModel votoModel = new VotoModel();
+        votoModel.setUsuarioId(idUsuario);
         votoModel.setFechaVoto(new Date());
 
         //* Añadir campos automáticamente a votos con base al usuario */
-        ObjectId votoUsuarioId = voto.getUsuarioId();
-        UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
+        UsuariosModel usuarioVoto = usuariosRepository.findById(idUsuario)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
+                "Error! No existe un usuario con id: " + idUsuario + " o está mal escrito."));
         votoModel.setNombreCompleto(usuarioVoto.getNombreCompleto());
 
         // Agregar voto
