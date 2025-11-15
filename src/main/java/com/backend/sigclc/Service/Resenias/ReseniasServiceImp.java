@@ -208,6 +208,11 @@ public class ReseniasServiceImp implements IReseniasService {
             
             if (!reseniaUpdateDTO.getValoraciones().isEmpty()) {
                 for (ValoracionCreateDTO valoracionDTO : reseniaUpdateDTO.getValoraciones()) {
+                    //* Un usuario solo puede valorar una vez */
+                    if (valoraciones.stream().anyMatch(v -> v.getValorador().getUsuarioId().equals(valoracionDTO.getUsuarioId()))) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario con id " + valoracionDTO.getUsuarioId() + " ya ha valorado esta reseña.");
+                    }
+                    
                     UsuariosModel usuario = usuariosRepository.findById(valoracionDTO.getUsuarioId())
                         .orElseThrow(() -> new RecursoNoEncontradoException(
                             "Error! No existe un usuario con id: " + valoracionDTO.getUsuarioId() + " o está mal escrito."));
@@ -244,6 +249,32 @@ public class ReseniasServiceImp implements IReseniasService {
         }
 
         // Guardar la reseña
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public ReseniaResponseDTO valorarResenia(ObjectId reseniaId, ValoracionCreateDTO valoracionCreateDTO) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        UsuariosModel usuario = usuariosRepository.findById(valoracionCreateDTO.getUsuarioId())
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un usuario con id: " + valoracionCreateDTO.getUsuarioId() + " o está mal escrito."));
+
+        //* Un usuario solo puede valorar una vez */
+        if (reseniaModel.getValoraciones().stream()
+            .anyMatch(valoracion -> valoracion.getValorador().getUsuarioId().equals(usuario.getId()))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario ya ha valorado esta reseña.");
+        }
+
+        ValoracionModel valoracion = new ValoracionModel();
+        valoracion.setValorador(new ValoradorModel(usuario.getId(), usuario.getNombreCompleto()));
+        valoracion.setFecha(new Date());
+        valoracion.setValoracion(valoracionCreateDTO.getValoracion());
+        reseniaModel.getValoraciones().add(valoracion);
+        
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
     }

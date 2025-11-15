@@ -6,8 +6,9 @@ import lombok.NoArgsConstructor;
 
 import org.bson.types.ObjectId;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Data
@@ -18,7 +19,8 @@ public class LibroReseniadoCreateDTO {
     private ObjectId libroId;
 
     @NotNull(message = "La calificacion es obligatoria")
-    @Pattern(regexp = "^(?:[1-4](?:\\.5)?|5(?:\\.0)?)$", message = "La calificación debe ser un valor entero o mitad entre 1 y 5 (ej: 1, 1.5, 2, 2.5, etc.)")
+    @Min(value = 1, message = "La calificacion debe ser mayor o igual a 1")
+    @Max(value = 5, message = "La calificacion debe ser menor o igual a 5")
     private Double calificacion;
 
     @NotNull(message = "La opinion es obligatoria")

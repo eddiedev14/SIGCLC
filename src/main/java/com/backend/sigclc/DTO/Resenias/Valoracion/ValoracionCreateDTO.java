@@ -2,8 +2,10 @@ package com.backend.sigclc.DTO.Resenias.Valoracion;
 
 import org.bson.types.ObjectId;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ public class ValoracionCreateDTO {
     private ObjectId usuarioId;
 
     @NotNull(message = "La valoracion no puede ser nula")
-    @Pattern(regexp = "^(?:[1-4](?:\\.5)?|5(?:\\.0)?)$", message = "La calificación debe ser un valor entero o mitad entre 1 y 5 (ej: 1, 1.5, 2, 2.5, etc.)")
+    @Min(value = 1, message = "La valoracion debe ser mayor o igual a 1")
+    @Max(value = 5, message = "La valoracion debe ser menor o igual a 5")
     private Double valoracion;
 }

@@ -2,7 +2,8 @@ package com.backend.sigclc.DTO.Resenias.LibroReseniado;
 
 import org.bson.types.ObjectId;
 
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LibroReseniadoUpdateDTO {
     private ObjectId libroId;
-    
-    @Pattern(regexp = "^(?:[1-4](?:\\.5)?|5(?:\\.0)?)$", message = "La calificación debe ser un valor entero o mitad entre 1 y 5 (ej: 1, 1.5, 2, 2.5, etc.)")
+
+    @Min(value = 1, message = "La calificacion debe ser mayor o igual a 1")
+    @Max(value = 5, message = "La calificacion debe ser menor o igual a 5")
     private Double calificacion;
     
     private String opinion;
