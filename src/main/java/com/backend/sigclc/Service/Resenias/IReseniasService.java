@@ -12,4 +12,5 @@ public interface IReseniasService {
     public List<ReseniaResponseDTO> listarResenias();
     public ReseniaResponseDTO buscarReseniaPorId(ObjectId id);
     public List<ReseniaResponseDTO> buscarReseniasPorRedactor(ObjectId redactorId);
+    public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId);
 }

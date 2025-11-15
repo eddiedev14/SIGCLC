@@ -126,4 +126,10 @@ public class ReseniasServiceImp implements IReseniasService {
         List<ReseniaModel> resenias = reseniasRepository.buscarReseniasPorRedactor(redactorId);
         return reseniaMapper.toResponseDTOList(resenias);
     }
+
+    @Override
+    public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId) {
+        List<ReseniaModel> resenias = reseniasRepository.buscarReseniasPorLibro(libroId);
+        return reseniaMapper.toResponseDTOList(resenias);
+    }
 }

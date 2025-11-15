@@ -14,4 +14,8 @@ public interface IReseniasRepository extends MongoRepository <ReseniaModel, Obje
     // Consultas por redactor
     @Query("{'redactor.usuarioId': ?0}")
     List<ReseniaModel> buscarReseniasPorRedactor(ObjectId redactorId);
+
+    // Consultas por libro
+    @Query("{'libro.libroId': ?0}")
+    List<ReseniaModel> buscarReseniasPorLibro(ObjectId libroId);
 }
