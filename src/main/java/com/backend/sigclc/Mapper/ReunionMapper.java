@@ -10,14 +10,16 @@ import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
 import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteResponseDTO;
 import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoResponseDTO;
-import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
-import com.backend.sigclc.DTO.Archivos.ArchivoAdjuntoResponseDTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class ReunionMapper {
+    @Autowired
+    private ArchivoAdjuntoMapper archivoAdjuntoMapper;
     
     public ReunionesModel toModel(ReunionCreateDTO dto) {
         ReunionesModel model = new ReunionesModel();
@@ -37,7 +39,7 @@ public class ReunionMapper {
         dto.setEspacioReunion(model.getEspacioReunion());
         dto.setLibrosSeleccionados(toLibrosSeleccionadosResponseDTOList(model.getLibrosSeleccionados()));
         dto.setAsistentes(toAsistentesResponseDTOList(model.getAsistentes()));
-        dto.setArchivosAdjuntos(toArchivosAdjuntosResponseDTOList(model.getArchivosAdjuntos()));
+        dto.setArchivosAdjuntos(archivoAdjuntoMapper.toArchivosAdjuntosResponseDTOList(model.getArchivosAdjuntos()));
         return dto;
     }
 
@@ -55,13 +57,6 @@ public class ReunionMapper {
         return dto;
     }
 
-    public ArchivoAdjuntoResponseDTO toArchivoAdjuntoResponseDTO(ArchivoAdjuntoModel model) {
-        ArchivoAdjuntoResponseDTO dto = new ArchivoAdjuntoResponseDTO();
-        dto.setArchivoPath(model.getArchivoPath());
-        dto.setTipo(model.getTipo());
-        return dto;
-    }
-
     public AsistenteResponseDTO toAsistenteResponseDTO(AsistenteModel model) {
         AsistenteResponseDTO dto = new AsistenteResponseDTO();
         dto.setAsistenteId(model.getAsistenteIdAString());
@@ -72,12 +67,6 @@ public class ReunionMapper {
     public List<LibroSeleccionadoResponseDTO> toLibrosSeleccionadosResponseDTOList(List<LibroSeleccionadoModel> models) {
         return models.stream()
                 .map(this::toLibroSeleccionadoResponseDTO)
-                .toList();
-    }
-
-    public List<ArchivoAdjuntoResponseDTO> toArchivosAdjuntosResponseDTOList(List<ArchivoAdjuntoModel> models) {
-        return models.stream()
-                .map(this::toArchivoAdjuntoResponseDTO)
                 .toList();
     }
 
@@ -121,7 +110,4 @@ public class ReunionMapper {
         if (dto.getLibrosSeleccionadosId() != null) model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
         if (dto.getAsistentesId() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
     }
-
-    
-
 }
