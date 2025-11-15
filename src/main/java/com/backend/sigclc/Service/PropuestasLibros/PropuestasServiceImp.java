@@ -1,6 +1,5 @@
 package com.backend.sigclc.Service.PropuestasLibros;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -46,8 +45,6 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Definir campos con valores por defecto SOLO CUANDO SE CREA UNA NUEVA PROPUESTA
         model.setFechaPropuesta(new Date());
         model.setEstadoPropuesta(EstadoPropuesta.en_votacion);
-        model.setVotos(new ArrayList<>());
-        model.setPeriodoSeleccion(null);
 
         //* Añadir campos automáticamente a libroPropuesto con base al libro */
         ObjectId libroId = model.getLibroPropuesto().getLibroId();
