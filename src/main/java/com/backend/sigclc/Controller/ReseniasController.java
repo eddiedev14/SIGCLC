@@ -43,4 +43,10 @@ public class ReseniasController {
         ReseniaResponseDTO response = reseniasService.buscarReseniaPorId(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(value = "/buscarPorRedactor/{redactorId}")
+    public ResponseEntity<List<ReseniaResponseDTO>> buscarReseniasPorRedactor(@PathVariable ObjectId redactorId) {
+        List<ReseniaResponseDTO> response = reseniasService.buscarReseniasPorRedactor(redactorId);
+        return ResponseEntity.ok(response);
+    }
 }

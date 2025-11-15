@@ -120,4 +120,10 @@ public class ReseniasServiceImp implements IReseniasService {
                 "Error! No existe una reseña con id: " + id + " o está mal escrito."));
         return reseniaMapper.toResponseDTO(reseniaModel);
     }
+
+    @Override
+    public List<ReseniaResponseDTO> buscarReseniasPorRedactor(ObjectId redactorId) {
+        List<ReseniaModel> resenias = reseniasRepository.buscarReseniasPorRedactor(redactorId);
+        return reseniaMapper.toResponseDTOList(resenias);
+    }
 }
