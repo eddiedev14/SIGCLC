@@ -15,6 +15,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReseniaMapper;
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
@@ -300,10 +301,10 @@ public class ReseniasServiceImp implements IReseniasService {
     }
 
     @Override
-    public ReseniaResponseDTO agregarArchivosAResenia(ObjectId id, List<MultipartFile> archivosAdjuntos) {
-        ReseniaModel reseniaModel = reseniasRepository.findById(id)
+    public ReseniaResponseDTO agregarArchivosAResenia(ObjectId reseniaId, List<MultipartFile> archivosAdjuntos) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una reseña con id: " + id + " o está mal escrito."));
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
 
         List<ArchivoAdjuntoModel> adjuntos = reseniaModel.getArchivosAdjuntos();
         boolean tieneArchivoValido = false;
@@ -341,6 +342,37 @@ public class ReseniasServiceImp implements IReseniasService {
         }
 
         // Guardar la reseña
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public ReseniaResponseDTO actualizarValoracion(ObjectId reseniaId, ObjectId usuarioId, ValoracionUpdateDTO valoracionUpdateDTO) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        UsuariosModel usuario = usuariosRepository.findById(usuarioId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
+
+        //* Validar que dicho usuario haya valorado la reseña (sino, mostrar error) *
+        if (reseniaModel.getValoraciones().stream()
+            .noneMatch(valoracion -> valoracion.getValorador().getUsuarioId().equals(usuario.getId()))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario no ha valorado esta reseña.");
+        }
+
+        //* Obtener valoracion de ese usuario */
+        ValoracionModel valoracion = reseniaModel.getValoraciones().stream()
+            .filter(v -> v.getValorador().getUsuarioId().equals(usuario.getId()))
+            .findFirst()
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una valoración con id: " + usuarioId + " o está mal escrito."));
+
+        //* Actualizar valoracion *
+        valoracion.setValoracion(valoracionUpdateDTO.getValoracion());
+
+        //* Guardar la reseña *
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
     }
