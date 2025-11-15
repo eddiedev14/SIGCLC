@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
@@ -76,6 +77,12 @@ public class ReseniasController {
     @PatchMapping(value = "/comentar/{id}")
     public ResponseEntity<ReseniaResponseDTO> comentarResenia(@PathVariable ObjectId id, @Valid @RequestBody ComentarioCreateDTO dto) {
         ReseniaResponseDTO response = reseniasService.comentarResenia(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping(value = "/agregar-archivos/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<ReseniaResponseDTO> agregarArchivosAResenia(@PathVariable ObjectId id, @ModelAttribute List<MultipartFile> archivosAdjuntos) {
+        ReseniaResponseDTO response = reseniasService.agregarArchivosAResenia(id, archivosAdjuntos);
         return ResponseEntity.ok(response);
     }
 }

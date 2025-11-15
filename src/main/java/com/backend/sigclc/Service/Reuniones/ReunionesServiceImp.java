@@ -406,13 +406,6 @@ public class ReunionesServiceImp implements IReunionesService{
                     EXTENSIONES_PERMITIDAS
                 );
 
-                boolean yaExiste = adjuntos.stream()
-                    .anyMatch(a -> a.getArchivoPath().equals(ruta));
-
-                if (yaExiste) {
-                    continue;
-                }
-
                 ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
                 adjunto.setArchivoPath(ruta);
 

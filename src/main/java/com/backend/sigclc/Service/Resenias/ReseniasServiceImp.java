@@ -298,4 +298,50 @@ public class ReseniasServiceImp implements IReseniasService {
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
     }
+
+    @Override
+    public ReseniaResponseDTO agregarArchivosAResenia(ObjectId id, List<MultipartFile> archivosAdjuntos) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + id + " o está mal escrito."));
+
+        List<ArchivoAdjuntoModel> adjuntos = reseniaModel.getArchivosAdjuntos();
+        boolean tieneArchivoValido = false;
+
+        for (MultipartFile archivo : archivosAdjuntos) {
+            if (archivo == null || archivo.isEmpty()) {
+                continue;
+            }
+
+            tieneArchivoValido = true;
+
+            String ruta = archivosService.guardarArchivo(
+                archivo,
+                CARPETA_ARCHIVOS,
+                EXTENSIONES_PERMITIDAS
+            );
+
+            ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
+            adjunto.setArchivoPath(ruta);
+
+            String extension = archivosService.obtenerExtensionSinPunto(ruta);
+            switch (extension.toLowerCase()) {
+                case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                default -> throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
+            }
+            adjuntos.add(adjunto);
+
+        }
+
+        if (!tieneArchivoValido) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
+        }
+
+        // Guardar la reseña
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
 }
