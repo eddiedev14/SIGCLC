@@ -112,4 +112,12 @@ public class ReseniasServiceImp implements IReseniasService {
         List<ReseniaModel> resenias = reseniasRepository.findAll();
         return reseniaMapper.toResponseDTOList(resenias);
     }
+
+    @Override
+    public ReseniaResponseDTO buscarReseniaPorId(ObjectId id) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + id + " o está mal escrito."));
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
 }

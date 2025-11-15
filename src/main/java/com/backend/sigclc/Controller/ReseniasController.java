@@ -2,11 +2,13 @@ package com.backend.sigclc.Controller;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +35,12 @@ public class ReseniasController {
     @GetMapping(value = "/listar")
     public ResponseEntity<List<ReseniaResponseDTO>> listarResenias() {
         List<ReseniaResponseDTO> response = reseniasService.listarResenias();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/buscar/{id}")
+    public ResponseEntity<ReseniaResponseDTO> buscarReseniaPorId(@PathVariable ObjectId id) {
+        ReseniaResponseDTO response = reseniasService.buscarReseniaPorId(id);
         return ResponseEntity.ok(response);
     }
 }
