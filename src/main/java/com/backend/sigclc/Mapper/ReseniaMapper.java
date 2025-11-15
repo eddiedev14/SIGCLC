@@ -131,6 +131,7 @@ public class ReseniaMapper {
 
     public ComentarioResponseDTO toComentarioResponseDTO(ComentarioModel comentarioModel) {
         ComentarioResponseDTO comentarioResponseDTO = new ComentarioResponseDTO();
+        comentarioResponseDTO.setComentarioId(comentarioModel.getComentarioIdAsString());
         comentarioResponseDTO.setComentador(toComentadorResponseDTO(comentarioModel.getComentador()));
         comentarioResponseDTO.setFecha(comentarioModel.getFecha());
         comentarioResponseDTO.setComentario(comentarioModel.getComentario());

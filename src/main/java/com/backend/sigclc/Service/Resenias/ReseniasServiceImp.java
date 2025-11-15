@@ -239,6 +239,7 @@ public class ReseniasServiceImp implements IReseniasService {
                         .orElseThrow(() -> new RecursoNoEncontradoException(
                             "Error! No existe un usuario con id: " + comentarioDTO.getUsuarioId() + " o está mal escrito."));
                     ComentarioModel comentario = new ComentarioModel();
+                    comentario.setComentarioId(new ObjectId());
                     comentario.setComentador(new ComentadorModel(usuario.getId(), usuario.getNombreCompleto()));
                     comentario.setFecha(new Date());
                     comentario.setComentario(comentarioDTO.getComentario());
@@ -291,6 +292,7 @@ public class ReseniasServiceImp implements IReseniasService {
                 "Error! No existe un usuario con id: " + comentarioCreateDTO.getUsuarioId() + " o está mal escrito."));
 
         ComentarioModel comentario = new ComentarioModel();
+        comentario.setComentarioId(new ObjectId());
         comentario.setComentador(new ComentadorModel(usuario.getId(), usuario.getNombreCompleto()));
         comentario.setFecha(new Date());
         comentario.setComentario(comentarioCreateDTO.getComentario());

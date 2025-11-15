@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComentarioResponseDTO {
+    private String comentarioId;
     private ComentadorResponseDTO comentador;
     private Date fecha;
     private String comentario;
