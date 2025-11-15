@@ -1,5 +1,6 @@
 package com.backend.sigclc.Service.Resenias;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,13 +21,13 @@ import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReseniaMapper;
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
+import com.backend.sigclc.Model.Archivos.TipoArchivo;
 import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Resenias.ComentadorModel;
 import com.backend.sigclc.Model.Resenias.ComentarioModel;
 import com.backend.sigclc.Model.Resenias.ReseniaModel;
 import com.backend.sigclc.Model.Resenias.ValoracionModel;
 import com.backend.sigclc.Model.Resenias.ValoradorModel;
-import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 
 import com.backend.sigclc.Repository.ILibrosRepository;
@@ -93,9 +94,9 @@ public class ReseniasServiceImp implements IReseniasService {
 
                 String extension = archivosService.obtenerExtensionSinPunto(ruta);
                 switch (extension.toLowerCase()) {
-                    case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                    case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                    case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                    case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                     default -> throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                 }
@@ -186,9 +187,9 @@ public class ReseniasServiceImp implements IReseniasService {
 
                     String extension = archivosService.obtenerExtensionSinPunto(ruta);
                     switch (extension.toLowerCase()) {
-                        case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                        case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                        case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                        case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                         default -> throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                     }
@@ -330,9 +331,9 @@ public class ReseniasServiceImp implements IReseniasService {
 
             String extension = archivosService.obtenerExtensionSinPunto(ruta);
             switch (extension.toLowerCase()) {
-                case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                 default -> throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
             }
@@ -418,5 +419,81 @@ public class ReseniasServiceImp implements IReseniasService {
         //* Guardar la reseña *
         reseniasRepository.save(reseniaModel);
         return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public ReseniaResponseDTO eliminarComentario(ObjectId reseniaId, ObjectId comentarioId) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        ComentarioModel comentario = reseniaModel.getComentarios().stream()
+            .filter(c -> c.getComentarioId().equals(comentarioId))
+            .findFirst()
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe un comentario con id: " + comentarioId + " o está mal escrito."));
+
+        //* Eliminar comentario *
+        reseniaModel.getComentarios().remove(comentario);
+
+        //* Guardar la reseña *
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public ReseniaResponseDTO eliminarArchivosDeResenia(ObjectId id, List<String> archivoUuids) {
+        ReseniaModel resenia = reseniasRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + id + " o está mal escrito."
+            ));
+
+        List<ArchivoAdjuntoModel> adjuntos = resenia.getArchivosAdjuntos();
+        if (adjuntos == null || adjuntos.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La reunión no tiene archivos adjuntos.");
+        }
+
+        if (archivoUuids == null || archivoUuids.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe proporcionar una lista de identificadores de archivos a eliminar.");
+        }
+
+        List<String> notFound = new ArrayList<>();
+        List<String> failedToDelete = new ArrayList<>();
+        List<ArchivoAdjuntoModel> encontrados = new ArrayList<>();
+
+        for (String uuid : archivoUuids) {
+            ArchivoAdjuntoModel encontrado = adjuntos.stream()
+                .filter(a -> a.getArchivoPath() != null && a.getArchivoPath().contains(uuid))
+                .findFirst()
+                .orElse(null);
+            if (encontrado == null) {
+                notFound.add(uuid);
+            } else {
+                encontrados.add(encontrado);
+            }
+        }
+
+        if (encontrados.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "No se encontraron archivos adjuntos para los identificadores proporcionados: " + notFound);
+        }
+
+        for (ArchivoAdjuntoModel a : encontrados) {
+            try {
+                archivosService.eliminarArchivo(a.getArchivoPath());
+                adjuntos.remove(a);
+            } catch (Exception e) {
+                failedToDelete.add(a.getArchivoPath());
+            }
+        }
+
+        reseniasRepository.save(resenia);
+
+        if (!failedToDelete.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Algunos archivos no se pudieron eliminar físicamente: " + failedToDelete);
+        }
+
+        return reseniaMapper.toResponseDTO(resenia);
     }
 }

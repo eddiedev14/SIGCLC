@@ -105,4 +105,16 @@ public class ReseniasController {
         ReseniaResponseDTO response = reseniasService.eliminarValoracion(idResenia, idUsuario);
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping(value = "/eliminar-comentario/{idResenia}/{idComentario}")
+    public ResponseEntity<ReseniaResponseDTO> eliminarComentario(@PathVariable ObjectId idResenia, @PathVariable ObjectId idComentario) {
+        ReseniaResponseDTO response = reseniasService.eliminarComentario(idResenia, idComentario);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping(value = "/eliminar-archivos/{id}")
+    public ResponseEntity<ReseniaResponseDTO> eliminarArchivosDeResenia(@PathVariable ObjectId id, @RequestBody List<String> archivosAdjuntosUuid) {
+        ReseniaResponseDTO response = reseniasService.eliminarArchivosDeResenia(id, archivosAdjuntosUuid);
+        return ResponseEntity.ok(response);
+    }
 }

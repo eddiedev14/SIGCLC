@@ -26,4 +26,6 @@ public interface IReseniasService {
     public ReseniaResponseDTO actualizarValoracion(ObjectId reseniaId, ObjectId usuarioId, ValoracionUpdateDTO valoracionUpdateDTO);
     public ReseniaResponseDTO actualizarComentario(ObjectId reseniaId, ObjectId comentarioId, ComentarioUpdateDTO comentarioUpdateDTO);
     public ReseniaResponseDTO eliminarValoracion(ObjectId reseniaId, ObjectId usuarioId);
+    public ReseniaResponseDTO eliminarComentario(ObjectId reseniaId, ObjectId comentarioId);
+    public ReseniaResponseDTO eliminarArchivosDeResenia(ObjectId reseniaId, List<String> archivoUuids);
 }

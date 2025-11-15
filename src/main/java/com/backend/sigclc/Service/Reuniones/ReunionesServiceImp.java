@@ -2,6 +2,7 @@ package com.backend.sigclc.Service.Reuniones;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,12 +23,12 @@ import com.backend.sigclc.Mapper.ReunionMapper;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
+import com.backend.sigclc.Model.Archivos.TipoArchivo;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.Reuniones.AsistenteModel;
 import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
 import com.backend.sigclc.Model.Reuniones.ModalidadReunion;
 import com.backend.sigclc.Model.Reuniones.ReunionesModel;
-import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
@@ -108,9 +109,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
                     String extension = archivosService.obtenerExtensionSinPunto(ruta);
                     switch (extension.toLowerCase()) {
-                        case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                        case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                        case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                        case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                         default -> throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                     }
@@ -256,9 +257,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
                         String extension = archivosService.obtenerExtensionSinPunto(ruta);
                         switch (extension.toLowerCase()) {
-                            case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                            case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                            case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                            case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                            case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                            case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                             default -> throw new ResponseStatusException(
                                 HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                         }
@@ -411,9 +412,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
                 String extension = archivosService.obtenerExtensionSinPunto(ruta);
                 switch (extension.toLowerCase()) {
-                    case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
-                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
-                    case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                    case "pdf" -> adjunto.setTipo(TipoArchivo.pdf);
+                    case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoArchivo.imagen);
+                    case "ppt", "pptx" -> adjunto.setTipo(TipoArchivo.presentacion);
                     default -> throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
                 }
@@ -506,9 +507,9 @@ public class ReunionesServiceImp implements IReunionesService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe proporcionar una lista de identificadores de archivos a eliminar.");
             }
 
-            List<String> notFound = new java.util.ArrayList<>();
-            List<String> failedToDelete = new java.util.ArrayList<>();
-            List<ArchivoAdjuntoModel> encontrados = new java.util.ArrayList<>();
+            List<String> notFound = new ArrayList<>();
+            List<String> failedToDelete = new ArrayList<>();
+            List<ArchivoAdjuntoModel> encontrados = new ArrayList<>();
 
             for (String uuid : archivoUuids) {
                 ArchivoAdjuntoModel encontrado = adjuntos.stream()
