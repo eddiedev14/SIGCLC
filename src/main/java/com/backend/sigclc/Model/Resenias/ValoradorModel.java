@@ -12,4 +12,8 @@ import org.bson.types.ObjectId;
 public class ValoradorModel {
     private ObjectId usuarioId;
     private String nombreCompleto;
+
+    public String getValoradorIdAString(){
+        return usuarioId != null ? usuarioId.toHexString():null;
+    }
 }

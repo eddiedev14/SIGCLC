@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class ComentadorModel {
     private ObjectId usuarioId;
     private String nombreCompleto;
+
+    public String getComentadorIdAString(){
+        return usuarioId != null ? usuarioId.toHexString():null;
+    }
 }

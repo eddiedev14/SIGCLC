@@ -13,6 +13,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document("resenias")
 @Data
@@ -27,4 +28,9 @@ public class ReseniaModel {
     private List<ArchivoAdjuntoModel> archivosAdjuntos = new ArrayList<>();
     private List<ValoracionModel> valoraciones = new ArrayList<>();
     private List<ComentarioModel> comentarios = new ArrayList<>();
+
+    @JsonProperty("id")
+    public String getIdAString(){
+        return id != null ? id.toHexString():null;
+    }
 }

@@ -12,4 +12,8 @@ import org.bson.types.ObjectId;
 public class RedactorModel {
     private ObjectId usuarioId;
     private String nombreCompleto;
+
+    public String getRedactorIdAString(){
+        return usuarioId != null ? usuarioId.toHexString():null;
+    }
 }

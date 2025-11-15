@@ -14,4 +14,8 @@ public class LibroReseniadoModel {
     private String titulo;
     private Double calificacion;
     private String opinion;
+
+    public String getLibroReseniadoIdAString(){
+        return libroId != null ? libroId.toHexString():null;
+    }
 }
