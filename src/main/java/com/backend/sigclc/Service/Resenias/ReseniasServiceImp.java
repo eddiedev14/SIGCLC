@@ -104,8 +104,12 @@ public class ReseniasServiceImp implements IReseniasService {
         reseniasRepository.save(reseniaModel);
 
         // Retornar DTO
-        ReseniaResponseDTO reseniaResponseDTO = reseniaMapper.toResponseDTO(reseniaModel);
-        reseniaResponseDTO.setCalificacionPromedio(0.0);
-        return reseniaResponseDTO;
+        return reseniaMapper.toResponseDTO(reseniaModel);
+    }
+
+    @Override
+    public List<ReseniaResponseDTO> listarResenias() {
+        List<ReseniaModel> resenias = reseniasRepository.findAll();
+        return reseniaMapper.toResponseDTOList(resenias);
     }
 }

@@ -33,4 +33,14 @@ public class ReseniaModel {
     public String getIdAString(){
         return id != null ? id.toHexString():null;
     }
+
+    public Double getCalificacionPromedio() {
+        if (valoraciones == null || valoraciones.isEmpty()) {
+            return 0.0;
+        }
+        return valoraciones.stream()
+                .mapToDouble(ValoracionModel::getValoracion)
+                .average()
+                .orElse(0.0);
+    }
 }

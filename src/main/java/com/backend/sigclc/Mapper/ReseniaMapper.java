@@ -57,11 +57,18 @@ public class ReseniaMapper {
         reseniaResponseDTO.setId(reseniaModel.getIdAString());
         reseniaResponseDTO.setRedactor(toRedactorResponseDTO(reseniaModel.getRedactor()));
         reseniaResponseDTO.setFechaPublicacion(reseniaModel.getFechaPublicacion());
+        reseniaResponseDTO.setCalificacionPromedio(reseniaModel.getCalificacionPromedio());
         reseniaResponseDTO.setLibroReseniado(toLibroReseniadoResponseDTO(reseniaModel.getLibro()));
         reseniaResponseDTO.setArchivosAdjuntos(archivoAdjuntoMapper.toArchivosAdjuntosResponseDTOList(reseniaModel.getArchivosAdjuntos()));
         reseniaResponseDTO.setComentarios(toComentariosResponseDTOList(reseniaModel.getComentarios()));
         reseniaResponseDTO.setValoraciones(toValoracionesResponseDTOList(reseniaModel.getValoraciones()));
         return reseniaResponseDTO;
+    }
+
+    public List<ReseniaResponseDTO> toResponseDTOList(List<ReseniaModel> resenias) {
+        return resenias.stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     public RedactorResponseDTO toRedactorResponseDTO(RedactorModel redactorModel) {

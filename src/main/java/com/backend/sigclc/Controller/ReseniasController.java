@@ -1,8 +1,11 @@
 package com.backend.sigclc.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +27,12 @@ public class ReseniasController {
     @PostMapping(value = "/insertar", consumes = "multipart/form-data")
     public ResponseEntity<ReseniaResponseDTO> insertarResenia(@Valid @ModelAttribute ReseniaCreateDTO dto) {
         ReseniaResponseDTO response = reseniasService.crearResenia(dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/listar")
+    public ResponseEntity<List<ReseniaResponseDTO>> listarResenias() {
+        List<ReseniaResponseDTO> response = reseniasService.listarResenias();
         return ResponseEntity.ok(response);
     }
 }
