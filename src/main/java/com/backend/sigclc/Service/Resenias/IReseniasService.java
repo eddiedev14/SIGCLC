@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
+import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 
 public interface IReseniasService {
     public ReseniaResponseDTO crearResenia(ReseniaCreateDTO reseniaCreateDTO);
@@ -13,4 +14,5 @@ public interface IReseniasService {
     public ReseniaResponseDTO buscarReseniaPorId(ObjectId id);
     public List<ReseniaResponseDTO> buscarReseniasPorRedactor(ObjectId redactorId);
     public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId);
+    public ReseniaResponseDTO actualizarResenia(ObjectId reseniaId, ReseniaUpdateDTO reseniaUpdateDTO);
 }

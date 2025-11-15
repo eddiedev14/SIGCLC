@@ -107,7 +107,5 @@ public class ReunionMapper {
         if (dto.getHora() != null) model.setHora(dto.getHora());
         if (dto.getModalidad() != null) model.setModalidad(dto.getModalidad());
         if (dto.getEspacioReunion() != null) model.setEspacioReunion(dto.getEspacioReunion());
-        if (dto.getLibrosSeleccionadosId() != null) model.setLibrosSeleccionados(toLibroSeleccionadoModelList(dto.getLibrosSeleccionadosId()));
-        if (dto.getAsistentesId() != null) model.setAsistentes(toAsistentesModelList(dto.getAsistentesId()));
     }
 }

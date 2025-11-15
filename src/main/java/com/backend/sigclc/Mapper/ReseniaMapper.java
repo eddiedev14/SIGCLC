@@ -6,12 +6,16 @@ import org.bson.types.ObjectId;
 
 import com.backend.sigclc.DTO.Resenias.LibroReseniado.LibroReseniadoCreateDTO;
 import com.backend.sigclc.DTO.Resenias.LibroReseniado.LibroReseniadoResponseDTO;
+import com.backend.sigclc.DTO.Resenias.LibroReseniado.LibroReseniadoUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Redactor.RedactorResponseDTO;
+import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoradorResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
+import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentadorResponseDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioResponseDTO;
 import com.backend.sigclc.Model.Resenias.ReseniaModel;
 import com.backend.sigclc.Model.Resenias.ValoracionModel;
@@ -49,6 +53,44 @@ public class ReseniaMapper {
         libroReseniadoModel.setCalificacion(libroReseniadoCreateDTO.getCalificacion());
         libroReseniadoModel.setOpinion(libroReseniadoCreateDTO.getOpinion());
         return libroReseniadoModel;
+    }
+
+    public ValoracionModel createValoracionModel(ValoracionCreateDTO valoracionCreateDTO) {
+        ValoracionModel valoracionModel = new ValoracionModel();
+        valoracionModel.setValorador(createValoradorModel(valoracionCreateDTO.getUsuarioId()));
+        valoracionModel.setValoracion(valoracionCreateDTO.getValoracion());
+        return valoracionModel;
+    }
+
+    public ValoradorModel createValoradorModel(ObjectId usuarioId) {
+        ValoradorModel valoradorModel = new ValoradorModel();
+        valoradorModel.setUsuarioId(usuarioId);
+        return valoradorModel;
+    }
+
+    public List<ValoracionModel> createValoracionModelList(List<ValoracionCreateDTO> valoracionCreateDTOList) {
+        return valoracionCreateDTOList.stream()
+                .map(this::createValoracionModel)
+                .toList();
+    }
+
+    public ComentarioModel createComentarioModel(ComentarioCreateDTO comentarioCreateDTO) {
+        ComentarioModel comentarioModel = new ComentarioModel();
+        comentarioModel.setComentador(createComentadorModel(comentarioCreateDTO.getUsuarioId()));
+        comentarioModel.setComentario(comentarioCreateDTO.getComentario());
+        return comentarioModel;
+    }
+
+    public ComentadorModel createComentadorModel(ObjectId usuarioId) {
+        ComentadorModel comentadorModel = new ComentadorModel();
+        comentadorModel.setUsuarioId(usuarioId);
+        return comentadorModel;
+    }
+
+    public List<ComentarioModel> createComentarioModelList(List<ComentarioCreateDTO> comentarioCreateDTOList) {
+        return comentarioCreateDTOList.stream()
+                .map(this::createComentarioModel)
+                .toList();
     }
 
     //* Responses */
@@ -128,5 +170,17 @@ public class ReseniaMapper {
         return valoraciones.stream()
                 .map(this::toValoracionResponseDTO)
                 .toList();
+    }
+
+    //* Update */
+    public void updateReseniaModelFromDTO(ReseniaModel reseniaModel, ReseniaUpdateDTO reseniaUpdateDTO) {
+        if (reseniaUpdateDTO.getLibroReseniado() != null) reseniaModel.setLibro(updateLibroReseniadoModel(reseniaModel.getLibro(), reseniaUpdateDTO.getLibroReseniado()));
+    }
+
+    public LibroReseniadoModel updateLibroReseniadoModel(LibroReseniadoModel libroReseniadoModel, LibroReseniadoUpdateDTO libroReseniadoUpdateDTO) {
+        if (libroReseniadoUpdateDTO.getLibroId() != null) libroReseniadoModel.setLibroId(libroReseniadoUpdateDTO.getLibroId());
+        if (libroReseniadoUpdateDTO.getCalificacion() != null) libroReseniadoModel.setCalificacion(libroReseniadoUpdateDTO.getCalificacion());
+        if (libroReseniadoUpdateDTO.getOpinion() != null) libroReseniadoModel.setOpinion(libroReseniadoUpdateDTO.getOpinion());
+        return libroReseniadoModel;
     }
 }

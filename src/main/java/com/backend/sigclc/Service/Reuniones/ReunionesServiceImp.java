@@ -189,16 +189,21 @@ public class ReunionesServiceImp implements IReunionesService{
 
             if (dto.getAsistentesId() != null) {
                 List<AsistenteModel> asistentes = reunion.getAsistentes();
-                for (ObjectId asistenteId : dto.getAsistentesId()) {
-                    UsuariosModel usuario = usuariosRepository.findById(asistenteId)
-                        .orElseThrow(() -> new RecursoNoEncontradoException(
-                            "Error! No existe un usuario con id: " + asistenteId
-                        ));
-                    AsistenteModel asistente = new AsistenteModel();
-                    asistente.setAsistenteId(usuario.getId());
-                    asistente.setNombreCompleto(usuario.getNombreCompleto());
-                    asistentes.add(asistente);
+                asistentes.clear();
+
+                if (!dto.getAsistentesId().isEmpty()) {
+                    for (ObjectId asistenteId : dto.getAsistentesId()) {
+                        UsuariosModel usuario = usuariosRepository.findById(asistenteId)
+                            .orElseThrow(() -> new RecursoNoEncontradoException(
+                                "Error! No existe un usuario con id: " + asistenteId
+                            ));
+                        AsistenteModel asistente = new AsistenteModel();
+                        asistente.setAsistenteId(usuario.getId());
+                        asistente.setNombreCompleto(usuario.getNombreCompleto());
+                        asistentes.add(asistente);
+                    }
                 }
+
                 reunion.setAsistentes(asistentes);
             }
 
@@ -209,13 +214,16 @@ public class ReunionesServiceImp implements IReunionesService{
                 validarLibrosSeleccionadosNoLeidos(propuestas);
 
                 List<LibroSeleccionadoModel> librosSeleccionados = reunion.getLibrosSeleccionados();
+                librosSeleccionados.clear();
 
-                for (PropuestasLibrosModel propuesta : propuestas) {
-                    LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
-                    libroSel.setPropuestaId(propuesta.getId());
-                    libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
-                    libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
-                    librosSeleccionados.add(libroSel);
+                if (!dto.getLibrosSeleccionadosId().isEmpty()) {
+                    for (PropuestasLibrosModel propuesta : propuestas) {
+                        LibroSeleccionadoModel libroSel = new LibroSeleccionadoModel();
+                        libroSel.setPropuestaId(propuesta.getId());
+                        libroSel.setTitulo(propuesta.getLibroPropuesto().getTitulo());
+                        libroSel.setGeneros(propuesta.getLibroPropuesto().getGeneros());
+                        librosSeleccionados.add(libroSel);
+                    }
                 }
 
                 reunion.setLibrosSeleccionados(librosSeleccionados);
@@ -223,9 +231,13 @@ public class ReunionesServiceImp implements IReunionesService{
 
             if (dto.getArchivosAdjuntos() != null) {
                 List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
+                // Eliminar archivos previos
+                for (ArchivoAdjuntoModel adjunto : adjuntos) {
+                    archivosService.eliminarArchivo(adjunto.getArchivoPath());
+                }
                 adjuntos.clear();
 
-                if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
+                if (!dto.getArchivosAdjuntos().isEmpty()) {
                     boolean tieneArchivoValido = false;
                     for (MultipartFile archivo : dto.getArchivosAdjuntos()) {
                         if (archivo == null || archivo.isEmpty()) {
@@ -256,13 +268,9 @@ public class ReunionesServiceImp implements IReunionesService{
                     if (!tieneArchivoValido) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
                     }
-
-                    reunion.setArchivosAdjuntos(adjuntos);
-                } else {
-                    // Si la lista se pone vacía, se considera como que se resetea entonces se guarda vacia, osea que 
-                    // es como borrar los archivos adjuntos
-                    reunion.setArchivosAdjuntos(adjuntos);
                 }
+
+                reunion.setArchivosAdjuntos(adjuntos);
             }
 
             reunionesRepository.save(reunion);

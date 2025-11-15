@@ -12,11 +12,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
+import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ReseniaMapper;
 import com.backend.sigclc.Model.Archivos.ArchivoAdjuntoModel;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.Resenias.ComentadorModel;
+import com.backend.sigclc.Model.Resenias.ComentarioModel;
 import com.backend.sigclc.Model.Resenias.ReseniaModel;
+import com.backend.sigclc.Model.Resenias.ValoracionModel;
+import com.backend.sigclc.Model.Resenias.ValoradorModel;
 import com.backend.sigclc.Model.Reuniones.TipoReunion;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 
@@ -131,5 +138,113 @@ public class ReseniasServiceImp implements IReseniasService {
     public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId) {
         List<ReseniaModel> resenias = reseniasRepository.buscarReseniasPorLibro(libroId);
         return reseniaMapper.toResponseDTOList(resenias);
+    }
+
+    @Override
+    public ReseniaResponseDTO actualizarResenia(ObjectId reseniaId, ReseniaUpdateDTO reseniaUpdateDTO) {
+        ReseniaModel reseniaModel = reseniasRepository.findById(reseniaId)
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                "Error! No existe una reseña con id: " + reseniaId + " o está mal escrito."));
+        
+        reseniaMapper.updateReseniaModelFromDTO(reseniaModel, reseniaUpdateDTO);
+
+        // Actualizar el titulo del libro reseñado automáticamente si se modifico
+        if (reseniaUpdateDTO.getLibroReseniado() != null && reseniaUpdateDTO.getLibroReseniado().getLibroId() != null) {
+            LibrosModel libro = librosRepository.findById(reseniaUpdateDTO.getLibroReseniado().getLibroId())
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "Error! No existe un libro con id: " + reseniaUpdateDTO.getLibroReseniado().getLibroId() + " o está mal escrito."));
+            reseniaModel.getLibro().setTitulo(libro.getTitulo());
+        }
+
+        // Actualizar y guardar archivos
+        if (reseniaUpdateDTO.getArchivosAdjuntos() != null) {
+            List<ArchivoAdjuntoModel> adjuntos = reseniaModel.getArchivosAdjuntos();
+            // Eliminar archivos previos
+            for (ArchivoAdjuntoModel adjunto : adjuntos) {
+                archivosService.eliminarArchivo(adjunto.getArchivoPath());
+            }
+            adjuntos.clear();
+
+            if (!reseniaUpdateDTO.getArchivosAdjuntos().isEmpty()) {
+                boolean tieneArchivoValido = false;
+                for (MultipartFile archivo : reseniaUpdateDTO.getArchivosAdjuntos()) {
+                    if (archivo == null || archivo.isEmpty()) {
+                        continue;
+                    }
+                    tieneArchivoValido = true;
+
+                    String ruta = archivosService.guardarArchivo(
+                        archivo,
+                        CARPETA_ARCHIVOS,
+                        EXTENSIONES_PERMITIDAS
+                    );
+
+                    ArchivoAdjuntoModel adjunto = new ArchivoAdjuntoModel();
+                    adjunto.setArchivoPath(ruta);
+
+                    String extension = archivosService.obtenerExtensionSinPunto(ruta);
+                    switch (extension.toLowerCase()) {
+                        case "pdf" -> adjunto.setTipo(TipoReunion.pdf);
+                        case "jpg", "jpeg", "png" -> adjunto.setTipo(TipoReunion.imagen);
+                        case "ppt", "pptx" -> adjunto.setTipo(TipoReunion.presentacion);
+                        default -> throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "Tipo de archivo no reconocido: " + extension);
+                    }
+                    adjuntos.add(adjunto);
+                }
+
+                if (!tieneArchivoValido) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar al menos un archivo válido.");
+                }
+            }
+
+            reseniaModel.setArchivosAdjuntos(adjuntos);
+        }
+
+        // Colocar automaticamente el nombre de las valoraciones
+        if (reseniaUpdateDTO.getValoraciones() != null) {
+            List<ValoracionModel> valoraciones = reseniaModel.getValoraciones();
+            valoraciones.clear();
+            
+            if (!reseniaUpdateDTO.getValoraciones().isEmpty()) {
+                for (ValoracionCreateDTO valoracionDTO : reseniaUpdateDTO.getValoraciones()) {
+                    UsuariosModel usuario = usuariosRepository.findById(valoracionDTO.getUsuarioId())
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un usuario con id: " + valoracionDTO.getUsuarioId() + " o está mal escrito."));
+                    ValoracionModel valoracion = new ValoracionModel();
+                    valoracion.setValorador(new ValoradorModel(usuario.getId(), usuario.getNombreCompleto()));
+                    valoracion.setFecha(new Date());
+                    valoracion.setValoracion(valoracionDTO.getValoracion());
+                    valoraciones.add(valoracion);
+                }
+            }
+
+            reseniaModel.setValoraciones(valoraciones);
+        }
+
+        // Colocar automáticamente el nombre de los comentarios
+        if (reseniaUpdateDTO.getComentarios() != null) {
+            List<ComentarioModel> comentarios = reseniaModel.getComentarios();
+            comentarios.clear();
+            
+            if (!reseniaUpdateDTO.getComentarios().isEmpty()) {
+                for (ComentarioCreateDTO comentarioDTO : reseniaUpdateDTO.getComentarios()) {
+                    UsuariosModel usuario = usuariosRepository.findById(comentarioDTO.getUsuarioId())
+                        .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un usuario con id: " + comentarioDTO.getUsuarioId() + " o está mal escrito."));
+                    ComentarioModel comentario = new ComentarioModel();
+                    comentario.setComentador(new ComentadorModel(usuario.getId(), usuario.getNombreCompleto()));
+                    comentario.setFecha(new Date());
+                    comentario.setComentario(comentarioDTO.getComentario());
+                    comentarios.add(comentario);
+                }
+            }
+
+            reseniaModel.setComentarios(comentarios);
+        }
+
+        // Guardar la reseña
+        reseniasRepository.save(reseniaModel);
+        return reseniaMapper.toResponseDTO(reseniaModel);
     }
 }
