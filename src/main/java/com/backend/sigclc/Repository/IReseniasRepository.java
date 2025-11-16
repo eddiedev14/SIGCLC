@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -33,6 +34,22 @@ public interface IReseniasRepository extends MongoRepository <ReseniaModel, Obje
     @Query("{'libro.libroId': ?0}")
     @Update("{$set: {'libro.titulo': ?1}}")
     void actualizarTituloLibroReseniado(ObjectId libroId, String tituloLibro);
+
+    // Validar si el usuario está asociado como redactor de una reseña
+    @ExistsQuery("{'redactor.usuarioId': ?0}")
+    boolean existsByRedactorId(ObjectId usuarioId);
+
+    // Validar si el usuario está asociado como comentador de una reseña
+    @ExistsQuery("{'comentarios.comentador.usuarioId': ?0}")
+    boolean existsByComentadorId(ObjectId usuarioId);
+
+    // Validar si el usuario está asociado como valorador de una reseña
+    @ExistsQuery("{'valoraciones.valorador.usuarioId': ?0}")
+    boolean existsByValoradorId(ObjectId usuarioId);
+
+    // Validar si el libro está asociado como libro reseniado de una reseña
+    @ExistsQuery("{'libro.libroId': ?0}")
+    boolean existsByLibroId(ObjectId libroId);
 
     //* Consultas básicas */
 

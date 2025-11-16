@@ -147,9 +147,12 @@ public class LibrosServiceImp implements ILibrosService {
 
             // Verificar si el libro esta asociada a una propuesta (sin importar su estado)
             if (propuestasLibrosRepository.existsByLibroPropuestoLibroId(id)) {
-                throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El libro no puede ser eliminado porque tiene propuestas asociadas");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene propuestas asociadas");
+            }
+
+            // Verificar si el libro esta asociada a una reseña
+            if (reseniasRepository.existsByLibroId(id)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene reseñas asociadas");
             }
 
             // Eliminar archivo físico de portada
