@@ -18,6 +18,7 @@ import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IReseniasRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Service.Archivos.ArchivosServiceImp;
@@ -36,6 +37,9 @@ public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private IUsuariosRepository usuarioRepository;
+
+    @Autowired
+    private IReseniasRepository reseniasRepository;
 
     @Autowired
     private LibroMapper libroMapper;
@@ -143,9 +147,12 @@ public class LibrosServiceImp implements ILibrosService {
 
             // Verificar si el libro esta asociada a una propuesta (sin importar su estado)
             if (propuestasLibrosRepository.existsByLibroPropuestoLibroId(id)) {
-                throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El libro no puede ser eliminado porque tiene propuestas asociadas");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene propuestas asociadas");
+            }
+
+            // Verificar si el libro esta asociada a una reseña
+            if (reseniasRepository.existsByLibroId(id)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene reseñas asociadas");
             }
 
             // Eliminar archivo físico de portada
@@ -159,6 +166,7 @@ public class LibrosServiceImp implements ILibrosService {
     public void sincronizarTituloLibro(ObjectId id, String tituloLibro) {
         propuestasLibrosRepository.actualizarTituloLibroPropuesto(id, tituloLibro);
         reunionesRepository.actualizarTituloLibroSeleccionado(id, tituloLibro);
+        reseniasRepository.actualizarTituloLibroReseniado(id, tituloLibro);
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.UsuarioMapper;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IReseniasRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
@@ -35,11 +36,14 @@ public class UsuariosServiceImp implements IUsuariosService {
     @Autowired 
     private IPropuestasLibrosRepository propuestasLibrosRepository;
 
-    @Autowired 
-    private UsuarioMapper usuarioMapper;
-
     @Autowired
     private IReunionesRepository reunionesRepository;
+
+    @Autowired
+    private IReseniasRepository reseniasRepository;
+
+    @Autowired 
+    private UsuarioMapper usuarioMapper;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -62,8 +66,7 @@ public class UsuariosServiceImp implements IUsuariosService {
 
         // Aquí usamos el mapper en lugar del método manual
         return usuarioMapper.toResponseDTO(usuario);
-}
-
+    }
 
     @Override
     public UsuarioResponseDTO actualizarUsuario(ObjectId id, UsuarioUpdateDTO dto) {
@@ -93,6 +96,9 @@ public class UsuariosServiceImp implements IUsuariosService {
         propuestasLibrosRepository.actualizarNombreUsuarioVoto(usuarioId, nombreCompleto);
         reunionesRepository.actualizarNombreAsistente(usuarioId, nombreCompleto);
         forosRepository.actualizarNombreModerador(usuarioId, nombreCompleto);
+        reseniasRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
+        reseniasRepository.actualizarNombreComentador(usuarioId, nombreCompleto);
+        reseniasRepository.actualizarNombreValorador(usuarioId, nombreCompleto);
     }
 
     @Override
@@ -126,6 +132,21 @@ public class UsuariosServiceImp implements IUsuariosService {
         // No se puede eliminar un usuario si está asociado como moderador de un foro
         if (forosRepository.existsByModeradorId(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como moderador de un foro.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como redactor de una reseña
+        if (reseniasRepository.existsByRedactorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como redactor de una reseña.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como comentador de una reseña
+        if (reseniasRepository.existsByComentadorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como comentador de una reseña.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como valorador de una reseña
+        if (reseniasRepository.existsByValoradorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como valorador de una reseña.");
         }
 
         usuariosRepository.deleteById(id);

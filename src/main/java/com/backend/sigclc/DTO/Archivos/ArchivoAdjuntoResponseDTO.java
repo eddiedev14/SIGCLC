@@ -1,6 +1,6 @@
 package com.backend.sigclc.DTO.Archivos;
 
-import com.backend.sigclc.Model.Reuniones.TipoReunion;
+import com.backend.sigclc.Model.Archivos.TipoArchivo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArchivoAdjuntoResponseDTO {
     private String archivoPath;
-    private TipoReunion tipo;
+    private TipoArchivo tipo;
 }

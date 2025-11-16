@@ -1,0 +1,19 @@
+package com.backend.sigclc.Model.Resenias;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import org.bson.types.ObjectId;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RedactorModel {
+    private ObjectId usuarioId;
+    private String nombreCompleto;
+
+    public String getRedactorIdAString(){
+        return usuarioId != null ? usuarioId.toHexString():null;
+    }
+}
