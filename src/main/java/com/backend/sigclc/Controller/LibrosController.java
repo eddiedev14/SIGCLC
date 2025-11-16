@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
@@ -34,7 +34,7 @@ public class LibrosController {
     private ILibrosService librosService;
 
     @PostMapping(value = "/insertar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<LibroResponseDTO> crearLibro(@Valid @RequestBody LibroCreateDTO dto) {
+    public ResponseEntity<LibroResponseDTO> crearLibro(@Valid @ModelAttribute LibroCreateDTO dto) {
         LibroResponseDTO response = librosService.guardarLibro(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -62,7 +62,7 @@ public class LibrosController {
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LibroResponseDTO> actualizarLibro(
             @PathVariable ObjectId id,
-            @Valid @RequestBody LibroUpdateDTO libro) {
+            @Valid @ModelAttribute LibroUpdateDTO libro) {
 
         LibroResponseDTO actualizado = librosService.actualizarLibro(id, libro);
         return ResponseEntity.ok(actualizado);
