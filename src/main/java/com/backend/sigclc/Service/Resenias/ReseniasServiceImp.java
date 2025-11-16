@@ -15,6 +15,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
@@ -141,6 +142,12 @@ public class ReseniasServiceImp implements IReseniasService {
     public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId) {
         List<ReseniaModel> resenias = reseniasRepository.buscarReseniasPorLibro(libroId);
         return reseniaMapper.toResponseDTOList(resenias);
+    }
+
+    @Override
+    public List<ComentarioResponseDTO> buscarComentariosDeUsuario(ObjectId usuarioId) {
+        List<ComentarioModel> comentarios = reseniasRepository.buscarComentariosDeUsuario(usuarioId);
+        return reseniaMapper.toComentariosResponseDTOList(comentarios);
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
@@ -62,6 +63,12 @@ public class ReseniasController {
     @GetMapping(value = "/buscarPorLibro/{libroId}")
     public ResponseEntity<List<ReseniaResponseDTO>> buscarReseniasPorLibro(@PathVariable ObjectId libroId) {
         List<ReseniaResponseDTO> response = reseniasService.buscarReseniasPorLibro(libroId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/buscarComentariosDeUsuario/{usuarioId}")
+    public ResponseEntity<List<ComentarioResponseDTO>> buscarComentariosDeUsuario(@PathVariable ObjectId usuarioId) {
+        List<ComentarioResponseDTO> response = reseniasService.buscarComentariosDeUsuario(usuarioId);
         return ResponseEntity.ok(response);
     }
 
