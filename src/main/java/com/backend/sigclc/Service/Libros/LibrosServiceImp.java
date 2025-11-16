@@ -18,6 +18,7 @@ import com.backend.sigclc.Model.Libros.LibrosModel;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
+import com.backend.sigclc.Repository.IReseniasRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Service.Archivos.ArchivosServiceImp;
@@ -36,6 +37,9 @@ public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private IUsuariosRepository usuarioRepository;
+
+    @Autowired
+    private IReseniasRepository reseniasRepository;
 
     @Autowired
     private LibroMapper libroMapper;
@@ -159,6 +163,7 @@ public class LibrosServiceImp implements ILibrosService {
     public void sincronizarTituloLibro(ObjectId id, String tituloLibro) {
         propuestasLibrosRepository.actualizarTituloLibroPropuesto(id, tituloLibro);
         reunionesRepository.actualizarTituloLibroSeleccionado(id, tituloLibro);
+        reseniasRepository.actualizarTituloLibroReseniado(id, tituloLibro);
     }
 
     @Override

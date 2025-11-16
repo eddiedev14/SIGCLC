@@ -6,12 +6,34 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 
 import com.backend.sigclc.Model.Resenias.ComentarioModel;
 import com.backend.sigclc.Model.Resenias.ReseniaModel;
 import com.backend.sigclc.Model.Resenias.ValoracionModel;
 
 public interface IReseniasRepository extends MongoRepository <ReseniaModel, ObjectId> {
+    //* Sincronización */
+    // Actualizar nombre de usuario como redactor
+    @Query("{'redactor.usuarioId': ?0}")
+    @Update("{$set: {'redactor.nombreCompleto': ?1}}")
+    void actualizarNombreRedactor(ObjectId usuarioId, String nombreCompleto);
+
+    // Actualizar nombre de usuario como comentador
+    @Query("{'comentarios.comentador.usuarioId': ?0}")
+    @Update("{$set: {'comentarios.$.comentador.nombreCompleto': ?1}}")
+    void actualizarNombreComentador(ObjectId usuarioId, String nombreCompleto);
+
+    // Actualizar nombre de usuario como valorador
+    @Query("{'valoraciones.valorador.usuarioId': ?0}")
+    @Update("{$set: {'valoraciones.$.valorador.nombreCompleto': ?1}}")
+    void actualizarNombreValorador(ObjectId usuarioId, String nombreCompleto);
+
+    // Actualizar el titulo del libro reseniado
+    @Query("{'libro.libroId': ?0}")
+    @Update("{$set: {'libro.titulo': ?1}}")
+    void actualizarTituloLibroReseniado(ObjectId libroId, String tituloLibro);
+
     //* Consultas básicas */
 
     // Consultas por redactor
