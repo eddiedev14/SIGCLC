@@ -60,15 +60,31 @@ public class ReunionesServiceImp implements IReunionesService{
         try {
             ReunionesModel reunion = reunionMapper.toModel(dto);
 
+            // Normalizar listas del DTO (usar ifs) para evitar NPE cuando vienen null
+            List<ObjectId> asistentesIds = new ArrayList<>();
+            if (dto.getAsistentesId() != null && !dto.getAsistentesId().isEmpty()) {
+                asistentesIds = dto.getAsistentesId();
+            }
+
+            List<ObjectId> librosSeleccionadosIds = new ArrayList<>();
+            if (dto.getLibrosSeleccionadosId() != null && !dto.getLibrosSeleccionadosId().isEmpty()) {
+                librosSeleccionadosIds = dto.getLibrosSeleccionadosId();
+            }
+
+            List<MultipartFile> archivosAdjuntosList = new ArrayList<>();
+            if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
+                archivosAdjuntosList = dto.getArchivosAdjuntos();
+            }
+
             // Obtener todas las propuestas una sola vez
-            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(dto.getLibrosSeleccionadosId());
+            List<PropuestasLibrosModel> propuestas = obtenerPropuestas(librosSeleccionadosIds);
             
             // Validar usando las propuestas ya obtenidas
             validarFechaReunionConPeriodos(reunion.getFecha(), propuestas);
             validarLibrosSeleccionadosNoLeidos(propuestas);
 
             List<AsistenteModel> asistentes = reunion.getAsistentes();
-            for (ObjectId asistenteId : dto.getAsistentesId()) {
+            for (ObjectId asistenteId : asistentesIds) {
                 UsuariosModel usuario = usuariosRepository.findById(asistenteId)
                     .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Error! No existe un usuario con id: " + asistenteId));
@@ -93,9 +109,9 @@ public class ReunionesServiceImp implements IReunionesService{
 
             List<ArchivoAdjuntoModel> adjuntos = reunion.getArchivosAdjuntos();
             adjuntos.clear();
-            if (dto.getArchivosAdjuntos() != null && !dto.getArchivosAdjuntos().isEmpty()) {
+            if (archivosAdjuntosList != null && !archivosAdjuntosList.isEmpty()) {
                 boolean tieneArchivoValido = false;
-                for (MultipartFile archivo : dto.getArchivosAdjuntos()) {
+                for (MultipartFile archivo : archivosAdjuntosList) {
 
                     tieneArchivoValido = true;
                     String ruta = archivosService.guardarArchivo(
