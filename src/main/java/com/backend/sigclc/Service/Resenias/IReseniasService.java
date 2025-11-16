@@ -12,6 +12,7 @@ import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Comentario.ComentarioUpdateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
+import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionUpdateDTO;
 
 public interface IReseniasService {
@@ -21,6 +22,7 @@ public interface IReseniasService {
     public List<ReseniaResponseDTO> buscarReseniasPorRedactor(ObjectId redactorId);
     public List<ReseniaResponseDTO> buscarReseniasPorLibro(ObjectId libroId);
     public List<ComentarioResponseDTO> buscarComentariosDeUsuario(ObjectId usuarioId);
+    public List<ValoracionResponseDTO> buscarValoracionesDeUsuario(ObjectId usuarioId);
     public ReseniaResponseDTO actualizarResenia(ObjectId reseniaId, ReseniaUpdateDTO reseniaUpdateDTO);
     public ReseniaResponseDTO valorarResenia(ObjectId reseniaId, ValoracionCreateDTO valoracionCreateDTO);
     public ReseniaResponseDTO comentarResenia(ObjectId reseniaId, ComentarioCreateDTO comentarioCreateDTO);

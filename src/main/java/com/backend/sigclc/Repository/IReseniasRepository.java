@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import com.backend.sigclc.Model.Resenias.ComentarioModel;
 import com.backend.sigclc.Model.Resenias.ReseniaModel;
+import com.backend.sigclc.Model.Resenias.ValoracionModel;
 
 public interface IReseniasRepository extends MongoRepository <ReseniaModel, ObjectId> {
     //* Consultas básicas */
@@ -35,4 +36,17 @@ public interface IReseniasRepository extends MongoRepository <ReseniaModel, Obje
         "{ $replaceRoot: { newRoot: '$comentarios' } }"
     })
     List<ComentarioModel> buscarComentariosDeUsuario(ObjectId usuarioId);
+
+    // Buscar valoraciones de un usuario
+    @Aggregation(pipeline = {
+        //* Filtra documentos que tengan valoraciones del usuario */
+        "{ $match: { 'valoraciones.valorador.usuarioId': ?0 } }",
+        //* Descompone el array de valoraciones */
+        "{ $unwind: '$valoraciones' }",
+        //* Filtra solo las valoraciones del usuario */
+        "{ $match: { 'valoraciones.valorador.usuarioId': ?0 } }",
+        //* Devuelve solo la valoración, no el documento completo */
+        "{ $replaceRoot: { newRoot: '$valoraciones' } }"
+    })
+    List<ValoracionModel> buscarValoracionesDeUsuario(ObjectId usuarioId);
 }
