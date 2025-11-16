@@ -363,26 +363,25 @@ public class ReunionesServiceImp implements IReunionesService{
 
             List<AsistenteModel> asistentes = reunion.getAsistentes();
 
+            Set<ObjectId> existentes = new HashSet<>();
+            for (AsistenteModel asistente : asistentes) {
+                existentes.add(asistente.getAsistenteId());
+            }
+
             for (ObjectId asistenteIdStr : asistentesId) {
-                boolean yaExiste = false;
-                for (AsistenteModel asistente : asistentes) {
-                    if (asistente.getAsistenteId().equals(asistenteIdStr)) {
-                        yaExiste = true;
-                        break;
-                    }
+                if (existentes.contains(asistenteIdStr)) {
+                    continue;
                 }
 
-                if (!yaExiste) {
-                    UsuariosModel usuario = usuariosRepository.findById(asistenteIdStr)
+                UsuariosModel usuario = usuariosRepository.findById(asistenteIdStr)
                         .orElseThrow(() -> new RecursoNoEncontradoException(
                             "Error! No existe un usuario con id: " + asistenteIdStr
                         ));
 
-                    AsistenteModel nuevo = new AsistenteModel();
-                    nuevo.setAsistenteId(usuario.getId());
-                    nuevo.setNombreCompleto(usuario.getNombreCompleto());
-                    asistentes.add(nuevo);
-                }
+                AsistenteModel nuevo = new AsistenteModel();
+                nuevo.setAsistenteId(usuario.getId());
+                nuevo.setNombreCompleto(usuario.getNombreCompleto());
+                asistentes.add(nuevo);
             }
 
             reunionesRepository.save(reunion);
