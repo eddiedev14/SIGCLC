@@ -230,11 +230,6 @@ public class PropuestasServiceImp implements IPropuestasService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
         }
 
-        // Si la propuesta está asociada a una reunion, no se puede eliminar
-        if (propuestasLibrosRepository.tieneReuniones(id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar una propuesta que está asociada a una reunion");
-        }
-
         // Eliminar propuesta
         propuestasLibrosRepository.delete(propuesta);
 
