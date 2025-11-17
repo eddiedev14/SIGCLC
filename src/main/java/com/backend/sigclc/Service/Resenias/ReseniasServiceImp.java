@@ -539,10 +539,10 @@ public class ReseniasServiceImp implements IReseniasService {
 
         // A través del metodo getCalificacionPromedio se calcula la calificacion promedio de cada reseña. Se deben ordenar descendentemente y solo las 5 primeras
         reseñas.sort(Comparator.comparing(ReseniaModel::getCalificacionPromedio).reversed());
-        List<ReseniaResponseDTO> reseñasDTO = reseñas.stream()
+        List<ReseniaResponseDTO> reseñasDTO = reseñas.stream().limit(5)
             .map(resenia -> reseniaMapper.toResponseDTO(resenia))
             .collect(Collectors.toList());
-
+            
         return reseñasDTO;
     }
 }
