@@ -44,6 +44,18 @@ public class ComentariosServiceImp implements IComentariosService {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Error! No existe un foro con id: " + foroId));
 
+        // Si viene parentId, validar que ese parentId comment exista y que adeams sea de este foro y no de otro
+        if (comentarioDTO.getParentId() != null) {
+            ObjectId parentId = comentarioDTO.getParentId();
+            ComentarioForoModel parent = comentariosRepository.findById(parentId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException(
+                            "Error! No existe un comentario con id: " + parentId));
+            if (!parent.getForoId().equals(foroId)) {
+                throw new RecursoNoEncontradoException(
+                        "Error! El comentario con id: " + parentId + " no pertenece al foro con id: " + foroId);
+            }
+        }
+
         // fecha actual
         model.setFechaPublicacion(new Date());
 
