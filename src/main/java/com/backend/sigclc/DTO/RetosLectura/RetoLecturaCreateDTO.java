@@ -39,8 +39,6 @@ public class RetoLecturaCreateDTO {
     @NotNull(message = "Los id de los libros asociados son obligatorios")
     private List<ObjectId> librosAsociadosId;
 
-    private List<ObjectId> usuariosInscritosId;
-
     @AssertTrue(message = "La fecha de finalización debe ser posterior a la fecha de inicio")
     public boolean isFechaFinalizacionPosteriorAFechaInicio() {
         if (fechaInicio == null || fechaFinalizacion == null) {

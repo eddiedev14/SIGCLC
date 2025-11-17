@@ -1,7 +1,9 @@
 package com.backend.sigclc.DTO.RetosLectura;
 
 import java.util.Date;
+import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.constraints.AssertTrue;
@@ -28,6 +30,10 @@ public class RetoLecturaUpdateDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @FutureOrPresent(message = "La fecha de finalización del reto de lectura no puede estar en el pasado")  
     private Date fechaFinalizacion;
+
+    private List<ObjectId> librosAsociadosId;
+
+    private List<ObjectId> usuariosInscritosId;
 
     @AssertTrue(message = "La fecha de finalización debe ser posterior a la fecha de inicio")
     public boolean isFechaFinalizacionPosteriorAFechaInicio() {
