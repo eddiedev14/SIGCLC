@@ -1,7 +1,6 @@
 package com.backend.sigclc.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -55,12 +54,4 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
         "{ $sort: { fechaPublicacion: -1 } }"
     })
     List<ForosModel> listarPorModerador(ObjectId moderadorId);
-
-    // Actualizar nombre de usuario si se modifica
-
-    @Query("{'moderador.moderadorId': ?0 }")
-    @Update("{ '$set': { 'moderador.nombreCompleto': ?1 } }")
-    void actualizarNombreModerador(ObjectId usuarioId, String nuevoNombre);
-
-    List<ForosModel> buscarPorModerador(ObjectId moderadorId);
 }

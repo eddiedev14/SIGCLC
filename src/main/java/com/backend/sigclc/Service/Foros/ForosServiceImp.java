@@ -2,7 +2,6 @@ package com.backend.sigclc.Service.Foros;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,17 +80,15 @@ public class ForosServiceImp implements IForosService {
     }
 
     @Override
-    public ForoResponseDTO listarPorTitulo(String titulo) {
-        Optional<ForosModel> foro = forosRepository.listarPorTitulo(titulo);
-        return foro.map(foroMapper::toResponseDTO)
-                   .orElseThrow(() -> new RuntimeException("No se encontró foro con el título: " + titulo));
+    public List<ForoResponseDTO> listarPorTitulo(String titulo) {
+        List<ForosModel> foro = forosRepository.listarPorTitulo(titulo);
+        return foroMapper.toResponseDTOList(foro);
     }
 
     @Override
-    public ForoResponseDTO listarPorTematica(String tematica) {
-        Optional<ForosModel> foro = forosRepository.listarPorTematica(tematica);
-        return foro.map(foroMapper::toResponseDTO)
-                   .orElseThrow(() -> new RuntimeException("No se encontró foro con la temática: " + tematica));
+    public List<ForoResponseDTO> listarPorTematica(String tematica) {
+        List<ForosModel> foro = forosRepository.listarPorTematica(tematica);
+        return foroMapper.toResponseDTOList(foro);
     }
 
     @Override
