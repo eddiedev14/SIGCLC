@@ -15,6 +15,7 @@ import com.backend.sigclc.Mapper.ComentarioForoMapper;
 import com.backend.sigclc.Model.ComentariosForos.ComentarioForoModel;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.IComentariosForosRepository;
+import com.backend.sigclc.Repository.IForosRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 
 @Service
@@ -32,10 +33,19 @@ public class ComentariosServiceImp implements IComentariosService {
     @Autowired
     private IComentariosForosRepository comentarioForoRepository;
 
+    @Autowired
+    private IForosRepository forosRepository; 
+
     @Override
     public ComentarioForoResponseDTO guardarComentario(ComentarioForoCreateDTO comentarioDTO) {
         // DTO → Model
         ComentarioForoModel model = comentarioForoMapper.toModel(comentarioDTO);
+
+         // Validar que el foro exista
+        ObjectId foroId = model.getForoId();
+        forosRepository.findById(foroId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Error! No existe un foro con id: " + foroId));
 
         // fecha actual
         model.setFechaPublicacion(new Date());
