@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 
+import com.backend.sigclc.DTO.Estadisticas.GeneroPopularResponseDTO;
 import com.backend.sigclc.DTO.Estadisticas.LibroLeidoResponseDTO;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Libros.LibrosModel;
@@ -108,4 +109,105 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
         "{ $limit: 5 }"
     })
     List<LibroLeidoResponseDTO> librosMasLeidosMensual();
+
+    @Aggregation(pipeline = {
+        // 1. Desanida los géneros del documento principal (Libros)
+        "{ $unwind: '$generos' }",
+
+        // 2. Agrupa por género. Esto crea un documento ÚNICO por cada género, resolviendo la duplicación.
+        "{ $group: { _id: '$generos', libroIds: { $addToSet: '$_id' } } }",
+
+        // 3. Busca reuniones
+        "{ $lookup: { " +
+            "from: 'reuniones', " +
+            "let: { genero: '$_id' }, " +
+            "pipeline: [" +
+                // Filtra solo reuniones del mes y año actual
+                "{ $match: { $expr: { $and: [" +
+                    "{ $eq: [ { $month: '$fecha' }, { $month: new Date() } ] }," +
+                    "{ $eq: [ { $year: '$fecha' }, { $year: new Date() } ] }" +
+                "] } } }," +
+                // Desanida los libros de la reunión
+                "{ $unwind: '$librosSeleccionados' }," +
+                // Filtra si el género actual está en el array de géneros de ese libro
+                "{ $match: { $expr: { $in: ['$$genero', '$librosSeleccionados.generos'] } } }," +
+                // De-duplica: agrupa por el _id de la reunión para contarla una sola vez
+                "{ $group: { _id: '$_id' } }" +
+            "], " +
+            "as: 'reunionesConGenero' " +
+        "} }",
+
+        // 4. Busca retos de lectura
+        "{ $lookup: { " +
+            "from: 'retosLectura', " +
+            "let: { genero: '$_id' }, " +
+            "pipeline: [" +
+                // Filtra solo retos iniciados en el mes y año actual
+                "{ $match: { $expr: { $and: [" +
+                    "{ $eq: [ { $month: '$fechaInicio' }, { $month: new Date() } ] }," +
+                    "{ $eq: [ { $year: '$fechaInicio' }, { $year: new Date() } ] }" +
+                "] } } }," +
+                // Desanida los libros del reto
+                "{ $unwind: '$librosAsociados' }," +
+                // Filtra si el género actual está en el array de géneros de ese libro
+                "{ $match: { $expr: { $in: ['$$genero', '$librosAsociados.generos'] } } }," +
+                // De-duplica: agrupa por el _id del reto para contarlo una sola vez
+                "{ $group: { _id: '$_id' } }" +
+            "], " +
+            "as: 'retosConGenero' " +
+        "} }",
+
+        // 5. Busca resenias
+        "{ $lookup: { " +
+            "from: 'resenias', " +
+            "let: { libroIds: '$libroIds' }, " +
+            "pipeline: [" +
+                // Filtra si el ID del libro en la reseña ('$libro.libroId') está en la lista de IDs de libros de este género
+                "{ $match: { $expr: { $in: ['$libro.libroId', '$$libroIds'] } } }" +
+            "], " +
+            "as: 'reseniasConGenero' " +
+        "} }",
+
+        //* FALTA CORREGIR */
+        // 6. Busca foros
+        "{ $lookup: { " +
+            "from: 'foros', " +
+            "let: { genero: '$_id' }, " +
+            "pipeline: [" +
+                // Filtra si tipoTematica es "genero"
+                "{ $match: { $expr: { $eq: ['$$genero', '$tipoTematica'] } } }" +
+                // Buscar si el nombreTematica incluye (regex) el género actual
+                "{ $match: { $expr: { $regexMatch: { input: '$nombreTematica', regex: '$$genero', options: 'i' } } } }" +
+            "] " +
+            "as: 'forosConGenero' " +
+        "} }",
+
+        // 7. Proyecta y calcula el total
+        "{ $project: { " +
+            "_id: 0, " +
+            "genero: '$_id', " +
+            "reuniones: { $size: '$reunionesConGenero' }, " +
+            "retos: { $size: '$retosConGenero' }, " +
+            "resenias: { $size: '$reseniasConGenero' }, " +
+            "comentariosResenias: { $size: '$reseniasConGenero.comentarios' }, " +
+            "foros: { $size: '$forosConGenero' }, " +
+            "popularidadTotal: { $add: [ { $size: '$reunionesConGenero' }, { $size: '$retosConGenero' }, { $size: '$reseniasConGenero' }, { $size: '$reseniasConGenero.comentarios' }, { $size: '$forosConGenero' } ] }" +
+        "} }",
+
+        // 8. Formato del DTO (Incluye los campos con valor literal 0)
+        "{ $project: { " +
+            "genero: 1, " +
+            "reuniones: 1, " +
+            "retos: 1, " +
+            "resenias: 1, " +
+            "comentariosResenias: 1, " +
+            "foros: 1, " +
+            "popularidadTotal: 1, " +
+        "} }",
+
+        // 9. Ordenar y limitar
+        "{ $sort: { popularidadTotal: -1 } }",
+        "{ $limit: 10 }"
+    })
+    List<GeneroPopularResponseDTO> generosMasPopularesDelMes();
 }

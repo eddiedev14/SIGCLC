@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.backend.sigclc.DTO.Estadisticas.GeneroPopularResponseDTO;
 import com.backend.sigclc.DTO.Estadisticas.LibroLeidoResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
@@ -78,5 +79,10 @@ public class LibrosController {
     @GetMapping("/librosMasLeidosMensual")
     public ResponseEntity<List<LibroLeidoResponseDTO>> librosMasLeidosMensual() {
         return ResponseEntity.ok(librosService.librosMasLeidosMensual());
+    }
+
+    @GetMapping("/generosMasPopularesDelMes")
+    public ResponseEntity<List<GeneroPopularResponseDTO>> generosMasPopularesDelMes() {
+        return ResponseEntity.ok(librosService.generosMasPopularesDelMes());
     }
 }
