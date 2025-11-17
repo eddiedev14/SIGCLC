@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.backend.sigclc.DTO.Estadisticas.LibroLeidoResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
@@ -71,5 +72,11 @@ public class LibrosController {
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarLibro(@PathVariable ObjectId id) {
         return ResponseEntity.ok(librosService.eliminarLibro(id));
+    }
+
+    //* Estadísticas */
+    @GetMapping("/librosMasLeidosMensual")
+    public ResponseEntity<List<LibroLeidoResponseDTO>> librosMasLeidosMensual() {
+        return ResponseEntity.ok(librosService.librosMasLeidosMensual());
     }
 }

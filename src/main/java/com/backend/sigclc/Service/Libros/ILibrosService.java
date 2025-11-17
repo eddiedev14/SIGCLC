@@ -8,6 +8,7 @@ import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
+import com.backend.sigclc.DTO.Estadisticas.LibroLeidoResponseDTO;
 
 public interface ILibrosService {
     public LibroResponseDTO guardarLibro(LibroCreateDTO libro);
@@ -19,4 +20,5 @@ public interface ILibrosService {
     public String eliminarLibro(ObjectId id);
     public List<LibroResponseDTO> listarPorGenero(GeneroLibro genero);
     public List<LibroResponseDTO> listarPorAutor(String autor);
+    public List<LibroLeidoResponseDTO> librosMasLeidosMensual();
 }
