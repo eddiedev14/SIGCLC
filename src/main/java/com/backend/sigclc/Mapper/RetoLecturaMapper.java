@@ -27,7 +27,6 @@ public class RetoLecturaMapper {
         model.setFechaInicio(dto.getFechaInicio());
         model.setFechaFinalizacion(dto.getFechaFinalizacion());
         model.setLibrosAsociados(createLibrosAsociadosModelList(dto.getLibrosAsociadosId()));
-        model.setUsuariosInscritos(createUsuariosInscritosModelList(dto.getUsuariosInscritosId()));
         return model;
     }
 
@@ -133,5 +132,7 @@ public class RetoLecturaMapper {
     public void updateModelFromDTO(RetosLecturaModel model, RetoLecturaUpdateDTO dto) {
         if (dto.getTitulo() != null) model.setTitulo(dto.getTitulo());
         if (dto.getDescripcion() != null) model.setDescripcion(dto.getDescripcion());
+        if (dto.getFechaInicio() != null) model.setFechaInicio(dto.getFechaInicio());
+        if (dto.getFechaFinalizacion() != null) model.setFechaFinalizacion(dto.getFechaFinalizacion());
     }
 }
