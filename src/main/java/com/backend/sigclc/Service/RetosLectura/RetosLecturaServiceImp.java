@@ -170,10 +170,6 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede modificar el periodo del reto porque ya comenzó.");
             }
 
-            if (dto.getFechaInicio().before(hoy)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La nueva fecha de inicio no puede ser anterior a la fecha actual.");
-            }
-
             if (!dto.getFechaInicio().before(dto.getFechaFinalizacion())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La fecha de inicio debe ser menor que la fecha de finalización.");
             }
