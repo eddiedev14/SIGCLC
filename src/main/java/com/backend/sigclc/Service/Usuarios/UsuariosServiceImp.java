@@ -17,6 +17,7 @@ import com.backend.sigclc.Mapper.UsuarioMapper;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReseniasRepository;
+import com.backend.sigclc.Repository.IRetosLecturaRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
@@ -41,6 +42,9 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired
     private IReseniasRepository reseniasRepository;
+
+    @Autowired
+    private IRetosLecturaRepository retosLecturaRepository;
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
@@ -99,6 +103,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         reseniasRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreComentador(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreValorador(usuarioId, nombreCompleto);
+        retosLecturaRepository.actualizarNombreUsuarioInscrito(usuarioId, nombreCompleto);
     }
 
     @Override

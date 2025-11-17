@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.RetosLectura.RetosLecturaModel;
 
 public interface IRetosLecturaRepository extends MongoRepository <RetosLecturaModel, ObjectId>{
@@ -20,6 +21,11 @@ public interface IRetosLecturaRepository extends MongoRepository <RetosLecturaMo
     @Query("{ 'librosAsociados.libroId': ?0 }")
     @Update("{$set: { 'librosAsociados.$.titulo': ?1 }}")
     void actualizarTituloLibroAsociado(ObjectId libroId, String nuevoTitulo);
+
+    // Actualizar generos de un libro dentro de un reto
+    @Query("{ 'librosAsociados.libroId': ?0 }")
+    @Update("{$set: { 'librosAsociados.$.generos': ?1 }}")
+    void actualizarGenerosLibro(ObjectId libroId, List<GeneroLibro> generos);
 
     // Validar si un libro está asociado a algún reto
     // Se usará para validar la eliminación de los libros

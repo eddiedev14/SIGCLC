@@ -19,6 +19,7 @@ import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReseniasRepository;
+import com.backend.sigclc.Repository.IRetosLecturaRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Service.Archivos.ArchivosServiceImp;
@@ -40,6 +41,9 @@ public class LibrosServiceImp implements ILibrosService {
 
     @Autowired
     private IReseniasRepository reseniasRepository;
+
+    @Autowired
+    private IRetosLecturaRepository retosLecturaRepository;
 
     @Autowired
     private LibroMapper libroMapper;
@@ -167,12 +171,14 @@ public class LibrosServiceImp implements ILibrosService {
         propuestasLibrosRepository.actualizarTituloLibroPropuesto(id, tituloLibro);
         reunionesRepository.actualizarTituloLibroSeleccionado(id, tituloLibro);
         reseniasRepository.actualizarTituloLibroReseniado(id, tituloLibro);
+        retosLecturaRepository.actualizarTituloLibroAsociado(id, tituloLibro);
     }
 
     @Override
     public void sincronizarGenerosLibro(ObjectId id, List<GeneroLibro> generosLibro) {
         propuestasLibrosRepository.actualizarGenerosLibroPropuesto(id, generosLibro);
         reunionesRepository.actualizarGenerosLibroSeleccionado(id, generosLibro);
+        retosLecturaRepository.actualizarGenerosLibro(id, generosLibro);
     }
 
     @Override
