@@ -2,9 +2,7 @@ package com.backend.sigclc.DTO.Foros;
 
 import com.backend.sigclc.Model.Foros.TipoTematica;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,14 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ForoUpdateDTO {
 
-
-    @NotBlank(message = "El nombre del foro es obligatorio")
-    @Size(min = 3, max = 100, message = "El nombre del foro debe tener entre 3 y 100 caracteres")
     private String titulo;
 
-    @NotNull(message = "El tipo de temática es obligatorio")
     private TipoTematica tipoTematica;
     
-    @NotBlank(message = "La temática es obligatoria")
     private String tematica;
 }

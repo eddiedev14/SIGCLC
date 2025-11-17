@@ -21,23 +21,20 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
     //Buscar foro por título
     @Aggregation(pipeline = {
         "{ $match: { titulo: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    Optional<ForosModel> listarPorTitulo(String titulo);
+    List<ForosModel> listarPorTitulo(String titulo);
 
     // Buscar foro por nombre de temática
     @Aggregation(pipeline = {
         "{ $match: { tematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    Optional<ForosModel> listarPorTematica(String tematica);
+    List<ForosModel> listarPorTematica(String tematica);
 
     // Buscar foros por tipo de temática (género, autor o tema)
     @Aggregation(pipeline = {
         "{ $match: { tipoTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
     List<ForosModel> listarPorTipoTematica(TipoTematica tipoTematica);
@@ -45,7 +42,6 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
     // Buscar foros por ID del moderador
     @Aggregation(pipeline = {
         "{ $match: { 'moderador.moderadorId': ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
     List<ForosModel> listarPorModerador(ObjectId moderadorId);
