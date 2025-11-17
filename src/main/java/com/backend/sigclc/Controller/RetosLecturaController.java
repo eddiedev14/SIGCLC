@@ -19,6 +19,7 @@ import com.backend.sigclc.DTO.RetosLectura.RetoLecturaCreateDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaResponseDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaUpdateDTO;
 import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoDTO;
+import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoResponseDTO;
 import com.backend.sigclc.Service.RetosLectura.IRetosLecturaService;
 
 import jakarta.validation.Valid;
@@ -121,6 +122,12 @@ public class RetosLecturaController {
     @GetMapping("/listar-activos")
     public ResponseEntity<List<RetoLecturaResponseDTO>> listarRetosActivos() {
         List<RetoLecturaResponseDTO> response = retosLecturaService.buscarRetosActivos();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/buscar-progreso/reto-{retoId}/usuario-{usuarioId}/libro-{libroId}")
+    public ResponseEntity<ProgresoResponseDTO> buscarProgreso(@PathVariable ObjectId retoId, @PathVariable ObjectId usuarioId, @PathVariable ObjectId libroId) {
+        ProgresoResponseDTO response = retosLecturaService.buscarProgreso(retoId, usuarioId, libroId);
         return ResponseEntity.ok(response);
     }
 }
