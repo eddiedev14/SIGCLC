@@ -17,29 +17,38 @@ import com.backend.sigclc.Model.Foros.TipoTematica;
 @Repository
 public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> {
 
-    // Buscar foro por nombre de temática
+
+    //Buscar foro por título
     @Aggregation(pipeline = {
-        "{ $match: { nombreTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $match: { titulo: ?0 } }",
+        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    Optional<ForosModel> buscarPorNombreTematica(String nombreTematica);
+    Optional<ForosModel> listarPorTitulo(String titulo);
+
+    // Buscar foro por nombre de temática
+    @Aggregation(pipeline = {
+        "{ $match: { tematica: ?0 } }",
+        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $sort: { fechaPublicacion: -1 } }"
+    })
+    Optional<ForosModel> listarPorTematica(String tematica);
 
     // Buscar foros por tipo de temática (género, autor o tema)
     @Aggregation(pipeline = {
         "{ $match: { tipoTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    List<ForosModel> buscarPorTipoTematica(TipoTematica tipoTematica);
+    List<ForosModel> listarPorTipoTematica(TipoTematica tipoTematica);
 
     // Buscar foros por ID del moderador
     @Aggregation(pipeline = {
         "{ $match: { 'moderador.moderadorId': ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $project: { _id: 1, tipoTematica: 1, tematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    List<ForosModel> buscarPorModerador(ObjectId moderadorId);
+    List<ForosModel> listarPorModerador(ObjectId moderadorId);
 
     // Actualizar nombre de usuario si se modifica
 
