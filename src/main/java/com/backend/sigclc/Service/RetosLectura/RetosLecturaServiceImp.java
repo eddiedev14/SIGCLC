@@ -14,6 +14,7 @@ import com.backend.sigclc.DTO.RetosLectura.RetoLecturaResponseDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaUpdateDTO;
 import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoDTO;
 import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoLibroDTO;
+import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoResponseDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.RetoLecturaMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
@@ -338,6 +339,35 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
             throw new RecursoNoEncontradoException("No hay retos activos actualmente.");
         }
         return retoLecturaMapper.toResponseDTOList(retos);
+    }
+
+    @Override
+    public ProgresoResponseDTO buscarProgreso(ObjectId retoId, ObjectId usuarioId, ObjectId libroAsociadoId) {
+
+        RetosLecturaModel resultado = retosLecturaRepository.buscarProgreso(retoId, usuarioId, libroAsociadoId);
+
+        if (resultado == null) {
+            throw new RecursoNoEncontradoException(
+                "No se encontró progreso para el usuario " + usuarioId +
+                " con el libro " + libroAsociadoId + " en el reto " + retoId
+            );
+        }
+
+        // Mongo devuelve solo el usuario que coincide
+        UsuariosInscritosModel usuario = resultado.getUsuariosInscritos().get(0);
+
+        ProgresoModel progreso = usuario.getProgreso().stream()
+            .filter(p -> p.getLibroAsociadoId().equals(libroAsociadoId))
+            .findFirst()
+            .orElseThrow(() -> new RecursoNoEncontradoException(
+                    "El usuario no tiene progreso registrado para el libro: " + libroAsociadoId
+            ));
+
+        // Convertir el modelo a un DTO usando tu mapper
+        return new ProgresoResponseDTO(
+            progreso.getLibroAsociadoIdAString(),
+            retoLecturaMapper.toProgresoLibroResponseDTOList(progreso.getProgresoLibro())
+        );
     }
 
 }

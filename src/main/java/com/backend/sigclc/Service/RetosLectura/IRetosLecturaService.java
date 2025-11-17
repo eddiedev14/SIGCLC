@@ -8,6 +8,7 @@ import com.backend.sigclc.DTO.RetosLectura.RetoLecturaCreateDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaResponseDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaUpdateDTO;
 import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoDTO;
+import com.backend.sigclc.DTO.RetosLectura.UsuariosInscritos.Progreso.ProgresoResponseDTO;
 
 public interface IRetosLecturaService {
     public RetoLecturaResponseDTO crearRetoLectura(RetoLecturaCreateDTO retoLectura);
@@ -23,4 +24,5 @@ public interface IRetosLecturaService {
     public List<RetoLecturaResponseDTO> buscarRetosPorUsuario(ObjectId usuarioId);
     public List<RetoLecturaResponseDTO> buscarRetosPorLibro(ObjectId libroId);
     public List<RetoLecturaResponseDTO> buscarRetosActivos();
+    public ProgresoResponseDTO buscarProgreso(ObjectId retoId, ObjectId usuarioId, ObjectId libroAsociadoId);
 }
