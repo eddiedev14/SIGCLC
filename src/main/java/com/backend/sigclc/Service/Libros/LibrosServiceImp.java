@@ -159,6 +159,11 @@ public class LibrosServiceImp implements ILibrosService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene reseñas asociadas");
             }
 
+            // Verificar si el libro estpa asociado a retos de lectura
+            if (retosLecturaRepository.existsByLibroAsociado(id)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El libro no puede ser eliminado porque tiene retos de lectura asociados");
+            }
+
             // Eliminar archivo físico de portada
             archivoService.eliminarArchivo(libro.getPortadaPath());
 
