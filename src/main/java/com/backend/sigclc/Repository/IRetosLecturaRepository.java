@@ -37,6 +37,19 @@ public interface IRetosLecturaRepository extends MongoRepository <RetosLecturaMo
     @ExistsQuery("{ 'usuariosInscritos.usuarioId': ?0 }")
     boolean existsByUsuarioInscrito(ObjectId usuarioId);
 
+    @Query(value = """
+    {
+    '_id': ?0,
+    'usuariosInscritos.usuarioId': ?1,
+    'usuariosInscritos.progreso.libroAsociadoId': ?2
+    }
+    """,
+    fields = """
+    {
+    'usuariosInscritos.$': 1
+    }""")
+    RetosLecturaModel buscarProgreso(ObjectId retoId, ObjectId usuarioId, ObjectId libroAsociadoId);
+
     //--------Consultas-----------
 
     // Buscar retos donde esté inscrito un usuario
