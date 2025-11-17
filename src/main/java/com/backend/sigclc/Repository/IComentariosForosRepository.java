@@ -19,6 +19,10 @@ public interface IComentariosForosRepository extends MongoRepository<ComentarioF
     @Update("{ '$set': { 'redactor.nombreCompleto': ?1 } }")
     void actualizarNombreRedactor(ObjectId usuarioId, String nombreCompleto);
 
+    // Validar si el usuario está asociado como redactor de un comentario
+    @ExistsQuery("{'redactor.usuarioId': ?0}")
+    boolean existsByRedactorId(ObjectId usuarioId);
+
     // Comentarios por foro (ordenados por fechaPublicacion asc)
     @Aggregation(pipeline = {
         "{ '$match': { 'foroId': ?0 } }",

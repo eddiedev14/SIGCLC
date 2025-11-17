@@ -154,6 +154,11 @@ public class UsuariosServiceImp implements IUsuariosService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como valorador de una reseña.");
         }
 
+        // No se puede eliminar un usuario si está asociado como redactor de un comentario
+        if(comentariosForosRepository.existsByRedactorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como redactor de un comentario.");
+        }
+
         usuariosRepository.deleteById(id);
         return "Usuario eliminado correctamente con id: " + id;
     }
