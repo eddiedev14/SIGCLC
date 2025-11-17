@@ -20,8 +20,9 @@ import lombok.NoArgsConstructor;
 public class ForosModel {
     @Id
     private ObjectId id;
+    private String titulo;
     private TipoTematica tipoTematica;
-    private String nombreTematica;
+    private String tematica;
     private Date fechaPublicacion;
     private ModeradorModel moderador;
 

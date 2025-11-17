@@ -20,8 +20,9 @@ public class ForoMapper {
 
     public ForosModel toModel(ForoCreateDTO dto) {
         ForosModel model = new ForosModel();
+        model.setTitulo(dto.getTitulo());
         model.setTipoTematica(dto.getTipoTematica());
-        model.setNombreTematica(dto.getNombreTematica());
+        model.setTematica(dto.getTematica());
         model.setModerador(toModeradorModel(dto.getModeradorId()));
         return model;
     }
@@ -38,8 +39,9 @@ public class ForoMapper {
     public ForoResponseDTO toResponseDTO(ForosModel model) {
         ForoResponseDTO dto = new ForoResponseDTO();
         dto.setId(model.getIdAString());
+        dto.setTitulo(model.getTitulo());
         dto.setTipoTematica(model.getTipoTematica());
-        dto.setNombreTematica(model.getNombreTematica());
+        dto.setTematica(model.getTematica());
         dto.setFechaPublicacion(model.getFechaPublicacion());
         dto.setModerador(toModeradorDTOResponse(model.getModerador()));
         return dto;
@@ -65,8 +67,9 @@ public class ForoMapper {
      * Actualiza un ForosModel existente con los datos de ForoUpdateDTO
      */
     public void updateModelFromDTO(ForoUpdateDTO dto, ForosModel model) {
+        if (dto.getTitulo() != null) model.setTitulo(dto.getTitulo());
         if (dto.getTipoTematica() != null) model.setTipoTematica(dto.getTipoTematica());
-        if (dto.getNombreTematica() != null) model.setNombreTematica(dto.getNombreTematica());
+        if (dto.getTematica() != null) model.setTematica(dto.getTematica());
     }
 
 }

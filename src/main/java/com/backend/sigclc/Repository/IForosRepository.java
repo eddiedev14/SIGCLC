@@ -27,27 +27,40 @@ public interface IForosRepository extends MongoRepository<ForosModel, ObjectId> 
 
     //* Agregaciones */
 
-    // Buscar foro por nombre de temática
+
+    //Buscar foro por título
     @Aggregation(pipeline = {
-        "{ $match: { nombreTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
+        "{ $match: { titulo: ?0 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    Optional<ForosModel> buscarPorNombreTematica(String nombreTematica);
+    List<ForosModel> listarPorTitulo(String titulo);
+
+    // Buscar foro por nombre de temática
+    @Aggregation(pipeline = {
+        "{ $match: { tematica: ?0 } }",
+        "{ $sort: { fechaPublicacion: -1 } }"
+    })
+    List<ForosModel> listarPorTematica(String tematica);
 
     // Buscar foros por tipo de temática (género, autor o tema)
     @Aggregation(pipeline = {
         "{ $match: { tipoTematica: ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
-    List<ForosModel> buscarPorTipoTematica(TipoTematica tipoTematica);
+    List<ForosModel> listarPorTipoTematica(TipoTematica tipoTematica);
 
     // Buscar foros por ID del moderador
     @Aggregation(pipeline = {
         "{ $match: { 'moderador.moderadorId': ?0 } }",
-        "{ $project: { _id: 1, tipoTematica: 1, nombreTematica: 1, fechaPublicacion: 1, moderador: 1 } }",
         "{ $sort: { fechaPublicacion: -1 } }"
     })
+    List<ForosModel> listarPorModerador(ObjectId moderadorId);
+
+    // Actualizar nombre de usuario si se modifica
+
+    @Query("{'moderador.moderadorId': ?0 }")
+    @Update("{ '$set': { 'moderador.nombreCompleto': ?1 } }")
+    void actualizarNombreModerador(ObjectId usuarioId, String nuevoNombre);
+
     List<ForosModel> buscarPorModerador(ObjectId moderadorId);
 }

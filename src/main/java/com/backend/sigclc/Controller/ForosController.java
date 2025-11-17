@@ -44,18 +44,23 @@ public class ForosController {
         return ResponseEntity.ok(forosService.buscarForoPorId(id));
     }
 
-    @GetMapping("/listar-por-nombre/{nombreTematica}")
-    public ResponseEntity<ForoResponseDTO> obtenerPorNombreTematica(@PathVariable String nombreTematica) {
-        return ResponseEntity.ok(forosService.listarPorNombreTematica(nombreTematica));
+    @GetMapping("/listar-por-titulo/{titulo}")
+    public ResponseEntity<List<ForoResponseDTO>> listarPorTitulo(@PathVariable String titulo) {
+        return ResponseEntity.ok(forosService.listarPorTitulo(titulo));
     }
 
     @GetMapping("/listar-por-tipo/{tipoTematica}")
-    public ResponseEntity<List<ForoResponseDTO>> obtenerPorTipoTematica(@PathVariable TipoTematica tipoTematica) {
+    public ResponseEntity<List<ForoResponseDTO>> listarPorTipoTematica(@PathVariable TipoTematica tipoTematica) {
         return ResponseEntity.ok(forosService.listarPorTipoTematica(tipoTematica));
     }
 
+    @GetMapping("/listar-por-tematica/{tematica}")
+    public ResponseEntity<List<ForoResponseDTO>> listarPorTematica(@PathVariable String tematica) {
+        return ResponseEntity.ok(forosService.listarPorTematica(tematica));
+    }
+
     @GetMapping("/listar-por-moderador/{moderadorId}")
-    public ResponseEntity<List<ForoResponseDTO>> obtenerPorModerador(@PathVariable ObjectId moderadorId) {
+    public ResponseEntity<List<ForoResponseDTO>> listarPorModerador(@PathVariable ObjectId moderadorId) {
         return ResponseEntity.ok(forosService.listarPorModerador(moderadorId));
     }
 
