@@ -41,7 +41,6 @@ public class ComentarioForoMapper {
         dto.setComentario(model.getComentario());
         dto.setFechaPublicacion(model.getFechaPublicacion());
         dto.setParentId(model.getParentIdAsString());
-        dto.setReplies(new ArrayList<>());
         return dto;
     }
     

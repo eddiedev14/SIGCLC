@@ -18,5 +18,4 @@ public class ComentarioForoResponseDTO {
  private String comentario;
  private Date fechaPublicacion;
  private String parentId; // null si es raíz
- private List<ComentarioForoResponseDTO> replies; // árbol de respuestas
 }

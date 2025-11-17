@@ -60,7 +60,7 @@ public class ComentariosServiceImp implements IComentariosService {
 
     @Override
     public List<ComentarioForoResponseDTO> listarComentariosPorForo(ObjectId foroId) {
-        List<ComentarioForoModel> comentarios = comentariosRepository.buscarporForoId(foroId);
+        List<ComentarioForoModel> comentarios = comentariosRepository.buscarPorForoId(foroId);
         return comentarioForoMapper.toResponseDTOList(comentarios);
     }
 
