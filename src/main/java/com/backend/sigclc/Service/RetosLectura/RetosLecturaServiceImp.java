@@ -218,9 +218,6 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
         RetosLecturaModel reto = retosLecturaRepository.findById(retoId)
             .orElseThrow(() -> new RecursoNoEncontradoException("No existe un reto con id: " + retoId));
 
-        validarFechaInicioNoPasada(reto);
-
-
         for (ObjectId usuarioId : usuariosIds) {
 
             boolean yaExiste = reto.getUsuariosInscritos().stream()
@@ -245,11 +242,8 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
 
     @Override
     public RetoLecturaResponseDTO eliminarUsuarios(ObjectId retoId, List<ObjectId> usuariosIds) {
-
         RetosLecturaModel reto = retosLecturaRepository.findById(retoId)
             .orElseThrow(() -> new RecursoNoEncontradoException("No existe un reto con id: " + retoId));
-
-        validarFechaInicioNoPasada(reto);
 
         reto.getUsuariosInscritos().removeIf(u ->
             usuariosIds.contains(u.getUsuarioId())
