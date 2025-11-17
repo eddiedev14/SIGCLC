@@ -20,6 +20,7 @@ import com.backend.sigclc.Repository.IReseniasRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
+import com.backend.sigclc.Repository.IComentariosForosRepository;
 
 @Service
 public class UsuariosServiceImp implements IUsuariosService {
@@ -44,6 +45,9 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private IComentariosForosRepository comentariosForosRepository;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -99,6 +103,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         reseniasRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreComentador(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreValorador(usuarioId, nombreCompleto);
+        comentariosForosRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
     }
 
     @Override
@@ -147,6 +152,11 @@ public class UsuariosServiceImp implements IUsuariosService {
         // No se puede eliminar un usuario si está asociado como valorador de una reseña
         if (reseniasRepository.existsByValoradorId(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como valorador de una reseña.");
+        }
+
+        // No se puede eliminar un usuario si está asociado como redactor de un comentario
+        if(comentariosForosRepository.existsByRedactorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como redactor de un comentario.");
         }
 
         usuariosRepository.deleteById(id);
