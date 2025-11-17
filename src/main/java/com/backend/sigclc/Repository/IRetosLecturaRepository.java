@@ -37,11 +37,6 @@ public interface IRetosLecturaRepository extends MongoRepository <RetosLecturaMo
     @ExistsQuery("{ 'usuariosInscritos.usuarioId': ?0 }")
     boolean existsByUsuarioInscrito(ObjectId usuarioId);
 
-    // Verificar si un usuario tiene progreso en algún reto
-    // Se usará para validar la eliminación de los usuarios
-    @ExistsQuery("{ 'usuariosInscritos.progreso.libroAsociadoId': ?0 }")
-    boolean existsByProgresoEnLibro(ObjectId libroAsociadoId);
-
     //--------Consultas-----------
 
     // Buscar retos donde esté inscrito un usuario
