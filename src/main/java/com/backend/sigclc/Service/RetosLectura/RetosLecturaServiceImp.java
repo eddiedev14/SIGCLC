@@ -164,16 +164,24 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
         boolean vieneFechaInicio = dto.getFechaInicio() != null;
         boolean vieneFechaFin = dto.getFechaFinalizacion() != null;
 
-        if (vieneFechaInicio && vieneFechaFin) {
-
+        // Validar que si viene fecha de inicio, el reto no haya comenzado
+        if (vieneFechaInicio) {
             if (reto.getFechaInicio().before(hoy)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede modificar el periodo del reto porque ya comenzó.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede modificar la fecha de inicio porque ya comenzó el reto.");
             }
+        }
 
+        // Validar que si viene fecha de inicio y fecha fin, la fecha de inicio sea menor que la fecha de finalización
+        if (vieneFechaInicio && vieneFechaFin) {
             if (!dto.getFechaInicio().before(dto.getFechaFinalizacion())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La fecha de inicio debe ser menor que la fecha de finalización.");
             }
-
+        }
+        // Validar que si solo viene fecha de finalización, la fecha de finalización sea mayor que la fecha de inicio del modelo
+        else if (vieneFechaFin) {
+            if (dto.getFechaFinalizacion().before(reto.getFechaInicio())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La fecha de finalización debe ser mayor que la fecha de inicio.");
+            }
         }
 
         if (dto.getLibrosAsociadosId() != null) {
