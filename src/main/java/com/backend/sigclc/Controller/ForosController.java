@@ -45,7 +45,7 @@ public class ForosController {
     }
 
     @GetMapping("/listar-por-titulo/{titulo}")
-    public ResponseEntity<ForoResponseDTO> listarPorTitulo(@PathVariable String titulo) {
+    public ResponseEntity<List<ForoResponseDTO>> listarPorTitulo(@PathVariable String titulo) {
         return ResponseEntity.ok(forosService.listarPorTitulo(titulo));
     }
 
@@ -55,7 +55,7 @@ public class ForosController {
     }
 
     @GetMapping("/listar-por-tematica/{tematica}")
-    public ResponseEntity<ForoResponseDTO> listarPorTematica(@PathVariable String tematica) {
+    public ResponseEntity<List<ForoResponseDTO>> listarPorTematica(@PathVariable String tematica) {
         return ResponseEntity.ok(forosService.listarPorTematica(tematica));
     }
 
