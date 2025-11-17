@@ -2,7 +2,6 @@ package com.backend.sigclc.DTO.ComentariosForos;
 import com.backend.sigclc.DTO.ComentariosForos.Redactor.RedactorResponseDTO;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

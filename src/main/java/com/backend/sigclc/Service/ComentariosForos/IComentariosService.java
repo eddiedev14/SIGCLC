@@ -14,5 +14,9 @@ public interface IComentariosService {
     public ComentarioForoResponseDTO buscarComentarioPorId(ObjectId id);
     public List<ComentarioForoResponseDTO> listarComentariosPorParent(ObjectId parentId);
     public ComentarioForoResponseDTO actualizarComentario(ObjectId id, ComentarioForoUpdateDTO comentario);
+    public void sincronizarNombreUsuario(ObjectId id, String nombreCompleto);
+    public List<ComentarioForoResponseDTO> listarComentariosRaizPorForo(ObjectId foroId);
+    public List<ComentarioForoResponseDTO> listarComentariosPorUsuario(ObjectId usuarioId);
+    public ComentarioForoResponseDTO buscarComentarioPadre(ObjectId comentarioId);
     public String eliminarComentario(ObjectId id);
 }

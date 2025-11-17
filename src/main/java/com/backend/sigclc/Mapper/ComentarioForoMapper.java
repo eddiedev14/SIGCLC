@@ -14,15 +14,15 @@ import com.backend.sigclc.DTO.ComentariosForos.Redactor.RedactorResponseDTO;
 @Component
 public class ComentarioForoMapper {
 
-    //create
+    //CREACIÓN
 
     public ComentarioForoModel toModel(ComentarioForoCreateDTO dto) {
-    ComentarioForoModel model = new ComentarioForoModel();
-    model.setForoId(dto.getForoId());
-    model.setRedactor(toRedactorModel(dto.getUsuarioId()));
-    model.setComentario(dto.getComentario());
-    model.setParentId(dto.getParentId());
-    return model;
+        ComentarioForoModel model = new ComentarioForoModel();
+        model.setForoId(dto.getForoId());
+        model.setRedactor(toRedactorModel(dto.getUsuarioId()));
+        model.setComentario(dto.getComentario());
+        model.setParentId(dto.getParentId());
+        return model;
     }
 
     public RedactorModel toRedactorModel(ObjectId redactorId) {
@@ -31,7 +31,7 @@ public class ComentarioForoMapper {
         return model;
     }
 
-    //response
+    //RESPONSES
 
     public ComentarioForoResponseDTO toResponseDTO(ComentarioForoModel model) {
         ComentarioForoResponseDTO dto = new ComentarioForoResponseDTO();

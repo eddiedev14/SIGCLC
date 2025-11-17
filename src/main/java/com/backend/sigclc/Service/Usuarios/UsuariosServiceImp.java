@@ -20,6 +20,7 @@ import com.backend.sigclc.Repository.IReseniasRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
+import com.backend.sigclc.Repository.IComentariosForosRepository;
 
 @Service
 public class UsuariosServiceImp implements IUsuariosService {
@@ -44,6 +45,9 @@ public class UsuariosServiceImp implements IUsuariosService {
 
     @Autowired 
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private IComentariosForosRepository comentariosForosRepository;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -99,6 +103,7 @@ public class UsuariosServiceImp implements IUsuariosService {
         reseniasRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreComentador(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreValorador(usuarioId, nombreCompleto);
+        comentariosForosRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
     }
 
     @Override

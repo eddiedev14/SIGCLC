@@ -31,17 +31,14 @@ public class ComentariosServiceImp implements IComentariosService {
     private IUsuariosRepository usuariosRepository;
 
     @Autowired
-    private IComentariosForosRepository comentarioForoRepository;
-
-    @Autowired
-    private IForosRepository forosRepository; 
+    private IForosRepository forosRepository;
 
     @Override
     public ComentarioForoResponseDTO guardarComentario(ComentarioForoCreateDTO comentarioDTO) {
         // DTO → Model
         ComentarioForoModel model = comentarioForoMapper.toModel(comentarioDTO);
 
-         // Validar que el foro exista
+        // Validar que el foro exista
         ObjectId foroId = model.getForoId();
         forosRepository.findById(foroId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -50,22 +47,22 @@ public class ComentariosServiceImp implements IComentariosService {
         // fecha actual
         model.setFechaPublicacion(new Date());
 
-        // Obtener el ID del usuario desde el DTO
+        // Obtener el ID del usuario desde el modelo
         ObjectId usuarioId = model.getRedactor().getUsuarioId();
 
         // Buscar el usuario en la colección 'usuarios'
         UsuariosModel redactor = usuariosRepository.findById(usuarioId)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe un usuario con id: " + usuarioId));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Error! No existe un usuario con id: " + usuarioId));
 
+        // completar datos del redactor
         model.getRedactor().setNombreCompleto(redactor.getNombreCompleto());
 
         // guardar
-        comentarioForoRepository.save(model);
+        ComentarioForoModel guardado = comentariosRepository.save(model);
 
         // respuesta
-        return comentarioForoMapper.toResponseDTO(model);
-
+        return comentarioForoMapper.toResponseDTO(guardado);
     }
 
     @Override
@@ -98,11 +95,47 @@ public class ComentariosServiceImp implements IComentariosService {
     }
 
     @Override
+    public void sincronizarNombreUsuario(ObjectId usuarioId, String nombreCompleto) {
+        comentariosRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
+    }
+
+    @Override
     public String eliminarComentario(ObjectId id) {
         if (!comentariosRepository.existsById(id)) {
             throw new RuntimeException("No se encontró comentario con ID: " + id);
         }
         comentariosRepository.deleteById(id);
         return "Comentario eliminado correctamente con ID: " + id;
+    }
+
+    @Override
+    public List<ComentarioForoResponseDTO> listarComentariosRaizPorForo(ObjectId foroId) {
+        List<ComentarioForoModel> comentarios = comentariosRepository.buscarComentariosPadrePorForoId(foroId);
+        return comentarioForoMapper.toResponseDTOList(comentarios);
+    }
+
+    @Override
+    public List<ComentarioForoResponseDTO> listarComentariosPorUsuario(ObjectId usuarioId) {
+        List<ComentarioForoModel> comentarios = comentariosRepository.buscarComentariosPorUsuario(usuarioId);
+        return comentarioForoMapper.toResponseDTOList(comentarios);
+    }
+
+    @Override
+    public ComentarioForoResponseDTO buscarComentarioPadre(ObjectId comentarioId) {
+        // Primero comprobamos que el comentario hijo existe (opcional pero recomendable)
+        ComentarioForoModel comentario = comentariosRepository.findById(comentarioId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado con ID: " + comentarioId));
+
+        // Si no responde a nadie
+        if (comentario.getParentId() == null) {
+            throw new RuntimeException("El comentario con ID: " + comentarioId + " no responde a ningún otro comentario");
+            // Alternativa: devolver null o un DTO vacío según tu diseño
+        }
+
+        // Buscar el padre con la agregación
+        return comentariosRepository.buscarComentarioPadre(comentarioId)
+                .map(comentarioForoMapper::toResponseDTO)
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró el comentario padre para el comentario con ID: " + comentarioId));
     }
 }

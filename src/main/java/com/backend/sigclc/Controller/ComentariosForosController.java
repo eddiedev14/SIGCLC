@@ -20,6 +20,7 @@ import com.backend.sigclc.DTO.ComentariosForos.ComentarioForoResponseDTO;
 import com.backend.sigclc.DTO.ComentariosForos.ComentarioForoUpdateDTO;
 import com.backend.sigclc.Service.ComentariosForos.IComentariosService;
 
+
 @RestController
 @RequestMapping("/SIGCLC/backend/comentariosforos")
 @CrossOrigin(origins = "*")
@@ -34,6 +35,12 @@ public class ComentariosForosController {
         return ResponseEntity.ok(comentariosService.guardarComentario(comentario));
     }
 
+    @GetMapping("/buscar-por-id/{id}")
+    public ResponseEntity<ComentarioForoResponseDTO> buscarComentarioPorId(
+            @PathVariable ObjectId id) {
+        return ResponseEntity.ok(comentariosService.buscarComentarioPorId(id));
+    }
+
     @GetMapping("/listar-por-foro/{foroId}")
     public ResponseEntity<List<ComentarioForoResponseDTO>> listarComentariosPorForo(
             @PathVariable ObjectId foroId) {
@@ -44,6 +51,24 @@ public class ComentariosForosController {
     public ResponseEntity<List<ComentarioForoResponseDTO>> listarComentariosPorParent(
             @PathVariable ObjectId parentId) {
         return ResponseEntity.ok(comentariosService.listarComentariosPorParent(parentId));
+    }
+
+    @GetMapping("/listar-comentariospadres-por-foro/{foroId}")
+    public ResponseEntity<List<ComentarioForoResponseDTO>> listarComentariosRaizPorForo(
+            @PathVariable ObjectId foroId) {
+        return ResponseEntity.ok(comentariosService.listarComentariosRaizPorForo(foroId));
+    }
+
+    @GetMapping("/listar-por-redactor/{usuarioId}")
+    public ResponseEntity<List<ComentarioForoResponseDTO>> listarComentariosPorUsuario(
+            @PathVariable ObjectId usuarioId) {
+        return ResponseEntity.ok(comentariosService.listarComentariosPorUsuario(usuarioId));
+    }
+
+    @GetMapping("/buscar-comentariopadre-por-comentario/{comentarioId}")
+    public ResponseEntity<ComentarioForoResponseDTO> buscarComentarioPadre(
+            @PathVariable ObjectId comentarioId) {
+        return ResponseEntity.ok(comentariosService.buscarComentarioPadre(comentarioId));
     }
 
     @PatchMapping("/actualizar/{id}")
