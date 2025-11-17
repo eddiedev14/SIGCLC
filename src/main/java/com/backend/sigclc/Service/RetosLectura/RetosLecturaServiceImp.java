@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaCreateDTO;
 import com.backend.sigclc.DTO.RetosLectura.RetoLecturaResponseDTO;
@@ -56,18 +58,6 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
             });
         }
 
-        // Traer los datos del usuario inscrito desde la base de datos
-        if (model.getUsuariosInscritos() != null && !model.getUsuariosInscritos().isEmpty()) {
-            model.getUsuariosInscritos().forEach(usuarioInscrito -> {
-                ObjectId usuarioId = usuarioInscrito.getUsuarioId();
-                UsuariosModel usuario = usuariosRepository.findById(usuarioId)
-                    .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Error! No existe un usuario con id: " + usuarioId + " o está mal escrito."));
-                
-                usuarioInscrito.setNombreCompleto(usuario.getNombreCompleto());
-            });
-        }
-
         RetosLecturaModel saved = retosLecturaRepository.save(model);
 
         return retoLecturaMapper.toResponseDTO(saved);
@@ -77,6 +67,16 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
     public RetoLecturaResponseDTO registrarProgreso(ObjectId retoId, ObjectId usuarioId, ProgresoDTO progreso) {
         RetosLecturaModel reto = retosLecturaRepository.findById(retoId)
             .orElseThrow(() -> new RecursoNoEncontradoException("No existe un reto con id: " + retoId));
+        
+        Date hoy = new Date();
+
+        if (reto.getFechaInicio().after(hoy)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede registrar el progreso pues el reto no ha comenzado.");
+            }
+        
+        if (reto.getFechaFinalizacion().before(hoy)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede registrar el progreso pues el reto ya ha finalizado");
+        }
 
         UsuariosInscritosModel usuarioInscrito = reto.getUsuariosInscritos().stream()
             .filter(usuario -> usuario.getUsuarioId().equals(usuarioId))
@@ -127,14 +127,16 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
             .orElseThrow(() -> new RecursoNoEncontradoException(
                 "Error! No existe un reto de lectura con id: " + retoId + " o está mal escrito."));
 
+        validarFechaInicioNoPasada(reto);
+
         retosLecturaRepository.delete(reto);
         return "Reto de lectura eliminado correctamente.";
     }
 
     private void validarFechaInicioNoPasada(RetosLecturaModel reto) {
         if (reto.getFechaInicio() != null && reto.getFechaInicio().before(new Date())) {
-            throw new IllegalStateException(
-                "No se pueden modificar asistentes ni libros porque la fecha de inicio ya ha pasado."
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "No se puede modificar reto de lectura porque la fecha de inicio ya ha pasado."
             );
         }
     }
@@ -147,37 +149,64 @@ public class RetosLecturaServiceImp implements IRetosLecturaService{
         Date hoy = new Date();
 
         if (reto.getFechaFinalizacion().before(hoy)) {
-            throw new IllegalStateException("No se puede modificar un reto que ya finalizó.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede modificar un reto que ya finalizó.");
         }
 
         if (dto.getTitulo() != null && dto.getTitulo().trim().isEmpty()) {
-            throw new IllegalStateException("El título no puede estar vacío.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El título no puede estar vacío.");
         }
 
         if (dto.getDescripcion() != null && dto.getDescripcion().trim().isEmpty()) {
-            throw new IllegalStateException("La descripción no puede estar vacía.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La descripción no puede estar vacía.");
         }
 
         boolean vieneFechaInicio = dto.getFechaInicio() != null;
-        boolean vieneFechaFin    = dto.getFechaFinalizacion() != null;
+        boolean vieneFechaFin = dto.getFechaFinalizacion() != null;
 
         if (vieneFechaInicio && vieneFechaFin) {
 
             if (reto.getFechaInicio().before(hoy)) {
-                throw new IllegalStateException("No se puede modificar el periodo del reto porque ya comenzó.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No se puede modificar el periodo del reto porque ya comenzó.");
             }
 
             if (dto.getFechaInicio().before(hoy)) {
-                throw new IllegalStateException("La nueva fecha de inicio no puede ser anterior a la fecha actual.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La nueva fecha de inicio no puede ser anterior a la fecha actual.");
             }
 
             if (!dto.getFechaInicio().before(dto.getFechaFinalizacion())) {
-                throw new IllegalStateException("La fecha de inicio debe ser menor que la fecha de finalización.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La fecha de inicio debe ser menor que la fecha de finalización.");
             }
 
-            if (dto.getFechaFinalizacion().before(reto.getFechaFinalizacion())) {
-                throw new IllegalStateException("La nueva fecha de finalización no puede ser menor a la actual.");
-            }
+        }
+
+        if (dto.getLibrosAsociadosId() != null) {
+            List<LibrosAsociadosModel> nuevos = dto.getLibrosAsociadosId().stream().map(id -> {
+                LibrosModel libro = librosRepository.findById(id)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Error! No existe un libro con id: " + id));
+
+                LibrosAsociadosModel model = new LibrosAsociadosModel();
+                model.setLibroId(id);
+                model.setTitulo(libro.getTitulo());
+                model.setGeneros(libro.getGeneros());
+                return model;
+            }).toList();
+
+            reto.setLibrosAsociados(nuevos); 
+        }
+
+        // Traer los datos del usuario inscrito desde la base de datos
+        if (dto.getUsuariosInscritosId() != null) {
+            List<UsuariosInscritosModel> nuevos = dto.getUsuariosInscritosId().stream().map(id -> {
+                UsuariosModel u = usuariosRepository.findById(id)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Error! No existe un usuario con id: " + id));
+
+                UsuariosInscritosModel model = new UsuariosInscritosModel();
+                model.setUsuarioId(id);
+                model.setNombreCompleto(u.getNombreCompleto());
+                return model;
+            }).toList();
+
+            reto.setUsuariosInscritos(nuevos); 
         }
 
         retoLecturaMapper.updateModelFromDTO(reto, dto);
