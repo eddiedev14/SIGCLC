@@ -1,5 +1,6 @@
 package com.backend.sigclc.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -88,4 +89,8 @@ public interface IReseniasRepository extends MongoRepository <ReseniaModel, Obje
         "{ $replaceRoot: { newRoot: '$valoraciones' } }"
     })
     List<ValoracionModel> buscarValoracionesDeUsuario(ObjectId usuarioId);
+
+    // Buscar reseñas del mes actual
+    @Query("{ 'fechaPublicacion': { $gte: ?0, $lt: ?1 } }")
+    List<ReseniaModel> buscarReseniasDelMesActual(Date start, Date end);
 }

@@ -1,5 +1,7 @@
 package com.backend.sigclc.Service.Resenias;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -525,8 +527,15 @@ public class ReseniasServiceImp implements IReseniasService {
 
     @Override
     public List<ReseniaResponseDTO> reseniasMejorValoradas() {
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate inicioMes = LocalDate.now(zone).withDayOfMonth(1);
+        LocalDate inicioMesSiguiente = inicioMes.plusMonths(1);
+
+        Date start = Date.from(inicioMes.atStartOfDay(zone).toInstant());
+        Date end   = Date.from(inicioMesSiguiente.atStartOfDay(zone).toInstant());
+
         // Obtener todas las reseñas
-        List<ReseniaModel> reseñas = reseniasRepository.findAll();
+        List<ReseniaModel> reseñas = reseniasRepository.buscarReseniasDelMesActual(start, end);
 
         // A través del metodo getCalificacionPromedio se calcula la calificacion promedio de cada reseña. Se deben ordenar descendentemente y solo las 5 primeras
         reseñas.sort(Comparator.comparing(ReseniaModel::getCalificacionPromedio).reversed());
