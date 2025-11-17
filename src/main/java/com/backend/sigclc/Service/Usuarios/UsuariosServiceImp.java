@@ -161,6 +161,8 @@ public class UsuariosServiceImp implements IUsuariosService {
 
         if (retosLecturaRepository.existsByUsuarioInscrito(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está inscrito a un reto de lectura.");
+        }
+        
         // No se puede eliminar un usuario si está asociado como redactor de un comentario
         if(comentariosForosRepository.existsByRedactorId(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como redactor de un comentario.");
