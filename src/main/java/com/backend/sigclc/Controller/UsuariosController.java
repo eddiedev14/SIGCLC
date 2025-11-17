@@ -20,6 +20,7 @@ import com.backend.sigclc.DTO.Usuarios.UsuarioCreateDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioResponseDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioUpdateDTO;
 import com.backend.sigclc.Service.Usuarios.IUsuariosService;
+import com.backend.sigclc.DTO.Estadisticas.LectorActivoResponseDTO;
 
 import jakarta.validation.Valid;
 
@@ -62,5 +63,11 @@ public class UsuariosController {
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable ObjectId id) {
         return ResponseEntity.ok(usuariosService.eliminarUsuario(id));
+    }
+
+    // Listar lectores mas activos
+    @GetMapping("/lectoresMasActivosMensual")
+    public ResponseEntity<List<LectorActivoResponseDTO>> lectoresMasActivosMensual() {
+        return ResponseEntity.ok(usuariosService.lectoresMasActivosMensual());
     }
 }
