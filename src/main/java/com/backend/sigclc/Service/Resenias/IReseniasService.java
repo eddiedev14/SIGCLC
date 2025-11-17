@@ -33,4 +33,5 @@ public interface IReseniasService {
     public ReseniaResponseDTO eliminarComentario(ObjectId reseniaId, ObjectId comentarioId);
     public ReseniaResponseDTO eliminarArchivosDeResenia(ObjectId reseniaId, List<String> archivoUuids);
     public String eliminarResenia(ObjectId reseniaId);
+    public List<ReseniaResponseDTO> reseniasMejorValoradas();
 }
