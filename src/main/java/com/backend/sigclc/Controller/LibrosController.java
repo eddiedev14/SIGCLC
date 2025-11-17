@@ -10,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
@@ -41,7 +41,7 @@ public class LibrosController {
 
     @GetMapping("/listar")
     public ResponseEntity<List<LibroResponseDTO>> listarLibros() {
-        return new ResponseEntity<>(librosService.listarLibros(), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarLibros());
     }
 
     @GetMapping("/buscar/{id}")
@@ -51,12 +51,12 @@ public class LibrosController {
     
     @GetMapping("/listar-por-genero/{genero}")
     public ResponseEntity<List<LibroResponseDTO>> listarLibroPorGenero(@PathVariable GeneroLibro genero) {
-        return new ResponseEntity<>(librosService.listarPorGenero(genero), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarPorGenero(genero));
     }
 
     @GetMapping("/listar-por-autor/{autor}")
     public ResponseEntity<List<LibroResponseDTO>> listarLibroPorAutor(@PathVariable String autor) {
-        return new ResponseEntity<>(librosService.listarPorAutor(autor), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.listarPorAutor(autor));
     }
 
     @PatchMapping(value = "/actualizar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -70,6 +70,6 @@ public class LibrosController {
     
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarLibro(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(librosService.eliminarLibro(id), HttpStatus.OK);
+        return ResponseEntity.ok(librosService.eliminarLibro(id));
     }
 }

@@ -33,16 +33,16 @@ public class UsuariosController {
 
     // Crear usuario
     @PostMapping("/insertar")
-    public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
-    UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
+        public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
+        UsuarioResponseDTO response = usuariosService.guardarUsuario(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 
     // Listar todos los usuarios
     @GetMapping("/listar")
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
-        return new ResponseEntity<>(usuariosService.listarUsuarios(), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.listarUsuarios());
     }
 
     // Buscar usuario por ID
@@ -51,24 +51,9 @@ public class UsuariosController {
         return ResponseEntity.ok(usuariosService.buscarUsuariosPorId(id));
     }
 
-    // Buscar usuario por correo electrónico
-    @GetMapping("/buscar-por-correo/{correoElectronico}")
-    public ResponseEntity<UsuarioResponseDTO> buscarPorCorreo(@PathVariable String correoElectronico) {
-        return ResponseEntity.ok(usuariosService.buscarPorCorreo(correoElectronico));
-    }
-
-    // Buscar usuarios por rol
-    @GetMapping("/buscar-por-rol/{rol}")
-    public ResponseEntity<List<UsuarioResponseDTO>> buscarPorRol(@PathVariable String rol) {
-        return ResponseEntity.ok(usuariosService.buscarPorRol(rol));
-    }
-
     // Actualizar usuario
     @PatchMapping("/actualizar/{id}")
-    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(
-            @PathVariable ObjectId id,
-            @Valid @RequestBody UsuarioUpdateDTO usuario) {
-
+    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable ObjectId id, @Valid @RequestBody UsuarioUpdateDTO usuario) {
         UsuarioResponseDTO actualizado = usuariosService.actualizarUsuario(id, usuario);
         return ResponseEntity.ok(actualizado);
     }
@@ -76,6 +61,6 @@ public class UsuariosController {
     // Eliminar usuario
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(usuariosService.eliminarUsuario(id), HttpStatus.OK);
+        return ResponseEntity.ok(usuariosService.eliminarUsuario(id));
     }
 }

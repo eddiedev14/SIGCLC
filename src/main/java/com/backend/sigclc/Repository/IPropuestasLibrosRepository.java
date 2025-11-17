@@ -1,17 +1,18 @@
 package com.backend.sigclc.Repository;
 
+import java.util.List;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
-import com.backend.sigclc.Model.Libros.GeneroLibro;
-
-import java.util.List;
-
-import org.bson.types.ObjectId;
 
 @Repository
 public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasLibrosModel, ObjectId> {
@@ -34,11 +35,19 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     @Update("{ '$set': { 'votos.$.nombreCompleto': ?1 } }")
     void actualizarNombreUsuarioVoto(ObjectId usuarioId, String nuevoNombre);
 
-    // Verificar si un libro tiene propuestas cuando el estado de la propuesta es en_votacion
-    @Query(value = "{ 'libroPropuesto.libroId': ?0, 'estadoPropuesta': 'en_votacion' }", exists = true)
-    boolean tienePropuestasEnVotacion(ObjectId libroId);
-    
-    //* Agregaciones */
+    // Validar si el usuario está asociado como proponente de una propuesta de libro
+    @ExistsQuery("{ 'usuarioProponente.usuarioId': ?0 }")
+    boolean existsByProponenteId(ObjectId usuarioId);
+
+    // Validar si el usuario está asociado como votante de una propuesta de libro
+    @ExistsQuery("{ 'votos.usuarioId': ?0 }")
+    boolean existsByVotanteId(ObjectId usuarioId);
+
+    // Validar si el libro está asociado a una propuesta
+    @ExistsQuery("{ 'libroPropuesto.libroId': ?0 }")
+    boolean existsByLibroPropuestoLibroId(ObjectId libroId);
+
+    //* Consultas */
 
     // Buscar propuestas por estado
     @Query("{ 'estadoPropuesta': ?0 }")
@@ -51,4 +60,15 @@ public interface IPropuestasLibrosRepository extends MongoRepository<PropuestasL
     // Buscar propuestas por libro
     @Query("{ 'libroPropuesto.libroId': ?0 }")
     List<PropuestasLibrosModel> buscarPropuestasPorLibro(ObjectId libroId);
+
+    //* Agregaciones */
+
+    // Retornar conteo de reuniones asociadas a una propuesta (en coleccion 'reuniones')
+    @Aggregation(pipeline = {
+        "{ $lookup: { from: 'reuniones', localField: '_id', foreignField: 'librosSeleccionados.propuestaId', as: 'reunionesAsociadas' } }",
+        "{ $addFields: { tieneReunion: { $gt: [ { $size: '$reunionesAsociadas' }, 0 ] } } }",
+        "{ $match: { _id: ?0 } }",
+        "{ $project: { _id: 1, tieneReunion: 1 } }"
+    })
+    boolean tieneReuniones(ObjectId propuestaId);
 }

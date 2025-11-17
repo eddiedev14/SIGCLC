@@ -7,14 +7,13 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
-import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuestoResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccionDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponenteResponseDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.VotoResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.LibroPropuesto.LibroPropuestoResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.PeriodoSeleccion.PeriodoSeleccionDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.UsuarioProponente.UsuarioProponenteResponseDTO;
+import com.backend.sigclc.DTO.PropuestasLibros.Votos.VotoResponseDTO;
 import com.backend.sigclc.Model.PropuestasLibros.LibroPropuestoModel;
 import com.backend.sigclc.Model.PropuestasLibros.UsuarioProponenteModel;
 import com.backend.sigclc.Model.PropuestasLibros.VotoModel;
@@ -42,13 +41,6 @@ public class PropuestaLibroMapper {
     public UsuarioProponenteModel createUsuarioProponenteModel(ObjectId usuarioId) {
         UsuarioProponenteModel model = new UsuarioProponenteModel();
         model.setUsuarioId(usuarioId);
-        return model;
-    }
-
-    // Convertir VotoDTO a VotoModel
-    public VotoModel toVotoModel(VotoDTO dto) {
-        VotoModel model = new VotoModel();
-        model.setUsuarioId(dto.getUsuarioId());
         return model;
     }
 

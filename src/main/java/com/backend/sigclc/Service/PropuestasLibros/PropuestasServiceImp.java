@@ -1,18 +1,18 @@
 package com.backend.sigclc.Service.PropuestasLibros;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 import org.bson.types.ObjectId;
 
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroCreateDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroResponseDTO;
 import com.backend.sigclc.DTO.PropuestasLibros.PropuestaLibroUpdateDTO;
-import com.backend.sigclc.DTO.PropuestasLibros.VotoDTO;
 import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.PropuestaLibroMapper;
 import com.backend.sigclc.Model.Libros.LibrosModel;
+import com.backend.sigclc.Model.PropuestasLibros.EstadoLectura;
 import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 import com.backend.sigclc.Model.PropuestasLibros.PropuestasLibrosModel;
 import com.backend.sigclc.Model.PropuestasLibros.VotoModel;
@@ -22,6 +22,7 @@ import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PropuestasServiceImp implements IPropuestasService {
@@ -44,8 +45,6 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Definir campos con valores por defecto SOLO CUANDO SE CREA UNA NUEVA PROPUESTA
         model.setFechaPropuesta(new Date());
         model.setEstadoPropuesta(EstadoPropuesta.en_votacion);
-        model.setVotos(new ArrayList<>());
-        model.setPeriodoSeleccion(null);
 
         //* Añadir campos automáticamente a libroPropuesto con base al libro */
         ObjectId libroId = model.getLibroPropuesto().getLibroId();
@@ -64,6 +63,14 @@ public class PropuestasServiceImp implements IPropuestasService {
 
         model.getUsuarioProponente().setNombreCompleto(usuario.getNombreCompleto());
 
+        // * Solo se puede crear una nueva si todas las propuestas de ese libro están seleccionadas y leidas
+        List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorLibro(libroId);
+        for (PropuestasLibrosModel propuestaModel : propuestas) {
+            if (propuestaModel.getEstadoPropuesta() != EstadoPropuesta.seleccionada || propuestaModel.getLibroPropuesto().getEstadoLectura() != EstadoLectura.leido) {
+                throw new IllegalArgumentException("Solo se puede crear una nueva propuesta si todas las propuestas de ese libro están seleccionadas y leidas");
+            }
+        }
+
         // Guardar propuesta
         propuestasLibrosRepository.save(model);
 
@@ -71,11 +78,11 @@ public class PropuestasServiceImp implements IPropuestasService {
     }
 
     @Override
-    public PropuestaLibroResponseDTO votarPropuesta(ObjectId id, VotoDTO voto) {
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idLibro, ObjectId idUsuario) {
         // Obtener la propuesta
-        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(id)
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(idLibro)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una propuesta con id: " + id + " o está mal escrito."));
+                "Error! No existe una propuesta con id: " + idLibro + " o está mal escrito."));
 
         // Solo se puede votar si el estado_propuesta es en_votacion
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.en_votacion) {
@@ -85,23 +92,21 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Validar que el usuario no haya votado previamente
         if (propuesta.getVotos() != null) {
             for (VotoModel votoModel : propuesta.getVotos()) {
-                if (votoModel.getUsuarioId().equals(voto.getUsuarioId())) {
+                if (votoModel.getUsuarioId().equals(idUsuario)) {
                     throw new IllegalArgumentException("El usuario ya ha votado previamente");
                 }
             }
         }
 
-        // Agregar voto
-        VotoModel votoModel = propuestaLibrosMapper.toVotoModel(voto);
-
         // Setear fecha del voto con la fecha actual
+        VotoModel votoModel = new VotoModel();
+        votoModel.setUsuarioId(idUsuario);
         votoModel.setFechaVoto(new Date());
 
         //* Añadir campos automáticamente a votos con base al usuario */
-        ObjectId votoUsuarioId = voto.getUsuarioId();
-        UsuariosModel usuarioVoto = usuariosRepository.findById(votoUsuarioId)
+        UsuariosModel usuarioVoto = usuariosRepository.findById(idUsuario)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe un usuario con id: " + votoUsuarioId + " o está mal escrito."));
+                "Error! No existe un usuario con id: " + idUsuario + " o está mal escrito."));
         votoModel.setNombreCompleto(usuarioVoto.getNombreCompleto());
 
         // Agregar voto
@@ -172,6 +177,11 @@ public class PropuestasServiceImp implements IPropuestasService {
             throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no se debe pasar el periodoSeleccion y/o el estadoLectura");
         }
 
+        // Si el estado original es seleccionado, y se quiere cambiar a distinto de seleccionado (transición explícita en el DTO), no puede estar asociado a una reunion
+        if (estadoOriginal == EstadoPropuesta.seleccionada && propuesta.getEstadoPropuesta() != null && propuesta.getEstadoPropuesta() != EstadoPropuesta.seleccionada && propuestasLibrosRepository.tieneReuniones(id)) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a " + propuesta.getEstadoPropuesta() + ", no puede estar asociado a una reunion");
+        }
+
         // Para cambiar al estado seleccionado, la propuesta debe tener al menos un voto
         if (propuesta.getEstadoPropuesta() == EstadoPropuesta.seleccionada && propuestaModel.getVotos().isEmpty()) {
             throw new IllegalArgumentException("Para cambiar el estado de la propuesta a seleccionada, debe de tener al menos un voto");
@@ -180,6 +190,11 @@ public class PropuestasServiceImp implements IPropuestasService {
         // Si la fechaInicio es mayor a la fechaFin del periodoSeleccion, se debe de lanzar una excepción
         if (propuesta.getPeriodoSeleccion() != null && propuesta.getPeriodoSeleccion().getFechaInicio().after(propuesta.getPeriodoSeleccion().getFechaFin())) {
             throw new IllegalArgumentException("La fecha de inicio del periodo de seleccion debe de ser anterior a la fecha de fin");
+        }
+
+        // Para cambiar al estado de lectura a leido, la propuesta debe estar asociado a al menos una reunion
+        if (propuesta.getEstadoLectura() == EstadoLectura.leido && !propuestasLibrosRepository.tieneReuniones(propuestaModel.getId())) {
+            throw new IllegalArgumentException("Para cambiar el estado de la propuesta a leido, debe de estar asociado a al menos una reunion");
         }
         
         // * Actualizar propuesta de libro
@@ -212,7 +227,7 @@ public class PropuestasServiceImp implements IPropuestasService {
 
         // Si el estado es diferente a no seleccionada, no se puede eliminar
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.no_seleccionada) {
-            throw new IllegalArgumentException("No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar una propuesta que no está en estado 'no_seleccionada'");
         }
 
         // Eliminar propuesta

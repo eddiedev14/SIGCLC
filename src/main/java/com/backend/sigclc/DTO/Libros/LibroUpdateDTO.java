@@ -32,9 +32,6 @@ public class LibroUpdateDTO {
     @Size(min = 1, max = 1000, message = "La sinopsis debe tener entre {min} y {max} caracteres")
     private String sinopsis;
 
-    @Size(max = 300, message = "La ubicación del archivo tener menos de {max} caracteres")
-    private String portadaPath;
-
     private MultipartFile imagen;
 
     @AssertTrue(message = "El año de publicación no puede ser del futuro")

@@ -78,9 +78,5 @@ public class LibroMapper {
         if (dto.getGeneros() != null) model.setGeneros(toGenerosModelList(dto.getGeneros()));
         if (dto.getAnioPublicacion() != null) model.setAnioPublicacion(dto.getAnioPublicacion());
         if (dto.getSinopsis() != null) model.setSinopsis(dto.getSinopsis());
-
-        if (dto.getPortadaPath() != null && !dto.getPortadaPath().isBlank()) {
-            model.setPortadaPath(dto.getPortadaPath());
-        }
     }
 }
