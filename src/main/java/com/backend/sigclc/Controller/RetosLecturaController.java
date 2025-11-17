@@ -42,8 +42,8 @@ public class RetosLecturaController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/listar-por-id/{retoId}")
-    public ResponseEntity<RetoLecturaResponseDTO> listarRetosLectura(@PathVariable ObjectId retoId) {
+    @GetMapping(value = "/buscar-por-id/{retoId}")
+    public ResponseEntity<RetoLecturaResponseDTO> buscarRetosLectura(@PathVariable ObjectId retoId) {
         RetoLecturaResponseDTO response = retosLecturaService.buscarRetoLectura(retoId);
         return ResponseEntity.ok(response);
     }
