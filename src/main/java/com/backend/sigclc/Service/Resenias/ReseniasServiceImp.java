@@ -1,8 +1,12 @@
 package com.backend.sigclc.Service.Resenias;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -519,5 +523,26 @@ public class ReseniasServiceImp implements IReseniasService {
 
         reseniasRepository.delete(resenia);
         return "Reseña eliminada correctamente.";
+    }
+
+    @Override
+    public List<ReseniaResponseDTO> reseniasMejorValoradas() {
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate inicioMes = LocalDate.now(zone).withDayOfMonth(1);
+        LocalDate inicioMesSiguiente = inicioMes.plusMonths(1);
+
+        Date start = Date.from(inicioMes.atStartOfDay(zone).toInstant());
+        Date end   = Date.from(inicioMesSiguiente.atStartOfDay(zone).toInstant());
+
+        // Obtener todas las reseñas
+        List<ReseniaModel> reseñas = reseniasRepository.buscarReseniasDelMesActual(start, end);
+
+        // A través del metodo getCalificacionPromedio se calcula la calificacion promedio de cada reseña. Se deben ordenar descendentemente y solo las 5 primeras
+        reseñas.sort(Comparator.comparing(ReseniaModel::getCalificacionPromedio).reversed());
+        List<ReseniaResponseDTO> reseñasDTO = reseñas.stream().limit(5)
+            .map(resenia -> reseniaMapper.toResponseDTO(resenia))
+            .collect(Collectors.toList());
+            
+        return reseñasDTO;
     }
 }

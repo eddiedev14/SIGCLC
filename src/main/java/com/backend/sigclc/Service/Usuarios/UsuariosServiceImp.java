@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.backend.sigclc.DTO.Estadisticas.LectorActivoResponseDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioCreateDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioResponseDTO;
 import com.backend.sigclc.DTO.Usuarios.UsuarioUpdateDTO;
@@ -170,5 +171,11 @@ public class UsuariosServiceImp implements IUsuariosService {
 
         usuariosRepository.deleteById(id);
         return "Usuario eliminado correctamente con id: " + id;
+    }
+
+    //* Estadísticas */
+    @Override
+    public List<LectorActivoResponseDTO> lectoresMasActivosMensual() {
+        return usuariosRepository.lectoresMasActivosMensual();
     }
 }

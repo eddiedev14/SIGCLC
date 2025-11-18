@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.backend.sigclc.DTO.Estadisticas.GeneroPopularResponseDTO;
+import com.backend.sigclc.DTO.Estadisticas.LibroLeidoResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroCreateDTO;
 import com.backend.sigclc.DTO.Libros.LibroResponseDTO;
 import com.backend.sigclc.DTO.Libros.LibroUpdateDTO;
@@ -195,5 +197,16 @@ public class LibrosServiceImp implements ILibrosService {
     public List<LibroResponseDTO> listarPorAutor(String autor) {
         autor = autor.replace("-", " ");
         return libroMapper.toResponseDTOList(librosRepository.buscarPorAutor(autor));
+    }
+
+    //* Estadísticas */
+    @Override
+    public List<LibroLeidoResponseDTO> librosMasLeidosMensual() {
+        return librosRepository.librosMasLeidosMensual();
+    }
+
+    @Override
+    public List<GeneroPopularResponseDTO> generosMasPopularesDelMes() {
+        return librosRepository.generosMasPopularesDelMes();
     }
 }

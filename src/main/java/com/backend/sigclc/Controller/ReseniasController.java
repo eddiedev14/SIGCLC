@@ -138,4 +138,10 @@ public class ReseniasController {
         String response = reseniasService.eliminarResenia(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(value = "/mejorValoradas")
+    public ResponseEntity<List<ReseniaResponseDTO>> mejoresResenias() {
+        List<ReseniaResponseDTO> response = reseniasService.reseniasMejorValoradas();
+        return ResponseEntity.ok(response);
+    }
 }
