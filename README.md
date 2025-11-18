@@ -1,6 +1,6 @@
 # 📚 SIGCLC — API REST (Spring Boot + MongoDB)
 
-**SIGCLC** (Sistema de Gestión del Club de Lectura Colectiva) es una API REST desarrollada en **Java (Spring Boot)** con **MongoDB**, diseñada para gestionar actividades, propuestas, reseñas y foros de un club de lectura. La aplicación sigue una arquitectura **en capas** inspirada en el patrón **MVT/MVC**, extendida con capas de **Service** y **Repository** para favorecer separación de responsabilidades y escalabilidad.
+**SIGCLC** (Sistema de Gestión del Club de Lectura Colectiva) es una API REST desarrollada en **Java (Spring Boot)** con **MongoDB**, diseñada para gestionar actividades, propuestas, reseñas y foros de un club de lectura. La aplicación sigue una arquitectura **en capas** inspirada en el patrón **MVC**, extendida con capas de **Service** y **Repository** para favorecer separación de responsabilidades y escalabilidad.
 
 ---
 

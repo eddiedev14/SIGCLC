@@ -1,0 +1,111 @@
+package com.backend.sigclc.Mapper;
+
+import java.util.List;
+
+import org.bson.types.ObjectId;
+import org.springframework.stereotype.Component;
+
+import com.backend.sigclc.DTO.Reuniones.ReunionCreateDTO;
+import com.backend.sigclc.DTO.Reuniones.ReunionResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.ReunionUpdateDTO;
+import com.backend.sigclc.DTO.Reuniones.Asistentes.AsistenteResponseDTO;
+import com.backend.sigclc.DTO.Reuniones.LibroSeleccionado.LibroSeleccionadoResponseDTO;
+import com.backend.sigclc.Model.Reuniones.AsistenteModel;
+import com.backend.sigclc.Model.Reuniones.LibroSeleccionadoModel;
+import com.backend.sigclc.Model.Reuniones.ReunionesModel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Component
+public class ReunionMapper {
+    @Autowired
+    private ArchivoAdjuntoMapper archivoAdjuntoMapper;
+    
+    public ReunionesModel toModel(ReunionCreateDTO dto) {
+        ReunionesModel model = new ReunionesModel();
+        model.setFecha(dto.getFecha());
+        model.setHora(dto.getHora());
+        model.setModalidad(dto.getModalidad());
+        model.setEspacioReunion(dto.getEspacioReunion());
+        return model;
+    }    
+
+    public ReunionResponseDTO toResponseDTO(ReunionesModel model) {
+        ReunionResponseDTO dto = new ReunionResponseDTO();
+        dto.setId(model.getIdAString());
+        dto.setFecha(model.getFecha());
+        dto.setHora(model.getHora());
+        dto.setModalidad(model.getModalidad());
+        dto.setEspacioReunion(model.getEspacioReunion());
+        dto.setLibrosSeleccionados(toLibrosSeleccionadosResponseDTOList(model.getLibrosSeleccionados()));
+        dto.setAsistentes(toAsistentesResponseDTOList(model.getAsistentes()));
+        dto.setArchivosAdjuntos(archivoAdjuntoMapper.toArchivosAdjuntosResponseDTOList(model.getArchivosAdjuntos()));
+        return dto;
+    }
+
+    public List<ReunionResponseDTO> toResponseDTOList(List<ReunionesModel> models) {
+        return models.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    public LibroSeleccionadoResponseDTO toLibroSeleccionadoResponseDTO(LibroSeleccionadoModel model) {
+        LibroSeleccionadoResponseDTO dto = new LibroSeleccionadoResponseDTO();
+        dto.setLibroSeleccionadoId(model.getPropuestaIdAString());
+        dto.setTitulo(model.getTitulo());
+        dto.setGeneros(model.getGeneros());
+        return dto;
+    }
+
+    public AsistenteResponseDTO toAsistenteResponseDTO(AsistenteModel model) {
+        AsistenteResponseDTO dto = new AsistenteResponseDTO();
+        dto.setAsistenteId(model.getAsistenteIdAString());
+        dto.setNombreCompleto(model.getNombreCompleto());
+        return dto;
+    }
+
+    public List<LibroSeleccionadoResponseDTO> toLibrosSeleccionadosResponseDTOList(List<LibroSeleccionadoModel> models) {
+        return models.stream()
+                .map(this::toLibroSeleccionadoResponseDTO)
+                .toList();
+    }
+
+    public List<AsistenteResponseDTO> toAsistentesResponseDTOList(List<AsistenteModel> models) {
+        return models.stream()
+                .map(this::toAsistenteResponseDTO)
+                .toList();
+    }
+
+    public List<LibroSeleccionadoModel> toLibroSeleccionadoModelList(List<ObjectId> ids) {
+        return ids.stream()
+                .map(this::toLibroSeleccionadoModelFromId)
+                .toList();
+    }
+
+    public List<AsistenteModel> toAsistentesModelList(List<ObjectId> ids) {
+        return ids.stream()
+                .map(this::toAsistenteModelFromId)
+                .toList();
+    }
+
+    public AsistenteModel toAsistenteModelFromId(ObjectId asistenteId) {
+        AsistenteModel model = new AsistenteModel();
+        model.setAsistenteId(asistenteId);
+        return model;
+    }
+
+    public LibroSeleccionadoModel toLibroSeleccionadoModelFromId(ObjectId libroId) {
+        LibroSeleccionadoModel model = new LibroSeleccionadoModel();
+        model.setPropuestaId(libroId);
+        return model;
+    }
+
+
+
+    public void updateModelFromDTO(ReunionesModel model, ReunionUpdateDTO dto) {
+        if (dto.getFecha() != null) model.setFecha(dto.getFecha());
+        if (dto.getHora() != null) model.setHora(dto.getHora());
+        if (dto.getModalidad() != null) model.setModalidad(dto.getModalidad());
+        if (dto.getEspacioReunion() != null) model.setEspacioReunion(dto.getEspacioReunion());
+    }
+}

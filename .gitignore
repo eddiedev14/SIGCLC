@@ -32,3 +32,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Uploads ###
+uploads/portadas/*
+!uploads/portadas/.gitkeep
+uploads/archivosReunion/*
+!uploads/archivosReunion/.gitkeep
+uploads/archivosResenia/*
+!uploads/archivosResenia/.gitkeep
