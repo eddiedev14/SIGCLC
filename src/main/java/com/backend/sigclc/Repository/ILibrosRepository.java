@@ -168,21 +168,28 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
             "as: 'reseniasConGenero' " +
         "} }",
 
-        //* FALTA CORREGIR */
         // 6. Busca foros
         "{ $lookup: { " +
             "from: 'foros', " +
             "let: { genero: '$_id' }, " +
             "pipeline: [" +
                 // Filtra si tipoTematica es "genero"
-                "{ $match: { $expr: { $eq: ['$$genero', '$tipoTematica'] } } }" +
-                // Buscar si el nombreTematica incluye (regex) el género actual
-                "{ $match: { $expr: { $regexMatch: { input: '$nombreTematica', regex: '$$genero', options: 'i' } } } }" +
+                "{ $match: { $expr: { $and: [ { $eq: ['genero', '$tipoTematica'] }, { $eq: ['$$genero', '$tematica'] } ] } } }" +
             "] " +
             "as: 'forosConGenero' " +
         "} }",
 
-        // 7. Proyecta y calcula el total
+        // 7. Buscar comentarios de esos foros en la coleccion comentariosForos
+        "{ $lookup: { " +
+            "from: 'comentariosForos', " +
+            "let: { forosIds: '$forosConGenero._id' }, " +
+            "pipeline: [" +
+                "{ $match: { $expr: { $in: ['$foroId', '$$forosIds'] } } }" +
+            "] " +
+            "as: 'comentariosForosConGenero' " +
+        "} }",
+
+        // 8. Proyecta y calcula el total
         "{ $project: { " +
             "_id: 0, " +
             "genero: '$_id', " +
@@ -191,10 +198,11 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
             "resenias: { $size: '$reseniasConGenero' }, " +
             "comentariosResenias: { $size: '$reseniasConGenero.comentarios' }, " +
             "foros: { $size: '$forosConGenero' }, " +
-            "popularidadTotal: { $add: [ { $size: '$reunionesConGenero' }, { $size: '$retosConGenero' }, { $size: '$reseniasConGenero' }, { $size: '$reseniasConGenero.comentarios' }, { $size: '$forosConGenero' } ] }" +
+            "comentariosForos: { $size: '$comentariosForosConGenero' }, " +
+            "popularidadTotal: { $add: [ { $size: '$reunionesConGenero' }, { $size: '$retosConGenero' }, { $size: '$reseniasConGenero' }, { $size: '$reseniasConGenero.comentarios' }, { $size: '$forosConGenero' }, { $size: '$comentariosForosConGenero' } ] }" +
         "} }",
 
-        // 8. Formato del DTO (Incluye los campos con valor literal 0)
+        // 9. Formato del DTO
         "{ $project: { " +
             "genero: 1, " +
             "reuniones: 1, " +
@@ -202,12 +210,13 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
             "resenias: 1, " +
             "comentariosResenias: 1, " +
             "foros: 1, " +
+            "comentariosForos: 1, " +
             "popularidadTotal: 1, " +
         "} }",
 
-        // 9. Ordenar y limitar
+        // 10. Ordenar y limitar
         "{ $sort: { popularidadTotal: -1 } }",
-        "{ $limit: 10 }"
+        "{ $limit: 5 }"
     })
     List<GeneroPopularResponseDTO> generosMasPopularesDelMes();
 }
