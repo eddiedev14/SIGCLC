@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.backend.sigclc.DTO.Estadisticas.ReseniaMejorValoradaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
@@ -526,7 +527,7 @@ public class ReseniasServiceImp implements IReseniasService {
     }
 
     @Override
-    public List<ReseniaResponseDTO> reseniasMejorValoradas() {
+    public List<ReseniaMejorValoradaResponseDTO> reseniasMejorValoradas() {
         ZoneId zone = ZoneId.systemDefault();
         LocalDate inicioMes = LocalDate.now(zone).withDayOfMonth(1);
         LocalDate inicioMesSiguiente = inicioMes.plusMonths(1);
@@ -539,8 +540,8 @@ public class ReseniasServiceImp implements IReseniasService {
 
         // A través del metodo getCalificacionPromedio se calcula la calificacion promedio de cada reseña. Se deben ordenar descendentemente y solo las 5 primeras
         reseñas.sort(Comparator.comparing(ReseniaModel::getCalificacionPromedio).reversed());
-        List<ReseniaResponseDTO> reseñasDTO = reseñas.stream().limit(5)
-            .map(resenia -> reseniaMapper.toResponseDTO(resenia))
+        List<ReseniaMejorValoradaResponseDTO> reseñasDTO = reseñas.stream().limit(5)
+            .map(resenia -> reseniaMapper.toReseniaMejorValoradaResponseDTO(resenia))
             .collect(Collectors.toList());
             
         return reseñasDTO;

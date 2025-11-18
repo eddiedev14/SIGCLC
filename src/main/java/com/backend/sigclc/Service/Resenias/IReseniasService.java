@@ -5,6 +5,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.sigclc.DTO.Estadisticas.ReseniaMejorValoradaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
@@ -33,5 +34,5 @@ public interface IReseniasService {
     public ReseniaResponseDTO eliminarComentario(ObjectId reseniaId, ObjectId comentarioId);
     public ReseniaResponseDTO eliminarArchivosDeResenia(ObjectId reseniaId, List<String> archivoUuids);
     public String eliminarResenia(ObjectId reseniaId);
-    public List<ReseniaResponseDTO> reseniasMejorValoradas();
+    public List<ReseniaMejorValoradaResponseDTO> reseniasMejorValoradas();
 }

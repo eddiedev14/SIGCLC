@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.backend.sigclc.DTO.Estadisticas.ReseniaMejorValoradaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
@@ -140,8 +141,8 @@ public class ReseniasController {
     }
 
     @GetMapping(value = "/mejorValoradas")
-    public ResponseEntity<List<ReseniaResponseDTO>> mejoresResenias() {
-        List<ReseniaResponseDTO> response = reseniasService.reseniasMejorValoradas();
+    public ResponseEntity<List<ReseniaMejorValoradaResponseDTO>> mejoresResenias() {
+        List<ReseniaMejorValoradaResponseDTO> response = reseniasService.reseniasMejorValoradas();
         return ResponseEntity.ok(response);
     }
 }

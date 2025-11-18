@@ -11,6 +11,7 @@ import com.backend.sigclc.DTO.Resenias.Redactor.RedactorResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionCreateDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoracionResponseDTO;
 import com.backend.sigclc.DTO.Resenias.Valoracion.ValoradorResponseDTO;
+import com.backend.sigclc.DTO.Estadisticas.ReseniaMejorValoradaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaCreateDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaResponseDTO;
 import com.backend.sigclc.DTO.Resenias.ReseniaUpdateDTO;
@@ -158,6 +159,17 @@ public class ReseniaMapper {
         valoradorResponseDTO.setUsuarioId(valoradorModel.getValoradorIdAString());
         valoradorResponseDTO.setNombreCompleto(valoradorModel.getNombreCompleto());
         return valoradorResponseDTO;
+    }
+
+    //* Reseñas mejor valoradas (estadísticas) */
+    public ReseniaMejorValoradaResponseDTO toReseniaMejorValoradaResponseDTO(ReseniaModel reseniaModel) {
+        ReseniaMejorValoradaResponseDTO reseniaMejorValoradaResponseDTO = new ReseniaMejorValoradaResponseDTO();
+        reseniaMejorValoradaResponseDTO.setNombreRedactor(reseniaModel.getRedactor().getNombreCompleto());
+        reseniaMejorValoradaResponseDTO.setFechaPublicacion(reseniaModel.getFechaPublicacion());
+        reseniaMejorValoradaResponseDTO.setTituloLibro(reseniaModel.getLibro().getTitulo());
+        reseniaMejorValoradaResponseDTO.setOpinion(reseniaModel.getLibro().getOpinion());
+        reseniaMejorValoradaResponseDTO.setCalificacionResenia(reseniaModel.getCalificacionPromedio());
+        return reseniaMejorValoradaResponseDTO;
     }
 
     // Convertir a listas de responseDTO
