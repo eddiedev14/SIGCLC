@@ -11,7 +11,7 @@ import com.backend.sigclc.Model.PropuestasLibros.EstadoPropuesta;
 
 public interface IPropuestasService {
     public PropuestaLibroResponseDTO guardarPropuesta(PropuestaLibroCreateDTO propuesta);
-    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idLibro, ObjectId idUsuario);
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idPropuesta, ObjectId idUsuario);
     public List<PropuestaLibroResponseDTO> listarPropuestas();
     public PropuestaLibroResponseDTO buscarPropuesta(ObjectId id);
     public List<PropuestaLibroResponseDTO> listarPropuestasPorEstado(EstadoPropuesta estado);
