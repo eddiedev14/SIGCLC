@@ -32,14 +32,14 @@ public class PropuestasLibrosController {
     private IPropuestasService propuestasService;
 
     @PostMapping(value = "/insertar")
-    public ResponseEntity<PropuestaLibroResponseDTO> crearLibro(@Valid @RequestBody PropuestaLibroCreateDTO dto) {
+    public ResponseEntity<PropuestaLibroResponseDTO> crearPropuesta(@Valid @RequestBody PropuestaLibroCreateDTO dto) {
         PropuestaLibroResponseDTO response = propuestasService.guardarPropuesta(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping(value = "/votar/{idLibro}/{idUsuario}")
-    public ResponseEntity<PropuestaLibroResponseDTO> votarPropuesta(@PathVariable ObjectId idLibro, @PathVariable ObjectId idUsuario) {
-        PropuestaLibroResponseDTO response = propuestasService.votarPropuesta(idLibro, idUsuario);
+    @PatchMapping(value = "/votar/{idPropuesta}/{idUsuario}")
+    public ResponseEntity<PropuestaLibroResponseDTO> votarPropuesta(@PathVariable ObjectId idPropuesta, @PathVariable ObjectId idUsuario) {
+        PropuestaLibroResponseDTO response = propuestasService.votarPropuesta(idPropuesta, idUsuario);
         return ResponseEntity.ok(response);
     }
 

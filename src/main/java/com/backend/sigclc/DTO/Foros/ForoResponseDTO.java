@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ForoResponseDTO {
     private String id;
+    private String titulo;
     private TipoTematica tipoTematica;
-    private String nombreTematica;
+    private String tematica;
     private Date fechaPublicacion;
     private ModeradorResponseDTO moderador;
 }

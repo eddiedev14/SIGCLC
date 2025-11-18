@@ -78,11 +78,11 @@ public class PropuestasServiceImp implements IPropuestasService {
     }
 
     @Override
-    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idLibro, ObjectId idUsuario) {
+    public PropuestaLibroResponseDTO votarPropuesta(ObjectId idPropuesta, ObjectId idUsuario) {
         // Obtener la propuesta
-        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(idLibro)
+        PropuestasLibrosModel propuesta = propuestasLibrosRepository.findById(idPropuesta)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "Error! No existe una propuesta con id: " + idLibro + " o está mal escrito."));
+                "Error! No existe una propuesta con id: " + idPropuesta + " o está mal escrito."));
 
         // Solo se puede votar si el estado_propuesta es en_votacion
         if (propuesta.getEstadoPropuesta() != EstadoPropuesta.en_votacion) {

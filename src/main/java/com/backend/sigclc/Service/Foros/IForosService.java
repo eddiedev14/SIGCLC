@@ -13,7 +13,8 @@ public interface IForosService {
     public ForoResponseDTO guardarForo(ForoCreateDTO foro);
     public List<ForoResponseDTO> listarForos();
     public ForoResponseDTO buscarForoPorId(ObjectId id);
-    public ForoResponseDTO listarPorNombreTematica(String nombreTematica);
+    public List<ForoResponseDTO> listarPorTitulo(String titulo);
+    public List<ForoResponseDTO> listarPorTematica(String tematica);
     public List<ForoResponseDTO> listarPorTipoTematica(TipoTematica tipoTematica);
     public List<ForoResponseDTO> listarPorModerador(ObjectId moderadorId);
     public ForoResponseDTO actualizarForo(ObjectId id, ForoUpdateDTO foro);

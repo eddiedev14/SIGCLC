@@ -2,7 +2,6 @@ package com.backend.sigclc.Service.Foros;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import com.backend.sigclc.Exception.RecursoNoEncontradoException;
 import com.backend.sigclc.Mapper.ForoMapper;
 import com.backend.sigclc.Model.Foros.ForosModel;
 import com.backend.sigclc.Model.Foros.TipoTematica;
+import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Usuarios.RolUsuario;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
 import com.backend.sigclc.Repository.IForosRepository;
@@ -35,6 +35,9 @@ public class ForosServiceImp implements IForosService {
     public ForoResponseDTO guardarForo(ForoCreateDTO foro) {
         // Convertir DTO a modelo
         ForosModel model = foroMapper.toModel(foro);
+
+        // Validar que la temática corresponda a un genero literario si el tipo es genero
+        validarTematicaSegunTipo(model);
 
         // Asignar fecha actual
         model.setFechaPublicacion(new Date());
@@ -77,21 +80,26 @@ public class ForosServiceImp implements IForosService {
     }
 
     @Override
-    public ForoResponseDTO listarPorNombreTematica(String nombreTematica) {
-        Optional<ForosModel> foro = forosRepository.buscarPorNombreTematica(nombreTematica);
-        return foro.map(foroMapper::toResponseDTO)
-                   .orElseThrow(() -> new RuntimeException("No se encontró foro con nombre de temática: " + nombreTematica));
+    public List<ForoResponseDTO> listarPorTitulo(String titulo) {
+        List<ForosModel> foro = forosRepository.listarPorTitulo(titulo);
+        return foroMapper.toResponseDTOList(foro);
+    }
+
+    @Override
+    public List<ForoResponseDTO> listarPorTematica(String tematica) {
+        List<ForosModel> foro = forosRepository.listarPorTematica(tematica);
+        return foroMapper.toResponseDTOList(foro);
     }
 
     @Override
     public List<ForoResponseDTO> listarPorTipoTematica(TipoTematica tipoTematica) {
-        List<ForosModel> foros = forosRepository.buscarPorTipoTematica(tipoTematica);
+        List<ForosModel> foros = forosRepository.listarPorTipoTematica(tipoTematica);
         return foroMapper.toResponseDTOList(foros);
     }
 
     @Override
     public List<ForoResponseDTO> listarPorModerador(ObjectId moderadorId) {
-        List<ForosModel> foros = forosRepository.buscarPorModerador(moderadorId);
+        List<ForosModel> foros = forosRepository.listarPorModerador(moderadorId);
         return foroMapper.toResponseDTOList(foros);
     }
 
@@ -102,6 +110,7 @@ public class ForosServiceImp implements IForosService {
                 .orElseThrow(() -> new RuntimeException("No se encontró foro con ID: " + id));
         
         foroMapper.updateModelFromDTO(foroDTO, foro);
+        validarTematicaSegunTipo(foro);
         ForosModel actualizado = forosRepository.save(foro);
         return foroMapper.toResponseDTO(actualizado);
     }
@@ -114,4 +123,17 @@ public class ForosServiceImp implements IForosService {
         forosRepository.deleteById(id);
         return "Foro eliminado correctamente con ID: " + id;
     }
+
+    private void validarTematicaSegunTipo(ForosModel model) {
+    if (model.getTipoTematica() == TipoTematica.genero) {
+        String tematica = model.getTematica();
+        try {
+            GeneroLibro.valueOf(tematica.toLowerCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException(
+                "La temática '" + tematica + "' no es un género válido."
+            );
+        }
+    }
+}
 }

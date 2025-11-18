@@ -18,9 +18,11 @@ import com.backend.sigclc.Mapper.UsuarioMapper;
 import com.backend.sigclc.Repository.ILibrosRepository;
 import com.backend.sigclc.Repository.IPropuestasLibrosRepository;
 import com.backend.sigclc.Repository.IReseniasRepository;
+import com.backend.sigclc.Repository.IRetosLecturaRepository;
 import com.backend.sigclc.Repository.IReunionesRepository;
 import com.backend.sigclc.Repository.IUsuariosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
+import com.backend.sigclc.Repository.IComentariosForosRepository;
 
 @Service
 public class UsuariosServiceImp implements IUsuariosService {
@@ -43,8 +45,14 @@ public class UsuariosServiceImp implements IUsuariosService {
     @Autowired
     private IReseniasRepository reseniasRepository;
 
+    @Autowired
+    private IRetosLecturaRepository retosLecturaRepository;
+
     @Autowired 
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private IComentariosForosRepository comentariosForosRepository;
 
     @Override
     public UsuarioResponseDTO guardarUsuario(UsuarioCreateDTO usuario) {
@@ -100,6 +108,8 @@ public class UsuariosServiceImp implements IUsuariosService {
         reseniasRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreComentador(usuarioId, nombreCompleto);
         reseniasRepository.actualizarNombreValorador(usuarioId, nombreCompleto);
+        retosLecturaRepository.actualizarNombreUsuarioInscrito(usuarioId, nombreCompleto);
+        comentariosForosRepository.actualizarNombreRedactor(usuarioId, nombreCompleto);
     }
 
     @Override
@@ -148,6 +158,15 @@ public class UsuariosServiceImp implements IUsuariosService {
         // No se puede eliminar un usuario si está asociado como valorador de una reseña
         if (reseniasRepository.existsByValoradorId(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como valorador de una reseña.");
+        }
+
+        if (retosLecturaRepository.existsByUsuarioInscrito(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está inscrito a un reto de lectura.");
+        }
+        
+        // No se puede eliminar un usuario si está asociado como redactor de un comentario
+        if(comentariosForosRepository.existsByRedactorId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede eliminar el usuario con id: " + id + " porque está asociado como redactor de un comentario.");
         }
 
         usuariosRepository.deleteById(id);
