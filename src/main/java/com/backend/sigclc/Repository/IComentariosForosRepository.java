@@ -28,10 +28,6 @@ public interface IComentariosForosRepository extends MongoRepository<ComentarioF
     @DeleteQuery("{'foroId': ?0}")
     void deleteAllByForoId(ObjectId foroId);
 
-    // Método para eliminar todos los comentarios hijos de un comentario
-    @DeleteQuery("{'parentId': ?0}")
-    void deleteAllByParentId(ObjectId parentId);
-
     // Comentarios por foro (ordenados por fechaPublicacion asc)
     @Aggregation(pipeline = {
         "{ '$match': { 'foroId': ?0 } }",

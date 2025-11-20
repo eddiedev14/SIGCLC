@@ -117,11 +117,17 @@ public class ComentariosServiceImp implements IComentariosService {
             throw new RuntimeException("No se encontró comentario con ID: " + id);
         }
 
-        // Si se elimina un comentario se eliminan los comentarios hijos si tiene
-        comentariosRepository.deleteAllByParentId(id);
+        // Obtener todos los comentarios hijos
+        List<ComentarioForoModel> comentariosHijos = comentariosRepository.buscarPorParentId(id);
+        
+        // Eliminar recursivamente los comentarios hijos
+        for (ComentarioForoModel hijo : comentariosHijos) {
+            eliminarComentario(hijo.getId());
+        }
 
+        // Finalmente, eliminar el comentario actual
         comentariosRepository.deleteById(id);
-        return "Comentario eliminado correctamente con ID: " + id;
+        return "Comentario y sus respuestas eliminados correctamente con ID: " + id;
     }
 
     @Override
