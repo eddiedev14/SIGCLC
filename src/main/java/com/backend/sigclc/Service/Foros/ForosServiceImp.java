@@ -17,6 +17,7 @@ import com.backend.sigclc.Model.Foros.TipoTematica;
 import com.backend.sigclc.Model.Libros.GeneroLibro;
 import com.backend.sigclc.Model.Usuarios.RolUsuario;
 import com.backend.sigclc.Model.Usuarios.UsuariosModel;
+import com.backend.sigclc.Repository.IComentariosForosRepository;
 import com.backend.sigclc.Repository.IForosRepository;
 
 @Service
@@ -24,6 +25,9 @@ public class ForosServiceImp implements IForosService {
 
     @Autowired
     private IForosRepository forosRepository;
+
+    @Autowired
+    private IComentariosForosRepository comentariosForosRepository;
 
     @Autowired
     private ForoMapper foroMapper;
@@ -120,6 +124,10 @@ public class ForosServiceImp implements IForosService {
         if (!forosRepository.existsById(id)) {
             throw new RuntimeException("No se encontró foro con ID: " + id);
         }
+
+        // Si se borra el foro deben eliminarse todos los comentarios foros de ese foro
+        comentariosForosRepository.deleteAllByForoId(id);
+
         forosRepository.deleteById(id);
         return "Foro eliminado correctamente con ID: " + id;
     }

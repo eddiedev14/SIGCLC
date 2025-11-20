@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.DeleteQuery;
 import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -22,6 +23,10 @@ public interface IComentariosForosRepository extends MongoRepository<ComentarioF
     // Validar si el usuario está asociado como redactor de un comentario
     @ExistsQuery("{'redactor.usuarioId': ?0}")
     boolean existsByRedactorId(ObjectId usuarioId);
+
+    // Método para eliminar todos los comentarios de un foro
+    @DeleteQuery("{'foroId': ?0}")
+    void deleteAllByForoId(ObjectId foroId);
 
     // Comentarios por foro (ordenados por fechaPublicacion asc)
     @Aggregation(pipeline = {
