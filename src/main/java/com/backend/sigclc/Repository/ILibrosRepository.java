@@ -46,27 +46,17 @@ public interface ILibrosRepository extends MongoRepository <LibrosModel, ObjectI
         // 1. Lookup de propuestas seleccionadas y leídas este mes
         "{ $lookup: {" +
             "from: 'propuestasLibros'," +
-            "localField: '_id'," +
-            "foreignField: 'libroPropuesto.libroId'," +
-            "as: 'propuestas'" +
-        "} }",
-
-        // Filtrar solo propuestas seleccionadas/leídas este mes
-        "{ $addFields: {" +
-            "propuestas: {" +
-                "$filter: {" +
-                    "input: '$propuestas'," +
-                    "as: 'p'," +
-                    "cond: {" +
-                        "$and: [" +
-                            "{ $eq: ['$$p.estadoPropuesta', 'seleccionada'] }," +
-                            "{ $eq: ['$$p.libroPropuesto.estadoLectura', 'leido'] }," +
-                            "{ $eq: [{ $month: '$$p.periodoSeleccion.fechaFin' }, { $month: new Date() }] }," +
-                            "{ $eq: [{ $year: '$$p.periodoSeleccion.fechaFin' }, { $year: new Date() }] }" +
-                        "]" +
-                    "}" +
-                "}" +
-            "}" +
+            "let: { libroId: '$_id' }," +
+            "pipeline: [" +
+                "{ $match: { $expr: { $and: [" +
+                    "{ $eq: ['$$libroId', '$libroPropuesto.libroId'] }" +
+                    "{ $eq: ['$estadoPropuesta', 'seleccionada'] }" +
+                    "{ $eq: ['$libroPropuesto.estadoLectura', 'leido'] }" +
+                    "{ $eq: [{ $month: '$periodoSeleccion.fechaFin' }, { $month: new Date() }] }" +
+                    "{ $eq: [{ $year: '$periodoSeleccion.fechaFin' }, { $year: new Date() }] }" +
+                "] } } }" +
+            "] " +
+            "as: 'propuestas' " +
         "} }",
 
         // 2. Lookup de retos que incluyen el libro

@@ -32,23 +32,17 @@ public interface IUsuariosRepository extends MongoRepository<UsuariosModel, Obje
         // 1. PROPIETARIO → Propuestas creadas este mes
         "{ $lookup: {" +
             "from: 'propuestasLibros'," +
-            "localField: '_id'," +
-            "foreignField: 'usuarioProponente.usuarioId'," +
+            "let: { userId: '$_id' }," +
+            "pipeline: [" +
+                "{ $match: { $expr: { $eq: ['$usuarioProponente.usuarioId', '$$userId'] } } }," +
+                "{ $match: { $expr: {" +
+                    "$and: [" +
+                        "{ $eq: [{ $month: '$fechaPropuesta' }, { $month: new Date() }] }," +
+                        "{ $eq: [{ $year: '$fechaPropuesta' }, { $year: new Date() }] }" +
+                    "]" +
+                "} } }" +
+            "]," +
             "as: 'propuestasCreadas'" +
-        "} }",
-        "{ $addFields: {" +
-            "propuestasCreadas: {" +
-                "$filter: {" +
-                    "input: '$propuestasCreadas'," +
-                    "as: 'p'," +
-                    "cond: {" +
-                        "$and: [" +
-                            "{ $eq: [{ $month: '$$p.fechaPropuesta' }, { $month: new Date() }] }," +
-                            "{ $eq: [{ $year: '$$p.fechaPropuesta' }, { $year: new Date() }] }" +
-                        "]" +
-                    "}" +
-                "}" +
-            "}" +
         "} }",
 
         // 2. VOTOS realizados este mes
@@ -71,23 +65,17 @@ public interface IUsuariosRepository extends MongoRepository<UsuariosModel, Obje
         // 3. Reseñas creadas este mes
         "{ $lookup: {" +
             "from: 'resenias'," +
-            "localField: '_id'," +
-            "foreignField: 'redactor.usuarioId'," +
+            "let: { userId: '$_id' }," +
+            "pipeline: [" +
+                "{ $match: { $expr: { $eq: ['$redactor.usuarioId', '$$userId'] } } }," +
+                "{ $match: { $expr: {" +
+                    "$and: [" +
+                        "{ $eq: [{ $month: '$fechaPublicacion' }, { $month: new Date() }] }," +
+                        "{ $eq: [{ $year: '$fechaPublicacion' }, { $year: new Date() }] }" +
+                    "]" +
+                "} } }" +
+            "]," +
             "as: 'reseniasCreadas'" +
-        "} }",
-        "{ $addFields: {" +
-            "reseniasCreadas: {" +
-                "$filter: {" +
-                    "input: '$reseniasCreadas'," +
-                    "as: 'r'," +
-                    "cond: {" +
-                        "$and: [" +
-                            "{ $eq: [{ $month: '$$r.fechaPublicacion' }, { $month: new Date() }] }," +
-                            "{ $eq: [{ $year: '$$r.fechaPublicacion' }, { $year: new Date() }] }" +
-                        "]" +
-                    "}" +
-                "}" +
-            "}" +
         "} }",
 
         // 4. Comentarios de reseñas hechos este mes
@@ -110,23 +98,17 @@ public interface IUsuariosRepository extends MongoRepository<UsuariosModel, Obje
         // 5. Comentarios en foros este mes
         "{ $lookup: {" +
             "from: 'comentariosForos'," +
-            "localField: '_id'," +
-            "foreignField: 'redactor.usuarioId'," +
+            "let: { userId: '$_id' }," +
+            "pipeline: [" +
+                "{ $match: { $expr: { $eq: ['$redactor.usuarioId', '$$userId'] } } }," +
+                "{ $match: { $expr: {" +
+                    "$and: [" +
+                        "{ $eq: [{ $month: '$fechaPublicacion' }, { $month: new Date() }] }," +
+                        "{ $eq: [{ $year: '$fechaPublicacion' }, { $year: new Date() }] }" +
+                    "]" +
+                "} } }" +
+            "]," +
             "as: 'comentariosForos'" +
-        "} }",
-        "{ $addFields: {" +
-            "comentariosForos: {" +
-                "$filter: {" +
-                    "input: '$comentariosForos'," +
-                    "as: 'c'," +
-                    "cond: {" +
-                        "$and: [" +
-                            "{ $eq: [{ $month: '$$c.fechaPublicacion' }, { $month: new Date() }] }," +
-                            "{ $eq: [{ $year: '$$c.fechaPublicacion' }, { $year: new Date() }] }" +
-                        "]" +
-                    "}" +
-                "}" +
-            "}" +
         "} }",
 
         // 6. Inscripciones en retos activos este mes
