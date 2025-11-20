@@ -116,6 +116,10 @@ public class ComentariosServiceImp implements IComentariosService {
         if (!comentariosRepository.existsById(id)) {
             throw new RuntimeException("No se encontró comentario con ID: " + id);
         }
+
+        // Si se elimina un comentario se eliminan los comentarios hijos si tiene
+        comentariosRepository.deleteAllByParentId(id);
+
         comentariosRepository.deleteById(id);
         return "Comentario eliminado correctamente con ID: " + id;
     }
