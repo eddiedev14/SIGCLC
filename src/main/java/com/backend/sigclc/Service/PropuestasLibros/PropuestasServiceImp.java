@@ -63,11 +63,11 @@ public class PropuestasServiceImp implements IPropuestasService {
 
         model.getUsuarioProponente().setNombreCompleto(usuario.getNombreCompleto());
 
-        // * Solo se puede crear una nueva si todas las propuestas de ese libro están seleccionadas y leidas
+        // * Solo se puede crear una nueva si todas las propuestas de ese libro si no hay propuestas en votacion de ese libro
         List<PropuestasLibrosModel> propuestas = propuestasLibrosRepository.buscarPropuestasPorLibro(libroId);
         for (PropuestasLibrosModel propuestaModel : propuestas) {
-            if (propuestaModel.getEstadoPropuesta() != EstadoPropuesta.seleccionada || propuestaModel.getLibroPropuesto().getEstadoLectura() != EstadoLectura.leido) {
-                throw new IllegalArgumentException("Solo se puede crear una nueva propuesta si todas las propuestas de ese libro están seleccionadas y leidas");
+            if (propuestaModel.getEstadoPropuesta() == EstadoPropuesta.en_votacion) {
+                throw new IllegalArgumentException("No se puede crear una nueva propuesta pues ya hay una propuesta en votacion");
             }
         }
 
